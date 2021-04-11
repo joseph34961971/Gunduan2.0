@@ -10,7 +10,7 @@ int main(int argc, char** argv){
 	//multisample for golygons smooth
 	glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE|GLUT_DEPTH|GLUT_MULTISAMPLE);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("OpenGL 4.3 - FreedomGunduan");
+	glutCreateWindow("OpenGL 4.3 - Freedom Gunduan");
 
 	glewExperimental = GL_TRUE; //¸m©óglewInit()¤§«e
 	if (glewInit()) {
