@@ -75,7 +75,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
+# *.obj
 *.iobj
 *.pch
 *.pdb
@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Project files
 FreedomGunduanProject
+FreedomGunduan/out
