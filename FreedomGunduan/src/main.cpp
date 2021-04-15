@@ -279,21 +279,21 @@ void Obj2Buffer(){
 	
 	load2Buffer("../FreedomGunduan/objs/body.obj",0);
 
+	load2Buffer("../FreedomGunduan/objs/left_hand.obj", 2);
 	load2Buffer("../FreedomGunduan/objs/left_arm.obj",4);
-	//load2Buffer("../FreedomGunduan/objs/left_hand.obj",2);
 	//
 	load2Buffer("../FreedomGunduan/objs/head.obj",5);
 
+	load2Buffer("../FreedomGunduan/objs/right_hand.obj", 7);
 	load2Buffer("../FreedomGunduan/objs/right_arm.obj",9);
-	//load2Buffer("../FreedomGunduan/objs/right_hand.obj",7);
 
 	load2Buffer("../FreedomGunduan/objs/wing.obj",10);
 
 	load2Buffer("../FreedomGunduan/objs/left_leg.obj",12);
-	//load2Buffer("../FreedomGunduan/objs/left_foot.obj",13);
+	load2Buffer("../FreedomGunduan/objs/left_foot.obj",13);
 
 	load2Buffer("../FreedomGunduan/objs/right_leg.obj",15);
-	//load2Buffer("../FreedomGunduan/objs/right_foot.obj",16);
+	load2Buffer("../FreedomGunduan/objs/right_foot.obj",16);
 	
 	GLuint totalSize[3] = {0,0,0};
 	GLuint offset[3] = {0,0,0};
@@ -463,9 +463,11 @@ void updateModels(){
 	pitch = DOR(alpha);r = -7;
 	roll = DOR(gamma);
 	alpha = angles[13]+angles[12];
-	Translation[13] = translate(-r*sin(roll),r*cos(pitch),r*sin(pitch))*Translation[12];
-	Rotatation[13] = rotate(alpha,1,0,0);
-	Models[13] = Translation[13]*Rotatation[13]*Models[13];
+	//Translation[13] = translate(-r * sin(roll), r * cos(pitch), r * sin(pitch)) * Translation[12];
+	Translation[13] = translate(0, 0, 0);
+	//Rotatation[13] = rotate(alpha, 1, 0, 0);
+	Rotatation[13] = rotate(0, 1, 0, 0);
+	Models[13] = Models[12] * Translation[13] * Rotatation[13];
 
 	pitch = DOR(alpha); r = -5;
 	//b = DOR(angles[13]);
@@ -486,9 +488,12 @@ void updateModels(){
 	pitch = DOR(alpha);r = -7;
 	roll = DOR(gamma);
 	alpha = angles[16]+angles[15];
-	Rotatation[16] = rotate(alpha,1,0,0);
-	Translation[16] = translate(-r*sin(roll),r*cos(pitch),r*sin(pitch))*Translation[15];
-	Models[16] = Translation[16]*Rotatation[16]*Models[16];
+	//Rotatation[16] = rotate(alpha, 1, 0, 0);
+	Rotatation[16] = rotate(0, 1, 0, 0);
+	//Translation[16] = translate(-r * sin(roll), r * cos(pitch), r * sin(pitch)) * Translation[15];
+	Translation[16] = translate(0, 0, 0);
+	//Models[16] = Translation[16] * Rotatation[16] * Models[16];
+	Models[16] = Models[15] * Translation[16] * Rotatation[16];
 
 	pitch = DOR(alpha); r = -5;
 	//b = DOR(angles[16]);
