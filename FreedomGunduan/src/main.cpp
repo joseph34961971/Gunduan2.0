@@ -277,14 +277,14 @@ void Obj2Buffer(){
 	}
 
 	
-	//load2Buffer("../FreedomGunduan/objs/body.obj",0);
+	load2Buffer("../FreedomGunduan/objs/body.obj",0);
 
 	load2Buffer("../FreedomGunduan/objs/left_arm.obj",4);
 	//load2Buffer("../FreedomGunduan/objs/left_hand.obj",2);
 	//
-	//load2Buffer("../FreedomGunduan/objs/head.obj",5);
+	load2Buffer("../FreedomGunduan/objs/head.obj",5);
 
-	//load2Buffer("../FreedomGunduan/objs/right_arm.obj",9);
+	load2Buffer("../FreedomGunduan/objs/right_arm.obj",9);
 	//load2Buffer("../FreedomGunduan/objs/right_hand.obj",7);
 
 	//load2Buffer("../FreedomGunduan/objs/wing.obj",10);
@@ -347,33 +347,40 @@ void Obj2Buffer(){
 void updateModels(){
 	mat4 Rotatation[PARTSNUM];
 	mat4 Translation[PARTSNUM];
+	mat4 Scaling[PARTSNUM];
 	for(int i = 0 ; i < PARTSNUM;i++){
 		Models[i] = mat4(1.0f);
+		Scaling[i] = scale(mat4(1.0f), vec3(0.125f, 0.125f, 0.125f));
 		Rotatation[i] = mat4(1.0f);
 		Translation[i] = mat4(1.0f); 
 	}
 	float r,pitch,yaw,roll;
 	float alpha, beta ,gamma;
 
+	float shouder_x = 11.0f;
+	float shouder_y = 1.0f;
+
 	//Body
 	beta = angle;
-	Rotatation[0] = rotate(beta,0,1,0);
-	Translation[0] = translate(0,2.9+position,0);
-	Models[0] = Translation[0]*Rotatation[0];
+	Rotatation[0] = rotate(beta, 0, 1, 0);
+	Translation[0] = translate(0, position, 0);
+	Models[0] = Translation[0] * Rotatation[0] * Scaling[0];
 	//左手=======================================================
 	//左上手臂
 	yaw = DOR(beta);r = 3.7;
 	alpha = angles[1];
-	gamma = 10;
+	//gamma = 10;
+	gamma = 0;
 	Rotatation[1] = rotate(alpha,1,0,0)*rotate(gamma,0,0,1);//向前旋轉*向右旋轉
-	Translation[1] = translate(3.7,1,-0.5);
+	Translation[1] = translate(0.0,1,0.0);
 
-	Models[1] = Models[0]*Translation[1]*Rotatation[1];
+	Models[1] = Models[0] * Translation[1] * Rotatation[1];
 	
 	//左肩膀
-	Rotatation[4] = rotate(alpha,1,0,0)*rotate(gamma,0,0,1);//向前旋轉*向右旋轉
-	Translation[4] =translate(3.7,1,-0.5);//位移到左上手臂處
-	Models[4] =Models[0]*Translation[1]*Rotatation[1];
+	Rotatation[4] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);//向前旋轉*向右旋轉
+	Translation[4] = translate(shouder_x, shouder_y, 0.0);//位移到左上手臂處
+	Models[4] = Models[0] * Translation[4] * Rotatation[4];
+	//Models[4] = Models[0] * Translation[1] * Rotatation[1];
 	
 	//左下手臂
 	pitch = DOR(alpha);r = 3;
@@ -387,7 +394,8 @@ void updateModels(){
 	//延z軸位移以上手臂為半徑角度:translate(r*sin,-rcos,0)
 	Translation[2] = translate(0,-3,0);
 
-	Models[2] = Models[1]*Translation[2]*Rotatation[2];
+	//Models[2] = Models[1] * Translation[2] * Rotatation[2];
+	Models[2] = Models[4] * Translation[2] * Rotatation[2];
 	
 
 	pitch = DOR(alpha);
@@ -400,8 +408,8 @@ void updateModels(){
 	Models[3] = Models[2]*Translation[3]*Rotatation[3];
 	//============================================================
 	//頭==========================================================
-	Translation[5] = translate(0,3.9,-0.5);
-	Models[5] = Models[0]*Translation[5]*Rotatation[5];
+	Translation[5] = translate(0.0, 0.0, 0.0);
+	Models[5] = Models[0] * Translation[5] * Rotatation[5];
 	//============================================================
 	//右手=========================================================
 	gamma = -10;alpha = angles[6] = -angles[1];
@@ -409,17 +417,19 @@ void updateModels(){
 	Translation[6] = translate(-3.9,1.7,-0.2);
 	Models[6] = Models[0]*Translation[6]*Rotatation[6];
 
-	Rotatation[9] = rotate(alpha,1,0,0)*rotate(gamma,0,0,1);
-	Translation[9] = translate(-3.9,1.1,-0.2);
-	Models[9] = Models[0]*Translation[9]*Rotatation[9];
+	//右肩膀(面對畫面)
+	Rotatation[9] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);
+	Translation[9] = translate(-shouder_x, shouder_y, 0);
+	Models[9] = Models[0] * Translation[9] * Rotatation[9];
 
 	angles[7] = angles[2];
 	pitch = DOR(alpha);r = -3;
 	roll = DOR(gamma);
 	alpha = angles[7]-20;
-	Rotatation[7] = rotate(alpha,1,0,0);
-	Translation[7] = translate(0,-3,0);
-	Models[7] = Models[6]*Translation[7]*Rotatation[7];
+	Rotatation[7] = rotate(alpha, 1, 0, 0);
+	Translation[7] = translate(0, -3, 0);
+	//Models[7] = Models[6] * Translation[7] * Rotatation[7];
+	Models[7] = Models[9] * Translation[7] * Rotatation[7];
 
 	pitch = DOR(alpha);
 	//b = DOR(angles[7]);
