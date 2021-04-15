@@ -1,5 +1,5 @@
 #include "Gundam.h"
-#define DOR(angle) (angle*3.1415/180);
+#define DOR(body_angle) (body_angle*3.1415/180);
 
 static mat4 translate(float x,float y,float z){
 	vec4 t = vec4(x,y,z,1);//w = 1 ,則x,y,z=0時也能translate
@@ -9,8 +9,8 @@ static mat4 translate(float x,float y,float z){
 	mat4 M = mat4(c1,c2,c3,t);
 	return M;
 } 
-static mat4 rotate(float angle,float x,float y,float z){
-	float r = DOR(angle);
+static mat4 rotate(float body_angle,float x,float y,float z){
+	float r = DOR(body_angle);
 	mat4 M = mat4(1);
 
 	vec4 c1 = vec4(cos(r)+(1-cos(r))*x*x,(1-cos(r))*y*x+sin(r)*z,(1-cos(r))*z*x-sin(r)*y,0);

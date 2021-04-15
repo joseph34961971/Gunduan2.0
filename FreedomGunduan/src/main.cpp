@@ -96,7 +96,7 @@ void updateObj(int frame){
 	case 3:
 		angles[1] +=10;
 		angles[12] -=15;
-		position += 0.1;
+		body_position_y += 0.1;
 		break;
 	case 4:
 	case 5:
@@ -104,7 +104,7 @@ void updateObj(int frame){
 		angles[1] -=10;
 		angles[12] +=15;
 		angles[13] -= 15;
-		position -= 0.1;
+		body_position_y -= 0.1;
 		break;
 	case 7:
 	case 8:
@@ -112,7 +112,7 @@ void updateObj(int frame){
 		angles[1] -=10;
 		angles[12] +=15;
 		angles[13] = 0;
-		position += 0.1;
+		body_position_y += 0.1;
 		break;
 	case 10:
 	case 11:
@@ -120,7 +120,7 @@ void updateObj(int frame){
 		angles[1] +=10;
 		angles[12] -=15;
 		angles[13] += 15;
-		position -= 0.1;
+		body_position_y -= 0.1;
 		break;
 	}
 }
@@ -184,7 +184,7 @@ void init(){
 	glClearColor(0.0,0.0,0.0,1);//black screen
 }
 
-#define DOR(angle) (angle*3.1415/180);
+#define DOR(body_angle) (body_angle*3.1415/180);
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -287,12 +287,12 @@ void Obj2Buffer(){
 	load2Buffer("../FreedomGunduan/objs/right_arm.obj",9);
 	//load2Buffer("../FreedomGunduan/objs/right_hand.obj",7);
 
-	//load2Buffer("../FreedomGunduan/objs/wing.obj",10);
+	load2Buffer("../FreedomGunduan/objs/wing.obj",10);
 
-	//load2Buffer("../FreedomGunduan/objs/left_leg.obj",12);
+	load2Buffer("../FreedomGunduan/objs/left_leg.obj",12);
 	//load2Buffer("../FreedomGunduan/objs/left_foot.obj",13);
 
-	//load2Buffer("../FreedomGunduan/objs/right_leg.obj",15);
+	load2Buffer("../FreedomGunduan/objs/right_leg.obj",15);
 	//load2Buffer("../FreedomGunduan/objs/right_foot.obj",16);
 	
 	GLuint totalSize[3] = {0,0,0};
@@ -357,13 +357,16 @@ void updateModels(){
 	float r,pitch,yaw,roll;
 	float alpha, beta ,gamma;
 
-	float shouder_x = 11.0f;
-	float shouder_y = 1.0f;
+	float shouder_x = 0.0f;
+	float shouder_y = 0.0f;
+	float shouder_z = 5.0f;
+	float left_leg_x = 0.0f;
+	float left_leg_y = 0.0f;
 
-	//Body
-	beta = angle;
+	//Body ok
+	beta = body_angle;
 	Rotatation[0] = rotate(beta, 0, 1, 0);
-	Translation[0] = translate(0, position, 0);
+	Translation[0] = translate(body_position_x, body_position_y, 0);
 	Models[0] = Translation[0] * Rotatation[0] * Scaling[0];
 	//左手=======================================================
 	//左上手臂
@@ -376,9 +379,10 @@ void updateModels(){
 
 	Models[1] = Models[0] * Translation[1] * Rotatation[1];
 	
-	//左肩膀
-	Rotatation[4] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);//向前旋轉*向右旋轉
-	Translation[4] = translate(shouder_x, shouder_y, 0.0);//位移到左上手臂處
+	//左肩膀 ok
+	//Rotatation[4] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);//向前旋轉*向右旋轉
+	Rotatation[4] = rotate(0, 1, 0, 0) * rotate(0, 0, 0, 1);//向前旋轉*向右旋轉
+	Translation[4] = translate(shouder_x, shouder_y, shouder_z);//位移到左上手臂處
 	Models[4] = Models[0] * Translation[4] * Rotatation[4];
 	//Models[4] = Models[0] * Translation[1] * Rotatation[1];
 	
@@ -389,10 +393,11 @@ void updateModels(){
 	i+=5;
 	alpha = angles[2]-20;
 	//上手臂+下手臂向前旋轉*向右旋轉
-	Rotatation[2] = rotate(alpha,1,0,0);
+	//Rotatation[2] = rotate(alpha, 1, 0, 0);
+	Rotatation[2] = rotate(0, 1, 0, 0);
 	//延x軸位移以上手臂為半徑的圓周長:translate(0,r*cos,r*sin)
 	//延z軸位移以上手臂為半徑角度:translate(r*sin,-rcos,0)
-	Translation[2] = translate(0,-3,0);
+	Translation[2] = translate(0,0,0); // 0 -3 0
 
 	//Models[2] = Models[1] * Translation[2] * Rotatation[2];
 	Models[2] = Models[4] * Translation[2] * Rotatation[2];
@@ -407,27 +412,31 @@ void updateModels(){
 	Translation[3] = translate(0,-4.8,0);
 	Models[3] = Models[2]*Translation[3]*Rotatation[3];
 	//============================================================
-	//頭==========================================================
+	
+	//頭 ok
 	Translation[5] = translate(0.0, 0.0, 0.0);
 	Models[5] = Models[0] * Translation[5] * Rotatation[5];
 	//============================================================
-	//右手=========================================================
+	//右手xx=========================================================
 	gamma = -10;alpha = angles[6] = -angles[1];
 	Rotatation[6] = rotate(alpha,1,0,0)*rotate(gamma,0,0,1);
 	Translation[6] = translate(-3.9,1.7,-0.2);
 	Models[6] = Models[0]*Translation[6]*Rotatation[6];
 
-	//右肩膀(面對畫面)
-	Rotatation[9] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);
-	Translation[9] = translate(-shouder_x, shouder_y, 0);
+	//右肩膀(面對畫面) ok
+	//Rotatation[9] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);
+	Rotatation[9] = rotate(0, 1, 0, 0) * rotate(0, 0, 0, 1);
+	Translation[9] = translate(-shouder_x, shouder_y, shouder_z);
 	Models[9] = Models[0] * Translation[9] * Rotatation[9];
 
+	//右手
 	angles[7] = angles[2];
 	pitch = DOR(alpha);r = -3;
 	roll = DOR(gamma);
 	alpha = angles[7]-20;
-	Rotatation[7] = rotate(alpha, 1, 0, 0);
-	Translation[7] = translate(0, -3, 0);
+	//Rotatation[7] = rotate(alpha, 1, 0, 0);
+	Rotatation[7] = rotate(0, 1, 0, 0);
+	Translation[7] = translate(0, 0, 0);
 	//Models[7] = Models[6] * Translation[7] * Rotatation[7];
 	Models[7] = Models[9] * Translation[7] * Rotatation[7];
 
@@ -437,18 +446,19 @@ void updateModels(){
 	Translation[8] =translate(0,-6,0);
 	Models[8] = Models[7]*Translation[8]*Rotatation[8];
 	//=============================================================
-	//back&DBody===================================================
-	Translation[10] =translate(0,2,-4.5);
-	Models[10] = Models[0]*Translation[10]*Rotatation[10];
+	//wing ok
+	Translation[10] = translate(0, 2, 0.0);
+	Models[10] = Models[0] * Translation[10] * Rotatation[10];
 
 	Translation[11] =translate(0,-5.3,0);
 	Models[11] = Models[0]*Translation[11]*Rotatation[11];
 	//=============================================================
-	//左腳
+	//左腳(面對畫面左邊) ok
 	alpha = angles[12];gamma = 10;
-	Rotatation[12] = rotate(alpha,1,0,0)*rotate(gamma,0,0,1);
-	Translation[12] =translate(1.8,-4.5,0);
-	Models[12] = Translation[12]*Rotatation[12]*Models[12];
+	//Rotatation[12] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);
+	Rotatation[12] = rotate(0, 1, 0, 0) * rotate(0, 0, 0, 1);
+	Translation[12] = translate(left_leg_x, left_leg_y, 0);
+	Models[12] = Models[0] * Translation[12] * Rotatation[12];
 
 	pitch = DOR(alpha);r = -7;
 	roll = DOR(gamma);
@@ -464,12 +474,13 @@ void updateModels(){
 	Rotatation[14] = rotate(alpha,1,0,0);
 	Models[14] = Translation[14]*Rotatation[14]*Models[14];
 	//=============================================================
-	//右腳
+	//右腳 ok
 	alpha = angles[15] = -angles[12];
 	gamma = -10;
-	Rotatation[15] = rotate(alpha ,1,0,0)*rotate(gamma ,0,0,1);
-	Translation[15] =translate(-1.8,-4.5,0);
-	Models[15] = Translation[15]*Rotatation[15]*Models[15];
+	//Rotatation[15] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);
+	Rotatation[15] = rotate(0, 1, 0, 0) * rotate(0, 0, 0, 1);
+	Translation[15] = translate(-left_leg_x, left_leg_y, 0);
+	Models[15] = Models[0] * Translation[15] * Rotatation[15];
 
 	angles[16] = angles[13];
 	pitch = DOR(alpha);r = -7;
@@ -537,8 +548,8 @@ mat4 scale(float x,float y,float z){
 	return M;
 }
 
-mat4 rotate(float angle,float x,float y,float z){
-	float r = DOR(angle);
+mat4 rotate(float body_angle,float x,float y,float z){
+	float r = DOR(body_angle);
 	mat4 M = mat4(1);
 
 	vec4 c1 = vec4(cos(r)+(1-cos(r))*x*x,(1-cos(r))*y*x+sin(r)*z,(1-cos(r))*z*x-sin(r)*y,0);
@@ -550,15 +561,27 @@ mat4 rotate(float angle,float x,float y,float z){
 }
 void Keyboard(unsigned char key, int x, int y){
 	switch(key){
-	case '1':
-		angle += 5;
-		if(angle>=360) angle = 0;
-		printf("beta:%f\n",angle);
+	case 'u':
+		body_angle += 5;
+		if(body_angle>=360) body_angle = 0;
+		printf("beta:%f\n",body_angle);
 		break;
-	case '2':
-		angle -= 5;
-		if(angle<=0) angle = 360;
-		printf("beta:%f\n",angle);
+	case 'o':
+		body_angle -= 5;
+		if(body_angle<=0) body_angle = 360;
+		printf("beta:%f\n",body_angle);
+		break;
+	case 'i':
+		body_position_y += 1;
+		break;
+	case 'k':
+		body_position_y -= 1;
+		break;
+	case 'j':
+		body_position_x -= 1;
+		break;
+	case 'l':
+		body_position_x += 1;
 		break;
 	case 'w':
 		eyedistance -= 0.2;

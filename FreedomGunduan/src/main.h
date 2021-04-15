@@ -42,7 +42,7 @@ void idle(int dummy);
 
 mat4 translate(float x,float y,float z);
 mat4 scale(float x,float y,float z);
-mat4 rotate(float angle,float x,float y,float z);
+mat4 rotate(float body_angle,float x,float y,float z);
 
 void Obj2Buffer();
 void load2Buffer( char* obj,int);
@@ -65,8 +65,9 @@ GLuint program;
 int pNo;
 
 float angles[PARTSNUM];
-float position = 0.0;
-float angle = 0.0;
+float body_position_x = 0.0;
+float body_position_y = 0.0;
+float body_angle = 0.0;
 float eyeAngley = 0.0;
 float eyedistance = 20.0;
 float size = 1;
