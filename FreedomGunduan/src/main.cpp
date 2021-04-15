@@ -268,7 +268,7 @@ void Obj2Buffer(){
 	std::vector<vec3> Kss;
 	std::vector<std::string> Materials;//mtl-name
 	std::string texture;
-	loadMTL("../FreedomGunduan/objs/gundam.mtl",Kds,Kas,Kss,Materials,texture);
+	loadMTL("../FreedomGunduan/objs/freedom.mtl",Kds,Kas,Kss,Materials,texture);
 	//printf("%d\n",texture);
 	for(int i = 0;i<Materials.size();i++){
 		string mtlname = Materials[i];
@@ -277,30 +277,23 @@ void Obj2Buffer(){
 	}
 
 	
-	load2Buffer("../FreedomGunduan/objs/body.obj",0);
+	//load2Buffer("../FreedomGunduan/objs/body.obj",0);
 
-	load2Buffer("../FreedomGunduan/objs/ulefthand.obj",1);
-	load2Buffer("../FreedomGunduan/objs/dlefthand.obj",2);
-	load2Buffer("../FreedomGunduan/objs/lefthand.obj",3);
-	load2Buffer("../FreedomGunduan/objs/lshouder.obj",4);
-	
-	load2Buffer("../FreedomGunduan/objs/head.obj",5);
+	load2Buffer("../FreedomGunduan/objs/left_arm.obj",4);
+	//load2Buffer("../FreedomGunduan/objs/left_hand.obj",2);
+	//
+	//load2Buffer("../FreedomGunduan/objs/head.obj",5);
 
-	load2Buffer("../FreedomGunduan/objs/urighthand.obj",6);
-	load2Buffer("../FreedomGunduan/objs/drighthand.obj",7);
-	load2Buffer("../FreedomGunduan/objs/righthand.obj",8);
-	load2Buffer("../FreedomGunduan/objs/rshouder.obj",9);
+	//load2Buffer("../FreedomGunduan/objs/right_arm.obj",9);
+	//load2Buffer("../FreedomGunduan/objs/right_hand.obj",7);
 
-	load2Buffer("../FreedomGunduan/objs/dbody.obj",11);
-	load2Buffer("../FreedomGunduan/objs/back2.obj",10);
+	//load2Buffer("../FreedomGunduan/objs/wing.obj",10);
 
-	load2Buffer("../FreedomGunduan/objs/uleftleg.obj",12);
-	load2Buffer("../FreedomGunduan/objs/dleftleg.obj",13);
-	load2Buffer("../FreedomGunduan/objs/leftfoot.obj",14);
+	//load2Buffer("../FreedomGunduan/objs/left_leg.obj",12);
+	//load2Buffer("../FreedomGunduan/objs/left_foot.obj",13);
 
-	load2Buffer("../FreedomGunduan/objs/urightleg.obj",15);	
-	load2Buffer("../FreedomGunduan/objs/drightleg.obj",16);	
-	load2Buffer("../FreedomGunduan/objs/rightfoot.obj",17);
+	//load2Buffer("../FreedomGunduan/objs/right_leg.obj",15);
+	//load2Buffer("../FreedomGunduan/objs/right_foot.obj",16);
 	
 	GLuint totalSize[3] = {0,0,0};
 	GLuint offset[3] = {0,0,0};
