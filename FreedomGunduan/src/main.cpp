@@ -69,15 +69,17 @@ void idle(int dummy)
 {
 	isFrame = true;
 	int out = 0;
-	if (action == WALK)
+	if (action == WALK || action == IDLE)
 	{
 		updateObj(dummy);
 		out = dummy + 1;
-		if (out >= fps) out = 0;
-	}
-	else if (action == IDLE)
-	{
-		out = 0;
+		if (out >= fps)
+		{
+			out = 0;
+			second_current++;
+			if (second_current > 2147483645)
+				second_current = 0;
+		}
 	}
 	glutPostRedisplay();
 
@@ -110,6 +112,7 @@ void updateObj(int frame)
 	{
 		angles[RIGHTSHOULDER][X] -= 5.0f;
 	}*/
+	positions[BODY][Y] = 1.0f * sin((((float)frame + second_current * fps) / fps * 3.1415));
 }
 
  GLuint M_KaID;
@@ -178,8 +181,8 @@ void display()
 	glUseProgram(program);//uniform參數數值前必須先use shader
 	float eyey = DOR(eyeAngley);
 	View = lookAt(
-		vec3(eyedistance * sin(eyey), 2, eyedistance * cos(eyey)), // Camera is at (0,0,20), in World Space
-		vec3(0, 0, 0), // and looks at the origin
+		vec3(eyedistance * sin(eyey), 2 + eyeheight, eyedistance * cos(eyey)), // Camera is at (0,0,20), in World Space
+		vec3(0, eyeheight, 0), // and looks at the origin
 		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 	updateModels();
@@ -341,7 +344,7 @@ void updateModels()
 
 	//Body
 	Rotatation[BODY] = rotate(angles[BODY][X], 0, 1, 0);
-	Translation[BODY] = translate(positions[BODY][X], positions[BODY][Y], 0);
+	Translation[BODY] = translate(positions[BODY][X], positions[BODY][Y], positions[BODY][Z]);
 	Models[BODY] = Translation[BODY] * Rotatation[BODY] * Scaling[BODY];
 	//============================================================
 
@@ -362,13 +365,13 @@ void updateModels()
 	Models[HEAD] = Models[BODY] * Translation[HEAD] * Rotatation[HEAD];
 	//============================================================
 
-	//右肩膀(面對畫面)
+	//右肩膀(面對畫面右邊)
 	Rotatation[RIGHTSHOULDER] = rotate(angles[RIGHTSHOULDER][X], 1, 0, 0) * rotate(angles[RIGHTSHOULDER][Z], 0, 0, 1);
 	Translation[RIGHTSHOULDER] = translate(positions[RIGHTSHOULDER][X], positions[RIGHTSHOULDER][Y], positions[RIGHTSHOULDER][Z]);
 	Models[RIGHTSHOULDER] = Models[BODY] * Translation[RIGHTSHOULDER] * Rotatation[RIGHTSHOULDER];
 	//============================================================
 	
-	//右手
+	//右手(面對畫面右邊)
 	Rotatation[RIGHTARM] = rotate(angles[RIGHTARM][X], 1, 0, 0);
 	Translation[RIGHTARM] = translate(positions[RIGHTARM][X], positions[RIGHTARM][Y], positions[RIGHTARM][Z]);
 	Models[RIGHTARM] = Models[RIGHTSHOULDER] * Translation[RIGHTARM] * Rotatation[RIGHTARM];
@@ -488,19 +491,19 @@ void Keyboard(unsigned char key, int x, int y)
 		break;
 	case 'i':
 	case 'I':
-		positions[BODY][Y] += 1;
+		eyeheight -= 2;
 		break;
 	case 'k':
 	case 'K':
-		positions[BODY][Y] -= 1;
+		eyeheight += 2;
 		break;
 	case 'j':
 	case 'J':
-		positions[BODY][X] -= 1;
+		positions[BODY][X] += 1;
 		break;
 	case 'l':
 	case 'L':
-		positions[BODY][X] += 1;
+		positions[BODY][X] -= 1;
 		break;
 	case 'w':
 	case 'W':
