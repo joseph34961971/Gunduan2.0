@@ -100,3 +100,4 @@ mat4 Models[PARTSNUM];
 #define IDLE 0
 int mode;
 int action;
+const int fps = 60;

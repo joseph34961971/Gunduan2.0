@@ -62,10 +62,10 @@ void Mouse(int button, int state, int x, int y) {
 void idle(int dummy){
 	isFrame = true;
 	int out = 0;
-	if(action == WALK){
+	if (action == WALK) {
 		updateObj(dummy);
 		out = dummy + 1;
-		if(out > 12) out = 1;
+		if (out >= fps) out = 0;
 	}
 	else if(action == IDLE){
 		//resetObj(dummy);
@@ -73,7 +73,7 @@ void idle(int dummy){
 	}
 	glutPostRedisplay();
 	
-	glutTimerFunc (150, idle, out); 
+	glutTimerFunc (1000.0f / fps, idle, out); // fps 60
 }
 
 void resetObj(int f)
@@ -93,6 +93,14 @@ void resetObj(int f)
 }
 
 void updateObj(int frame){
+	if (frame < 10)
+	{
+		angles[RIGHTSHOUDER][X] += 5.0f;
+	}
+	else if (frame < 20)
+	{
+		angles[RIGHTSHOUDER][X] -= 5.0f;
+	}
 	//switch(frame){
 	//case 0:
 	//	//¥ª¤â
