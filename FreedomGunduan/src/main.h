@@ -15,14 +15,18 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-
-
-#define PARTSNUM 18
+#define PARTSNUM 11
 #define BODY 0
-#define LEFTSHOUDER 1
-#define ULEFTARM 2
-#define DLEFTARM 3
-#define LEFTHAND 4
+#define HEAD 1
+#define LEFTSHOUDER 2
+#define LEFTARM 3
+#define RIGHTSHOUDER 4
+#define RIGHTARM 5
+#define WING 6
+#define LEFTLEG 7
+#define LEFTFOOT 8
+#define RIGHTLEG 9
+#define RIGHTFOOT 10
 
 void updateModels();
 
