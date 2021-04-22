@@ -29,21 +29,21 @@ int main(int argc, char** argv){
 	int ActionMenu,ModeMenu,ShaderMenu;
 	ActionMenu = glutCreateMenu(ActionMenuEvents);//建立右鍵菜單
 	//加入右鍵物件
-	glutAddMenuEntry("idle",0);
-	glutAddMenuEntry("walk",1);
+	glutAddMenuEntry("idle", 0);
+	glutAddMenuEntry("walk", 1);
+	glutAddMenuEntry("reset Model", 2);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
 	//加入右鍵物件
-	glutAddMenuEntry("Line",0);
-	glutAddMenuEntry("Fill",1);
+	glutAddMenuEntry("Line", 0);
+	glutAddMenuEntry("Fill", 1);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
-
 
 	glutCreateMenu(menuEvents);//建立右鍵菜單
 	//加入右鍵物件
-	glutAddSubMenu("action",ActionMenu);
-	glutAddSubMenu("mode",ModeMenu);
+	glutAddSubMenu("action", ActionMenu);
+	glutAddSubMenu("mode", ModeMenu);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	glutMouseFunc(Mouse);
@@ -56,73 +56,85 @@ void ChangeSize(int w,int h){
 	glViewport(0,0,w,h);
 	Projection = perspective(80.0f,(float)w/h,0.1f,100.0f);
 }
-void Mouse(int button,int state,int x,int y){
-	if(button == 2) isFrame = false;
+void Mouse(int button, int state, int x, int y) {
+	if (button == 2) isFrame = false;
 }
 void idle(int dummy){
 	isFrame = true;
 	int out = 0;
 	if(action == WALK){
 		updateObj(dummy);
-		out = dummy+1;
+		out = dummy + 1;
 		if(out > 12) out = 1;
 	}
 	else if(action == IDLE){
-		resetObj(dummy);
+		//resetObj(dummy);
 		out = 0;
 	}
 	glutPostRedisplay();
 	
 	glutTimerFunc (150, idle, out); 
 }
-void resetObj(int f){
-	for(int i = 0 ; i < PARTSNUM;i++){
-		angles[i] = 0.0f;
-	}	
-}
-void updateObj(int frame){
-	switch(frame){
-	case 0:
-		//左手
-		angles[2] = -45;
-		//右手
 
-		//腿
-		angles[13] = 45;	
-		
-		break;
-	case 1:
-	case 2:
-	case 3:
-		angles[1] +=10;
-		angles[12] -=15;
-		body_position_y += 0.1;
-		break;
-	case 4:
-	case 5:
-	case 6:
-		angles[1] -=10;
-		angles[12] +=15;
-		angles[13] -= 15;
-		body_position_y -= 0.1;
-		break;
-	case 7:
-	case 8:
-	case 9:
-		angles[1] -=10;
-		angles[12] +=15;
-		angles[13] = 0;
-		body_position_y += 0.1;
-		break;
-	case 10:
-	case 11:
-	case 12:
-		angles[1] +=10;
-		angles[12] -=15;
-		angles[13] += 15;
-		body_position_y -= 0.1;
-		break;
+void resetObj(int f)
+{
+	for (int i = 0; i < PARTSNUM; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			angles[i][j] = 0.0f;
+			positions[i][j] = 0.0f;
+		}
 	}
+
+	positions[LEFTSHOUDER][Z] = 5.0f;
+	positions[RIGHTSHOUDER][Z] = 5.0f;
+	positions[WING][Y] = 2.0f;
+}
+
+void updateObj(int frame){
+	//switch(frame){
+	//case 0:
+	//	//左手
+	//	angles[2] = -45;
+	//	//右手
+
+	//	//腿
+	//	angles[13] = 45;	
+	//	
+	//	break;
+	//case 1:
+	//case 2:
+	//case 3:
+	//	angles[1] +=10;
+	//	angles[12] -=15;
+	//	body_position_y += 0.1;
+	//	break;
+	//case 4:
+	//case 5:
+	//case 6:
+	//	angles[1] -=10;
+	//	angles[12] +=15;
+	//	angles[13] -= 15;
+	//	body_position_y -= 0.1;
+	//	break;
+	//case 7:
+	//case 8:
+	//case 9:
+	//	angles[1] -=10;
+	//	angles[12] +=15;
+	//	angles[13] = 0;
+	//	body_position_y += 0.1;
+	//	break;
+	//case 10:
+	//case 11:
+	//case 12:
+	//	angles[1] +=10;
+	//	angles[12] -=15;
+	//	angles[13] += 15;
+	//	body_position_y -= 0.1;
+	//	break;
+	//}
 }
 
 
@@ -133,11 +145,10 @@ void updateObj(int frame){
 void init(){
 	isFrame = false;
 	pNo = 0;
-	for(int i = 0;i<PARTSNUM;i++)//初始化角度陣列
-		angles[i] = 0.0;
+	resetObj(0); // initial angles array
 
 	//VAO
-	glGenVertexArrays(1,&VAO);
+	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
 	ShaderInfo shaders[] = {
@@ -191,21 +202,21 @@ void display(){
 	glBindVertexArray(VAO);
 	glUseProgram(program);//uniform參數數值前必須先use shader
 	float eyey = DOR(eyeAngley);
-	View       = lookAt(
-		               vec3(eyedistance*sin(eyey),2,eyedistance*cos(eyey)) , // Camera is at (0,0,20), in World Space
-		               vec3(0,0,0), // and looks at the origin
-		               vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
-		                );
+	View = lookAt(
+		vec3(eyedistance * sin(eyey), 2, eyedistance * cos(eyey)), // Camera is at (0,0,20), in World Space
+		vec3(0, 0, 0), // and looks at the origin
+		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+	);
 	updateModels();
 	//update data to UBO for MVP
-	glBindBuffer(GL_UNIFORM_BUFFER,UBO);
-	glBufferSubData(GL_UNIFORM_BUFFER,0,sizeof(mat4),&View);
-	glBufferSubData(GL_UNIFORM_BUFFER,sizeof(mat4),sizeof(mat4),&Projection);
-	glBindBuffer(GL_UNIFORM_BUFFER,0);
+	glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4), &View);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4), sizeof(mat4), &Projection);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	GLuint offset[3] = {0,0,0};//offset for vertices , uvs , normals
 	for(int i = 0;i < PARTSNUM ;i++){
-		glUniformMatrix4fv(ModelID,1,GL_FALSE,&Models[i][0][0]);
+		glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		// 1rst attribute buffer : vertices
@@ -217,7 +228,7 @@ void display(){
 							  0,				//strip
 							  (void*)offset[0]);//buffer offset
 		//(location,vec3,type,固定點,連續點的偏移量,buffer point)
-		offset[0] +=  vertices_size[i]*sizeof(vec3);
+		offset[0] += vertices_size[i] * sizeof(vec3);
 
 		// 2nd attribute buffer : UVs
 		glEnableVertexAttribArray(1);//location 1 :vec2 UV
@@ -229,7 +240,7 @@ void display(){
 							  0,
 							  (void*)offset[1]);
 		//(location,vec2,type,固定點,連續點的偏移量,point)
-		offset[1] +=  uvs_size[i]*sizeof(vec2);
+		offset[1] += uvs_size[i] * sizeof(vec2);
 
 		// 3rd attribute buffer : normals
 		glEnableVertexAttribArray(2);//location 2 :vec3 Normal
@@ -241,20 +252,20 @@ void display(){
 							  0,
 							  (void*)offset[2]);
 		//(location,vec3,type,固定點,連續點的偏移量,point)
-		offset[2] +=  normals_size[i]*sizeof(vec3);
+		offset[2] += normals_size[i] * sizeof(vec3);
 
 		int vertexIDoffset = 0;//glVertexID's offset 
 		string mtlname;//material name
 		vec3 Ks = vec3(1,1,1);//because .mtl excluding specular , so give it here.
-		for(int j = 0;j <mtls[i].size() ;j++){//
-			mtlname = mtls[i][j];	
+		for (int j = 0; j < mtls[i].size(); j++) {//
+			mtlname = mtls[i][j];
 			//find the material diffuse color in map:KDs by material name.
-			glUniform3fv(M_KdID,1,&KDs[mtlname][0]);
-			glUniform3fv(M_KsID,1,&Ks[0]);
+			glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
+			glUniform3fv(M_KsID, 1, &Ks[0]);
 			//          (primitive   , glVertexID base , vertex count    )
-			glDrawArrays(GL_TRIANGLES, vertexIDoffset  , faces[i][j+1]*3);
+			glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
 			//we draw triangles by giving the glVertexID base and vertex count is face count*3
-			vertexIDoffset += faces[i][j+1]*3;//glVertexID's base offset is face count*3
+			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
 		}//end for loop for draw one part of the robot	
 		
 	}//end for loop for updating and drawing model
@@ -346,119 +357,75 @@ void updateModels(){
 	mat4 Rotatation[PARTSNUM];
 	mat4 Translation[PARTSNUM];
 	mat4 Scaling[PARTSNUM];
-	for(int i = 0 ; i < PARTSNUM;i++){
+	for(int i = 0 ; i < PARTSNUM;i++)
+	{
 		Models[i] = mat4(1.0f);
 		Scaling[i] = scale(mat4(1.0f), vec3(0.125f, 0.125f, 0.125f));
 		Rotatation[i] = mat4(1.0f);
-		Translation[i] = mat4(1.0f); 
+		Translation[i] = mat4(1.0f);
 	}
-	float r,pitch,yaw,roll;
-	float alpha, beta ,gamma;
-
-	float shouder_x = 0.0f;
-	float shouder_y = 0.0f;
-	float shouder_z = 5.0f;
-	float left_leg_x = 0.0f;
-	float left_leg_y = 0.0f;
 
 	//Body
-	/*beta = body_angle;*/
-	Rotatation[BODY] = rotate(body_angle, 0, 1, 0);
-	Translation[BODY] = translate(body_position_x, body_position_y, 0);
+	Rotatation[BODY] = rotate(angles[BODY][X], 0, 1, 0);
+	Translation[BODY] = translate(positions[BODY][X], positions[BODY][Y], 0);
 	Models[BODY] = Translation[BODY] * Rotatation[BODY] * Scaling[BODY];
 	//============================================================
 
 	//左肩膀
-	//Rotatation[4] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);//向前旋轉*向右旋轉
-	Rotatation[LEFTSHOUDER] = rotate(0, 1, 0, 0) * rotate(0, 0, 0, 1);//向前旋轉*向右旋轉
-	Translation[LEFTSHOUDER] = translate(shouder_x, shouder_y, shouder_z);//位移到左上手臂處
+	Rotatation[LEFTSHOUDER] = rotate(angles[LEFTSHOUDER][X], 1, 0, 0) * rotate(angles[LEFTSHOUDER][Z], 0, 0, 1);//向前旋轉*向右旋轉
+	Translation[LEFTSHOUDER] = translate(positions[LEFTSHOUDER][X], positions[LEFTSHOUDER][Y], positions[LEFTSHOUDER][Z]);//位移到左上手臂處
 	Models[LEFTSHOUDER] = Models[BODY] * Translation[LEFTSHOUDER] * Rotatation[LEFTSHOUDER];
-	//Models[4] = Models[0] * Translation[1] * Rotatation[1];
 	//============================================================
 	
 	//左下手臂
-	/*pitch = DOR(alpha);r = 3;
-	roll = DOR(gamma);
-	static int i=0;
-	i+=5;
-	alpha = angles[2]-20;*/
-	//上手臂+下手臂向前旋轉*向右旋轉
-	//Rotatation[2] = rotate(alpha, 1, 0, 0);
-	Rotatation[LEFTARM] = rotate(0, 1, 0, 0);
-	//延x軸位移以上手臂為半徑的圓周長:translate(0,r*cos,r*sin)
-	//延z軸位移以上手臂為半徑角度:translate(r*sin,-rcos,0)
-	Translation[LEFTARM] = translate(0,0,0); // 0 -3 0
-	//Models[2] = Models[1] * Translation[2] * Rotatation[2];
+	Rotatation[LEFTARM] = rotate(angles[LEFTARM][X], 1, 0, 0);
+	Translation[LEFTARM] = translate(positions[LEFTARM][X], positions[LEFTARM][Y], positions[LEFTARM][Z]); // 0 -3 0
 	Models[LEFTARM] = Models[LEFTSHOUDER] * Translation[LEFTARM] * Rotatation[LEFTARM];
 	//============================================================
 	
 	//頭
-	Translation[HEAD] = translate(0.0, 0.0, 0.0);
+	Translation[HEAD] = translate(positions[HEAD][X], positions[HEAD][Y], positions[HEAD][Z]);
 	Models[HEAD] = Models[BODY] * Translation[HEAD] * Rotatation[HEAD];
 	//============================================================
 
 	//右肩膀(面對畫面)
-	//Rotatation[9] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);
-	Rotatation[RIGHTSHOUDER] = rotate(0, 1, 0, 0) * rotate(0, 0, 0, 1);
-	Translation[RIGHTSHOUDER] = translate(-shouder_x, shouder_y, shouder_z);
+	Rotatation[RIGHTSHOUDER] = rotate(angles[RIGHTSHOUDER][X], 1, 0, 0) * rotate(angles[RIGHTSHOUDER][Z], 0, 0, 1);
+	Translation[RIGHTSHOUDER] = translate(positions[RIGHTSHOUDER][X], positions[RIGHTSHOUDER][Y], positions[RIGHTSHOUDER][Z]);
 	Models[RIGHTSHOUDER] = Models[BODY] * Translation[RIGHTSHOUDER] * Rotatation[RIGHTSHOUDER];
 	//============================================================
 	
 	//右手
-	/*angles[7] = angles[2];
-	pitch = DOR(alpha);r = -3;
-	roll = DOR(gamma);
-	alpha = angles[7]-20;*/
-	//Rotatation[7] = rotate(alpha, 1, 0, 0);
-	Rotatation[RIGHTARM] = rotate(0, 1, 0, 0);
-	Translation[RIGHTARM] = translate(0, 0, 0);
-	//Models[7] = Models[6] * Translation[7] * Rotatation[7];
+	Rotatation[RIGHTARM] = rotate(angles[RIGHTARM][X], 1, 0, 0);
+	Translation[RIGHTARM] = translate(positions[RIGHTARM][X], positions[RIGHTARM][Y], positions[RIGHTARM][Z]);
 	Models[RIGHTARM] = Models[RIGHTSHOUDER] * Translation[RIGHTARM] * Rotatation[RIGHTARM];
 	//=============================================================
 	
 	//wing
-	Translation[WING] = translate(0, 2, 0.0);
+	Translation[WING] = translate(positions[WING][X], positions[WING][Y], positions[WING][Z]);
 	Models[WING] = Models[BODY] * Translation[WING] * Rotatation[WING];
 	//=============================================================
 	
 	//左腿(面對畫面左邊)
-	/*alpha = angles[12];gamma = 10;*/
-	//Rotatation[12] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);
-	Rotatation[LEFTLEG] = rotate(0, 1, 0, 0) * rotate(0, 0, 0, 1);
-	Translation[LEFTLEG] = translate(left_leg_x, left_leg_y, 0);
+	Rotatation[LEFTLEG] = rotate(angles[LEFTLEG][X], 1, 0, 0) * rotate(angles[LEFTLEG][Z], 0, 0, 1);
+	Translation[LEFTLEG] = translate(positions[LEFTLEG][X], positions[LEFTLEG][Y], positions[LEFTLEG][Z]);
 	Models[LEFTLEG] = Models[BODY] * Translation[LEFTLEG] * Rotatation[LEFTLEG];
 	//=============================================================
 
 	//左腳(面對畫面左邊)
-	/*pitch = DOR(alpha);r = -7;
-	roll = DOR(gamma);
-	alpha = angles[13]+angles[12];*/
-	//Translation[13] = translate(-r * sin(roll), r * cos(pitch), r * sin(pitch)) * Translation[12];
-	Translation[LEFTFOOT] = translate(0, 0, 0);
-	//Rotatation[13] = rotate(alpha, 1, 0, 0);
-	Rotatation[LEFTFOOT] = rotate(0, 1, 0, 0);
+	Rotatation[LEFTFOOT] = rotate(angles[LEFTFOOT][X], 1, 0, 0);
+	Translation[LEFTFOOT] = translate(positions[LEFTFOOT][X], positions[LEFTFOOT][Y], positions[LEFTFOOT][Z]);
 	Models[LEFTFOOT] = Models[LEFTLEG] * Translation[LEFTFOOT] * Rotatation[LEFTFOOT];
 	//=============================================================
 	
 	//右腿
-	/*alpha = angles[15] = -angles[12];
-	gamma = -10;*/
-	//Rotatation[15] = rotate(alpha, 1, 0, 0) * rotate(gamma, 0, 0, 1);
-	Rotatation[RIGHTLEG] = rotate(0, 1, 0, 0) * rotate(0, 0, 0, 1);
-	Translation[RIGHTLEG] = translate(-left_leg_x, left_leg_y, 0);
+	Rotatation[RIGHTLEG] = rotate(angles[RIGHTLEG][X], 1, 0, 0) * rotate(angles[RIGHTLEG][Z], 0, 0, 1);
+	Translation[RIGHTLEG] = translate(positions[RIGHTFOOT][X], positions[RIGHTFOOT][Y], positions[RIGHTFOOT][Z]);
 	Models[RIGHTLEG] = Models[BODY] * Translation[RIGHTLEG] * Rotatation[RIGHTLEG];
 	//=============================================================
 
 	//右腳
-	/*angles[16] = angles[13];
-	pitch = DOR(alpha);r = -7;
-	roll = DOR(gamma);
-	alpha = angles[16]+angles[15];*/
-	//Rotatation[16] = rotate(alpha, 1, 0, 0);
-	Rotatation[RIGHTFOOT] = rotate(0, 1, 0, 0);
-	//Translation[16] = translate(-r * sin(roll), r * cos(pitch), r * sin(pitch)) * Translation[15];
-	Translation[RIGHTFOOT] = translate(0, 0, 0);
-	//Models[16] = Translation[16] * Rotatation[16] * Models[16];
+	Rotatation[RIGHTFOOT] = rotate(angles[RIGHTFOOT][X], 1, 0, 0);
+	Translation[RIGHTFOOT] = translate(positions[RIGHTFOOT][X], positions[RIGHTFOOT][Y], positions[RIGHTFOOT][Z]);
 	Models[RIGHTFOOT] = Models[RIGHTLEG] * Translation[RIGHTFOOT] * Rotatation[RIGHTFOOT];
 	//=============================================================
 }
@@ -469,7 +436,7 @@ void load2Buffer(char* obj,int i){
 	std::vector<vec3> normals; // Won't be used at the moment.
 	std::vector<unsigned int> materialIndices;
 
-	bool res = loadOBJ(obj, vertices, uvs, normals,faces[i],mtls[i]);
+	bool res = loadOBJ(obj, vertices, uvs, normals, faces[i], mtls[i]);
 	if(!res) printf("load failed\n");
 
 	//glUseProgram(program);
@@ -525,50 +492,62 @@ mat4 rotate(float body_angle,float x,float y,float z){
 void Keyboard(unsigned char key, int x, int y){
 	switch(key){
 	case 'u':
-		body_angle += 5;
-		if(body_angle>=360) body_angle = 0;
-		printf("beta:%f\n",body_angle);
+	case 'U':
+		angles[BODY][X] += 5;
+		if (angles[BODY][X] >= 360) angles[BODY][X] = 0;
+		printf("beta:%f\n", angles[BODY][X]);
 		break;
 	case 'o':
-		body_angle -= 5;
-		if(body_angle<=0) body_angle = 360;
-		printf("beta:%f\n",body_angle);
+	case 'O':
+		angles[BODY][X] -= 5;
+		if (angles[BODY][X] <= 0) angles[BODY][X] = 360;
+		printf("beta:%f\n", angles[BODY][X]);
 		break;
 	case 'i':
-		body_position_y += 1;
+	case 'I':
+		positions[BODY][Y] += 1;
 		break;
 	case 'k':
-		body_position_y -= 1;
+	case 'K':
+		positions[BODY][Y] -= 1;
 		break;
 	case 'j':
-		body_position_x -= 1;
+	case 'J':
+		positions[BODY][X] -= 1;
 		break;
 	case 'l':
-		body_position_x += 1;
+	case 'L':
+		positions[BODY][X] += 1;
 		break;
 	case 'w':
+	case 'W':
 		eyedistance -= 0.2;
 		break;
 	case 's':
+	case 'S':
 		eyedistance += 0.2;
 		break;
 	case 'a':
+	case 'A':
 		eyeAngley -=10;
 		break;
 	case 'd':
+	case 'D':
 		eyeAngley +=10;
 		break;
 	case 'r':
-		angles[1] -= 5; 
+	case 'R':
+		/*angles[1] -= 5; 
 		if(angles[1] == -360) angles[1] = 0;
 		movey = 0;
-		movex = 0;
+		movex = 0;*/
 		break;
 	case 't':
-		angles[2] -= 5;
+	case 'T':
+		/*angles[2] -= 5;
 		if(angles[2] == -360) angles[2] = 0;
 		movey = 0;
-		movex = 0;
+		movex = 0;*/
 		break;
 	case 'q':
 		break;
@@ -577,8 +556,11 @@ void Keyboard(unsigned char key, int x, int y){
 	}
 	glutPostRedisplay();
 }
+
 void menuEvents(int option){}
-void ActionMenuEvents(int option){
+
+void ActionMenuEvents(int option)
+{
 	switch(option){
 	case 0:
 		action = IDLE;
@@ -586,8 +568,12 @@ void ActionMenuEvents(int option){
 	case 1:
 		action = WALK;
 		break;
+	case 2:
+		resetObj(0);
+		break;
 	}
 }
+
 void ModeMenuEvents(int option){
 	switch(option){
 	case 0:
@@ -598,6 +584,8 @@ void ModeMenuEvents(int option){
 		break;
 	}
 }
-void ShaderMenuEvents(int option){
+
+void ShaderMenuEvents(int option)
+{
 	pNo = option;
 }

@@ -68,10 +68,8 @@ GLuint nVBOs[PARTSNUM];
 GLuint program;
 int pNo;
 
-float angles[PARTSNUM];
-float body_position_x = 0.0;
-float body_position_y = 0.0;
-float body_angle = 0.0;
+float angles[PARTSNUM][3];
+float positions[PARTSNUM][3];
 float eyeAngley = 0.0;
 float eyedistance = 20.0;
 float size = 1;
