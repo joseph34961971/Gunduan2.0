@@ -45,7 +45,7 @@ void Mouse(int button, int state, int x, int y);
 void menuEvents(int option);
 void ActionMenuEvents(int option);
 void ModeMenuEvents(int option);
-void ShaderMenuEvents(int option);
+void PPSMenuEvents(int option);
 
 void idle(int dummy);
 
@@ -70,12 +70,17 @@ GLuint UBO;
 GLuint skybox_VAO;
 GLuint skybox_VBO;
 GLuint skybox_matrices_ubo;
+GLuint screen_quad_VAO;
+GLuint screen_quad_VBO;
 GLuint VBOs[PARTSNUM];
 GLuint uVBOs[PARTSNUM];
 GLuint nVBOs[PARTSNUM];
 GLuint gundaun_shader;
 GLuint skybox_shader;
-int pNo;
+GLuint gray_shader;
+#define ORIGIN 0
+#define GRAY 1
+int pps;
 
 float angles[PARTSNUM][3];
 float positions[PARTSNUM][3];
@@ -106,7 +111,7 @@ mat4 Models[PARTSNUM];
 
 #define WALK 1
 #define IDLE 0
-int mode;
+int mode = 1;
 int action;
 const int fps = 60;
 int second_current = 0;
@@ -118,3 +123,15 @@ void initSkybox();
 GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
 void drawSkybox();
 vec3 light_pos = vec3(-10, 0, 0);
+
+GLuint screen_id;
+bool load_screen = false;
+int screen_width = 800;
+int screen_height = 600;
+void initScreenRender();
+void renderScreenBegin();
+void renderScreenEnd();
+GLuint screen_fbo;	//frame buffer
+GLuint screen_rbo;	//attach to depth and stencil
+void initScreenQuad();
+void drawScreenQuad();

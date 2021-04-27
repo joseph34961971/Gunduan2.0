@@ -27,11 +27,11 @@ int main(int argc, char** argv)
 	glutDisplayFunc(display);
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(Keyboard);
-	int ActionMenu, ModeMenu, ShaderMenu;
+	int ActionMenu, ModeMenu, PPMenu;
 	ActionMenu = glutCreateMenu(ActionMenuEvents);//建立右鍵菜單
 	//加入右鍵物件
-	glutAddMenuEntry("idle", 0);
-	glutAddMenuEntry("walk", 1);
+	glutAddMenuEntry("Idle", 0);
+	glutAddMenuEntry("Walk", 1);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -40,10 +40,17 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Fill", 1);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
+	PPMenu = glutCreateMenu(PPSMenuEvents);//建立右鍵菜單
+	//加入右鍵物件
+	glutAddMenuEntry("Origin", 0);
+	glutAddMenuEntry("Gray", 1);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
+
 	glutCreateMenu(menuEvents);//建立右鍵菜單
 	//加入右鍵物件
-	glutAddSubMenu("action", ActionMenu);
-	glutAddSubMenu("mode", ModeMenu);
+	glutAddSubMenu("Action", ActionMenu);
+	glutAddSubMenu("Mode", ModeMenu);
+	glutAddSubMenu("Post-Processing", PPMenu);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	glutMouseFunc(Mouse);
@@ -56,6 +63,9 @@ void ChangeSize(int w, int h)
 {
 	if (h == 0) h = 1;
 	glViewport(0, 0, w, h);
+	screen_width = w;
+	screen_height = h;
+	initScreenRender();
 	Projection = perspective(80.0f, (float)w / h, 0.1f, 100.0f);
 }
 
@@ -208,7 +218,7 @@ void updateObj(int frame)
  void init()
  {
 	 isFrame = false;
-	 pNo = 0;
+	 pps = 0;
 	 action = WALK;
 	 resetObj(0); // initial angles array
 
@@ -227,6 +237,12 @@ void updateObj(int frame)
 		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/skybox.frag" },//fragment shader
 		 { GL_NONE, NULL } };
 	 skybox_shader = LoadShaders(skybox_shaders);//讀取shader
+
+	 ShaderInfo gray_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/gray.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/gray.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 gray_shader = LoadShaders(gray_shaders);//讀取shader
 
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
@@ -272,6 +288,10 @@ void updateObj(int frame)
 	 glBindBufferRange(GL_UNIFORM_BUFFER, /*binding point*/1, skybox_matrices_ubo, 0, sizeof(mat4) * 2);
 	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	 glClearColor(0.0, 1.0, 0.0, 1);//black screen
+
+	 initScreenRender();
+
+	 initScreenQuad();
  }
 
 #define DOR(body_angle) (body_angle*3.1415/180);
@@ -279,8 +299,6 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindVertexArray(VAO);
-	glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 	float eyey = DOR(eyeAngley);
 	View = lookAt(
 		vec3(eyedistance * sin(eyey), 2 + eyeheight, eyedistance * cos(eyey)), // Camera is at (0,0,20), in World Space
@@ -302,6 +320,21 @@ void display()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	//==========================
 
+	switch (mode)
+	{
+	case 0: // LINE
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	case 1: // FILL
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	}
+
+	if (pps != ORIGIN)
+		renderScreenBegin();
+
+	glBindVertexArray(VAO);
+	glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
 	for (int i = 0; i < PARTSNUM; i++) {
 		glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
@@ -359,7 +392,16 @@ void display()
 
 	}//end for loop for updating and drawing model
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	drawSkybox();
+
+	if (pps != ORIGIN)
+	{
+		renderScreenEnd();
+
+		drawScreenQuad();
+	}
 
 	glFlush();//強制執行上次的OpenGL commands
 	glutSwapBuffers();//調換前台和後台buffer ,當後臺buffer畫完和前台buffer交換使我們看見它
@@ -531,17 +573,10 @@ void load2Buffer(char* obj,int i)
 	bool res = loadOBJ(obj, vertices, uvs, normals, faces[i], mtls[i]);
 	if(!res) printf("load failed\n");
 
-	//glUseProgram(program);
-
 	glGenBuffers(1,&VBOs[i]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[i]);
 	glBufferData(GL_ARRAY_BUFFER,vertices.size()*sizeof(vec3),&vertices[0],GL_STATIC_DRAW);
 	vertices_size[i] = vertices.size();
-
-	//(buffer type,data起始位置,data size,data first ptr)
-	//vertices_size[i] = glm_model->numtriangles;
-	
-	//printf("vertices:%d\n",vertices_size[);
 
 	glGenBuffers(1,&uVBOs[i]);
 	glBindBuffer(GL_ARRAY_BUFFER, uVBOs[i]);
@@ -677,20 +712,12 @@ void ActionMenuEvents(int option)
 
 void ModeMenuEvents(int option)
 {
-	switch(option)
-	{
-	case 0:
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		break;
-	case 1:
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		break;
-	}
+	mode = option;
 }
 
-void ShaderMenuEvents(int option)
+void PPSMenuEvents(int option)
 {
-	pNo = option;
+	pps = option;
 }
 
 void initSkybox()
@@ -812,6 +839,92 @@ void drawSkybox()
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // set depth function back to default
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void initScreenRender()
+{
+	//************************************************************************
+	//
+	// * generate a new texture
+	//
+	//========================================================================
+	if (load_screen) // initial in different screen size
+		glDeleteTextures(1, &screen_id);
+	load_screen = true;
+	glGenTextures(1, &screen_id);
+	glBindTexture(GL_TEXTURE_2D, screen_id);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+}
+
+void renderScreenBegin()
+{
+	glGenFramebuffers(1, &screen_fbo);
+	glGenRenderbuffers(1, &screen_rbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, screen_fbo);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, screen_rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screen_width, screen_height); //GL_DEPTH_COMPONENT24
+	// attach it
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, screen_rbo);
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, screen_id, 0);
+
+	// clear
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void renderScreenEnd()
+{
+	//unbind
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glDeleteRenderbuffers(1, &screen_rbo);
+	glDeleteFramebuffers(1, &screen_fbo);
+}
+
+void initScreenQuad()
+{
+	GLfloat vertices[] = {
+		-1.0f,  1.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f,
+		 1.0f, -1.0f, 0.0f,
+
+		 -1.0f,  1.0f, 0.0f,
+		 1.0f, -1.0f, 0.0f,
+		 1.0f,  1.0f, 0.0f
+	};
+
+	glGenVertexArrays(1, &screen_quad_VAO);
+	glGenBuffers(1, &screen_quad_VBO);
+
+	glBindVertexArray(screen_quad_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, screen_quad_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	// Unbind VAO
+	glBindVertexArray(0);
+}
+
+void drawScreenQuad()
+{
+	glUseProgram(gray_shader);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, screen_id);
+	//this->shadow->bind(0);
+	//glUniform1i(glGetUniformLocation(gray_shader, "screen"), 0);
+	glBindVertexArray(screen_quad_VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
