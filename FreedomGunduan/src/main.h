@@ -13,6 +13,11 @@ using namespace std;
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+/*********************NEW ADDITIONS*********************/
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 using namespace glm;
 
 #define PARTSNUM 11
@@ -65,7 +70,7 @@ GLuint UBO;
 GLuint VBOs[PARTSNUM];
 GLuint uVBOs[PARTSNUM];
 GLuint nVBOs[PARTSNUM];
-GLuint program;
+GLuint gundaun_shader;
 int pNo;
 
 float angles[PARTSNUM][3];
@@ -100,3 +105,9 @@ int mode;
 int action;
 const int fps = 60;
 int second_current = 0;
+
+std::vector<std::string> skybox_textures_faces;
+GLuint cubemap_texture;
+
+GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
+void drawSkybox();

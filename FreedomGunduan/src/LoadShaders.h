@@ -71,7 +71,7 @@ GLuint
 {
 	if ( shaders == NULL ) { return 0; }
 
-	GLuint program = glCreateProgram();
+	GLuint gundaun_shader = glCreateProgram();
 
 	ShaderInfo* entry = shaders;
 	while ( entry->type != GL_NONE ) {
@@ -110,7 +110,7 @@ GLuint
 			return 0;
 		}
 
-		glAttachShader( program, shader );
+		glAttachShader( gundaun_shader, shader );
 
 		++entry;
 	}
@@ -121,10 +121,10 @@ GLuint
 	}
 #endif /* GL_VERSION_4_1 */
 
-	glLinkProgram( program );
+	glLinkProgram( gundaun_shader );
 
 	GLint linked;
-	glGetProgramiv( program, GL_LINK_STATUS, &linked );
+	glGetProgramiv( gundaun_shader, GL_LINK_STATUS, &linked );
 	if ( !linked ) {
 #ifdef _DEBUG
 		GLsizei len;
@@ -144,7 +144,7 @@ GLuint
 		return 0;
 	}
 
-	return program;
+	return gundaun_shader;
 }
 
 //----------------------------------------------------------------------------

@@ -161,7 +161,7 @@ void updateObj(int frame)
 	{
 		fly_position = 1.0f * sin((((float)frame + second_current * fps) / fps * 3.1415));
 	}
-	else
+	else if (action == WALK)
 	{
 		if (second_current % 2 == 0)
 		{
@@ -215,15 +215,15 @@ void updateObj(int frame)
 		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/DSPhong_Material.vp" },//vertex shader
 		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/DSPhong_Material.fp" },//fragment shader
 		 { GL_NONE, NULL } };
-	 program = LoadShaders(shaders);//弄shader
+	 gundaun_shader = LoadShaders(shaders);//弄shader
 
-	 glUseProgram(program);//uniform把计计玡ゲ斗use shader
+	 glUseProgram(gundaun_shader);//uniform把计计玡ゲ斗use shader
 
-	 MatricesIdx = glGetUniformBlockIndex(program, "MatVP");
-	 ModelID = glGetUniformLocation(program, "Model");
-	 M_KaID = glGetUniformLocation(program, "Material.Ka");
-	 M_KdID = glGetUniformLocation(program, "Material.Kd");
-	 M_KsID = glGetUniformLocation(program, "Material.Ks");
+	 MatricesIdx = glGetUniformBlockIndex(gundaun_shader, "MatVP");
+	 ModelID = glGetUniformLocation(gundaun_shader, "Model");
+	 M_KaID = glGetUniformLocation(gundaun_shader, "Material.Ka");
+	 M_KdID = glGetUniformLocation(gundaun_shader, "Material.Kd");
+	 M_KsID = glGetUniformLocation(gundaun_shader, "Material.Ks");
 	 //or
 	 M_KdID = M_KaID + 1;
 	 M_KsID = M_KaID + 2;
@@ -246,10 +246,10 @@ void updateObj(int frame)
 	 glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4) * 2, NULL, GL_DYNAMIC_DRAW);
 	 //get uniform struct size
 	 int UBOsize = 0;
-	 glGetActiveUniformBlockiv(program, MatricesIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &UBOsize);
+	 glGetActiveUniformBlockiv(gundaun_shader, MatricesIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &UBOsize);
 	 //bind UBO to its idx
 	 glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBO, 0, UBOsize);
-	 glUniformBlockBinding(program, MatricesIdx, 0);
+	 glUniformBlockBinding(gundaun_shader, MatricesIdx, 0);
 
 	 glClearColor(0.0, 0.0, 0.0, 1);//black screen
  }
@@ -260,7 +260,7 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(VAO);
-	glUseProgram(program);//uniform把计计玡ゲ斗use shader
+	glUseProgram(gundaun_shader);//uniform把计计玡ゲ斗use shader
 	float eyey = DOR(eyeAngley);
 	View = lookAt(
 		vec3(eyedistance * sin(eyey), 2 + eyeheight, eyedistance * cos(eyey)), // Camera is at (0,0,20), in World Space
@@ -409,6 +409,14 @@ void Obj2Buffer()
 		glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 	}
 	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/right.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/left.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/top.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/bottom.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/back.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/front.bmp");
+	cubemap_texture = loadCubemap(skybox_textures_faces); // chapter 1
 }
 
 void updateModels()
@@ -658,3 +666,62 @@ void ShaderMenuEvents(int option)
 {
 	pNo = option;
 }
+
+GLuint loadCubemap(std::vector<std::string> skybox_textures_faces)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height;
+	unsigned char* image;
+	for (GLuint i = 0; i < skybox_textures_faces.size(); i++)
+	{
+		image = stbi_load(skybox_textures_faces[i].c_str(), &width, &height, 0, 0);
+		if (image)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+			stbi_image_free(image);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << skybox_textures_faces[i] << std::endl;
+			stbi_image_free(image);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
+//void drawSkybox()
+//{
+//	glm::mat4 skybox_view_matrix;
+//	glGetFloatv(GL_MODELVIEW_MATRIX, &skybox_view_matrix[0][0]);
+//	skybox_view_matrix = glm::mat4(glm::mat3(skybox_view_matrix));
+//	glm::mat4 skybox_projection_matrix;
+//	glGetFloatv(GL_PROJECTION_MATRIX, &skybox_projection_matrix[0][0]);
+//
+//	glBindBuffer(GL_UNIFORM_BUFFER, this->skybox_matrices->ubo);
+//	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &skybox_projection_matrix[0][0]);
+//	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &skybox_view_matrix[0][0]);
+//	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+//
+//	// draw skybox as last
+//	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+//	skybox_shader->Use();
+//	glUniform1i(glGetUniformLocation(this->skybox_shader->Program, "skybox"), 0);
+//	// skybox cube
+//	glBindVertexArray(this->skybox->vertex_data->vao);
+//	glActiveTexture(GL_TEXTURE0);
+//	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture[chapter]);
+//	glDrawArrays(GL_TRIANGLES, 0, 36);
+//	glBindVertexArray(0);
+//	glDepthFunc(GL_LESS); // set depth function back to default
+//	//unbind shader(switch to fixed pipeline)
+//	glUseProgram(0);
+//}
