@@ -93,13 +93,52 @@ void resetObj(int f)
 		for (int j = 0; j < 3; j++)
 		{
 			angles[i][j] = 0.0f;
-			positions[i][j] = 0.0f;
 		}
 	}
 
-	positions[LEFTSHOULDER][Z] = 5.0f;
-	positions[RIGHTSHOULDER][Z] = 5.0f;
-	positions[WING][Y] = 2.0f;
+	positions[BODY][X] = 0.0f;
+	positions[BODY][Y] = 0.0f; // 34.0f
+	positions[BODY][Z] = 0.0f;
+
+	positions[HEAD][X] = 0;
+	positions[HEAD][Y] = 26.0f;
+	positions[HEAD][Z] = 0;
+
+	positions[LEFTSHOULDER][X] = -15.0f;
+	positions[LEFTSHOULDER][Y] = 19.0f;
+	positions[LEFTSHOULDER][Z] = 0.0f;
+
+	positions[LEFTARM][X] = -7.0f;
+	positions[LEFTARM][Y] = -11.0f;
+	positions[LEFTARM][Z] = 0.0f;
+
+	positions[RIGHTSHOULDER][X] = 14.0f;
+	positions[RIGHTSHOULDER][Y] = 21.0f;
+	positions[RIGHTSHOULDER][Z] = -1.0f;
+
+	positions[RIGHTARM][X] = 7.0f;
+	positions[RIGHTARM][Y] = -8.0f;
+	positions[RIGHTARM][Z] = 0.0f;
+
+	positions[WING][X] = 0.0f;
+	positions[WING][Y] = 25.0f;
+	positions[WING][Z] = -9.0f;
+
+	positions[LEFTLEG][X] = -9.0f;
+	positions[LEFTLEG][Y] = -8.0f;
+	positions[LEFTLEG][Z] = 0.0f;
+
+	positions[LEFTFOOT][X] = -4.0f;
+	positions[LEFTFOOT][Y] = -21.0f;
+	positions[LEFTFOOT][Z] = 0.0f;
+
+	positions[RIGHTLEG][X] = 8.0f;
+	positions[RIGHTLEG][Y] = -9.0f;
+	positions[RIGHTLEG][Z] = 0.0f;
+
+	positions[RIGHTFOOT][X] = 5.0f;
+	positions[RIGHTFOOT][Y] = -20.0f;
+	positions[RIGHTFOOT][Z] = 12.0f;
 }
 
 void updateObj(int frame)
@@ -112,7 +151,7 @@ void updateObj(int frame)
 	{
 		angles[RIGHTSHOULDER][X] -= 5.0f;
 	}*/
-	positions[BODY][Y] = 1.0f * sin((((float)frame + second_current * fps) / fps * 3.1415));
+	fly_position = 1.0f * sin((((float)frame + second_current * fps) / fps * 3.1415));
 }
 
  GLuint M_KaID;
@@ -344,7 +383,7 @@ void updateModels()
 
 	//Body
 	Rotatation[BODY] = rotate(angles[BODY][X], 0, 1, 0);
-	Translation[BODY] = translate(positions[BODY][X], positions[BODY][Y], positions[BODY][Z]);
+	Translation[BODY] = translate(positions[BODY][X], positions[BODY][Y] + fly_position, positions[BODY][Z]);
 	Models[BODY] = Translation[BODY] * Rotatation[BODY] * Scaling[BODY];
 	//============================================================
 
@@ -396,7 +435,7 @@ void updateModels()
 	
 	//¥k»L
 	Rotatation[RIGHTLEG] = rotate(angles[RIGHTLEG][X], 1, 0, 0) * rotate(angles[RIGHTLEG][Z], 0, 0, 1);
-	Translation[RIGHTLEG] = translate(positions[RIGHTFOOT][X], positions[RIGHTFOOT][Y], positions[RIGHTFOOT][Z]);
+	Translation[RIGHTLEG] = translate(positions[RIGHTLEG][X], positions[RIGHTLEG][Y], positions[RIGHTLEG][Z]);
 	Models[RIGHTLEG] = Models[BODY] * Translation[RIGHTLEG] * Rotatation[RIGHTLEG];
 	//=============================================================
 
