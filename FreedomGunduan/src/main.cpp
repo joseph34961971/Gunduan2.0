@@ -32,7 +32,6 @@ int main(int argc, char** argv)
 	//加入右鍵物件
 	glutAddMenuEntry("idle", 0);
 	glutAddMenuEntry("walk", 1);
-	glutAddMenuEntry("reset Model", 2);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -139,19 +138,62 @@ void resetObj(int f)
 	positions[RIGHTFOOT][X] = 5.0f;
 	positions[RIGHTFOOT][Y] = -20.0f;
 	positions[RIGHTFOOT][Z] = 12.0f;
+
+	if (action == WALK)
+	{
+		angles[LEFTSHOULDER][X] = 45.0f;
+		angles[LEFTARM][X] = -30.0f;
+
+		angles[RIGHTSHOULDER][X] = -45.0f;
+		angles[RIGHTARM][X] = -30.0f;
+
+		angles[LEFTLEG][X] = -30.0f;
+		angles[LEFTFOOT][X] = 0.0f;
+
+		angles[RIGHTLEG][X] = 30.0f;
+		angles[RIGHTFOOT][X] = 0.0f;
+	}
 }
 
 void updateObj(int frame)
 {
-	/*if (frame < 10)
+	if (action == IDLE)
 	{
-		angles[RIGHTSHOULDER][X] += 5.0f;
+		fly_position = 1.0f * sin((((float)frame + second_current * fps) / fps * 3.1415));
 	}
-	else if (frame < 20)
+	else
 	{
-		angles[RIGHTSHOULDER][X] -= 5.0f;
-	}*/
-	fly_position = 1.0f * sin((((float)frame + second_current * fps) / fps * 3.1415));
+		if (second_current % 2 == 0)
+		{
+			angles[LEFTSHOULDER][X] -= 1.5f;
+			angles[LEFTARM][X] -= 1.0f;
+
+			angles[RIGHTSHOULDER][X] += 1.5f;
+			angles[RIGHTARM][X] += 1.0f;
+
+			angles[LEFTLEG][X] += 1.0f;
+			angles[LEFTFOOT][X] -= 0.25f;
+
+			angles[RIGHTLEG][X] -= 1.0f;
+			angles[RIGHTFOOT][X] += 0.25f;
+		}
+		else
+		{
+			angles[LEFTSHOULDER][X] += 1.5f;
+			angles[LEFTARM][X] += 1.0f;
+
+			angles[RIGHTSHOULDER][X] -= 1.5f;
+			angles[RIGHTARM][X] -= 1.0f;
+
+			angles[LEFTLEG][X] -= 1.0f;
+			angles[LEFTFOOT][X] += 0.25f;
+
+			angles[RIGHTLEG][X] += 1.0f;
+			angles[RIGHTFOOT][X] -= 0.25f;
+		}
+
+		fly_position = 1.0f * sin((float)frame / fps * 3.1415);
+	}
 }
 
  GLuint M_KaID;
@@ -162,6 +204,7 @@ void updateObj(int frame)
  {
 	 isFrame = false;
 	 pNo = 0;
+	 action = WALK;
 	 resetObj(0); // initial angles array
 
 	 //VAO
@@ -590,12 +633,10 @@ void ActionMenuEvents(int option)
 	{
 	case 0:
 		action = IDLE;
+		resetObj(0);
 		break;
 	case 1:
 		action = WALK;
-		break;
-	case 2:
-		resetObj(0);
 		break;
 	}
 }
