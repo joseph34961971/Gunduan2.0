@@ -6,8 +6,10 @@ set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/)
 set(LIB_DIR ${PROJECT_SOURCE_DIR}/lib/)
 
 set(SRC_SHADER 
-    ${SRC_DIR}shaders/DSPhong_Material.vp
-    ${SRC_DIR}shaders/DSPhong_Material.fp)
+    ${SRC_DIR}shaders/DSPhong_Material.vert
+    ${SRC_DIR}shaders/DSPhong_Material.frag
+    ${SRC_DIR}shaders/skybox.vert
+    ${SRC_DIR}shaders/skybox.frag)
 
 include_directories(${INCLUDE_DIR})
 

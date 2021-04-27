@@ -67,10 +67,14 @@ GLuint uVBO;
 GLuint nVBO;
 GLuint mVBO;
 GLuint UBO;
+GLuint skybox_VAO;
+GLuint skybox_VBO;
+GLuint skybox_matrices_ubo;
 GLuint VBOs[PARTSNUM];
 GLuint uVBOs[PARTSNUM];
 GLuint nVBOs[PARTSNUM];
 GLuint gundaun_shader;
+GLuint skybox_shader;
 int pNo;
 
 float angles[PARTSNUM][3];
@@ -109,5 +113,6 @@ int second_current = 0;
 std::vector<std::string> skybox_textures_faces;
 GLuint cubemap_texture;
 
+void initSkybox();
 GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
 void drawSkybox();

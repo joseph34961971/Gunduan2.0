@@ -212,10 +212,16 @@ void updateObj(int frame)
 	 glBindVertexArray(VAO);
 
 	 ShaderInfo shaders[] = {
-		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/DSPhong_Material.vp" },//vertex shader
-		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/DSPhong_Material.fp" },//fragment shader
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/DSPhong_Material.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/DSPhong_Material.frag" },//fragment shader
 		 { GL_NONE, NULL } };
 	 gundaun_shader = LoadShaders(shaders);//讀取shader
+
+	 ShaderInfo skybox_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/skybox.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/skybox.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 skybox_shader = LoadShaders(skybox_shaders);//讀取shader
 
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
@@ -248,10 +254,19 @@ void updateObj(int frame)
 	 int UBOsize = 0;
 	 glGetActiveUniformBlockiv(gundaun_shader, MatricesIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &UBOsize);
 	 //bind UBO to its idx
-	 glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBO, 0, UBOsize);
+	 glBindBufferRange(GL_UNIFORM_BUFFER, /*binding point*/0, UBO, 0, UBOsize);
 	 glUniformBlockBinding(gundaun_shader, MatricesIdx, 0);
+	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	 glClearColor(0.0, 0.0, 0.0, 1);//black screen
+	 initSkybox();
+
+	 //skybox_matrices_ubo
+	 glGenBuffers(1, &skybox_matrices_ubo);
+	 glBindBuffer(GL_UNIFORM_BUFFER, skybox_matrices_ubo);
+	 glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4) * 2, NULL, GL_STATIC_DRAW);
+	 glBindBufferRange(GL_UNIFORM_BUFFER, /*binding point*/1, skybox_matrices_ubo, 0, sizeof(mat4) * 2);
+	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	 glClearColor(0.0, 1.0, 0.0, 1);//black screen
  }
 
 #define DOR(body_angle) (body_angle*3.1415/180);
@@ -273,6 +288,14 @@ void display()
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4), &View);
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4), sizeof(mat4), &Projection);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	//==========================
+
+	//update data to UBO for skybox
+	glBindBuffer(GL_UNIFORM_BUFFER, skybox_matrices_ubo);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &mat4(mat3(View)));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &Projection);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	//==========================
 
 	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
 	for (int i = 0; i < PARTSNUM; i++) {
@@ -329,6 +352,9 @@ void display()
 		}//end for loop for draw one part of the robot	
 
 	}//end for loop for updating and drawing model
+
+	drawSkybox();
+
 	glFlush();//強制執行上次的OpenGL commands
 	glutSwapBuffers();//調換前台和後台buffer ,當後臺buffer畫完和前台buffer交換使我們看見它
 }
@@ -409,14 +435,6 @@ void Obj2Buffer()
 		glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 	}
 	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
-
-	skybox_textures_faces.push_back("../FreedomGunduan/images/space/right.bmp");
-	skybox_textures_faces.push_back("../FreedomGunduan/images/space/left.bmp");
-	skybox_textures_faces.push_back("../FreedomGunduan/images/space/top.bmp");
-	skybox_textures_faces.push_back("../FreedomGunduan/images/space/bottom.bmp");
-	skybox_textures_faces.push_back("../FreedomGunduan/images/space/back.bmp");
-	skybox_textures_faces.push_back("../FreedomGunduan/images/space/front.bmp");
-	cubemap_texture = loadCubemap(skybox_textures_faces); // chapter 1
 }
 
 void updateModels()
@@ -667,6 +685,81 @@ void ShaderMenuEvents(int option)
 	pNo = option;
 }
 
+void initSkybox()
+{
+	GLfloat vertices[] = {
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	glGenVertexArrays(1, &skybox_VAO);
+	glGenBuffers(1, &skybox_VBO);
+
+	glBindVertexArray(skybox_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, skybox_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	// Unbind VAO
+	glBindVertexArray(0);
+
+	// for test
+	/*skybox_textures_faces.push_back("../FreedomGunduan/images/skybox/right.jpg");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/skybox/left.jpg");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/skybox/top.jpg");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/skybox/bottom.jpg");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/skybox/back.jpg");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/skybox/front.jpg");*/
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/right.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/left.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/top.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/bottom.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/front.bmp");
+	skybox_textures_faces.push_back("../FreedomGunduan/images/space/back.bmp");
+	cubemap_texture = loadCubemap(skybox_textures_faces);
+}
+
 GLuint loadCubemap(std::vector<std::string> skybox_textures_faces)
 {
 	GLuint textureID;
@@ -698,30 +791,19 @@ GLuint loadCubemap(std::vector<std::string> skybox_textures_faces)
 	return textureID;
 }
 
-//void drawSkybox()
-//{
-//	glm::mat4 skybox_view_matrix;
-//	glGetFloatv(GL_MODELVIEW_MATRIX, &skybox_view_matrix[0][0]);
-//	skybox_view_matrix = glm::mat4(glm::mat3(skybox_view_matrix));
-//	glm::mat4 skybox_projection_matrix;
-//	glGetFloatv(GL_PROJECTION_MATRIX, &skybox_projection_matrix[0][0]);
-//
-//	glBindBuffer(GL_UNIFORM_BUFFER, this->skybox_matrices->ubo);
-//	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &skybox_projection_matrix[0][0]);
-//	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &skybox_view_matrix[0][0]);
-//	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-//
-//	// draw skybox as last
-//	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-//	skybox_shader->Use();
-//	glUniform1i(glGetUniformLocation(this->skybox_shader->Program, "skybox"), 0);
-//	// skybox cube
-//	glBindVertexArray(this->skybox->vertex_data->vao);
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture[chapter]);
-//	glDrawArrays(GL_TRIANGLES, 0, 36);
-//	glBindVertexArray(0);
-//	glDepthFunc(GL_LESS); // set depth function back to default
-//	//unbind shader(switch to fixed pipeline)
-//	glUseProgram(0);
-//}
+void drawSkybox()
+{
+	// draw skybox as last
+	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+	glUseProgram(skybox_shader);
+	glUniform1i(glGetUniformLocation(skybox_shader, "skybox"), 0);
+	// skybox cube
+	glBindVertexArray(skybox_VAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthFunc(GL_LESS); // set depth function back to default
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
