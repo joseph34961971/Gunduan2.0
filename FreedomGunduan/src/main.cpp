@@ -44,6 +44,7 @@ int main(int argc, char** argv)
 	//加入右鍵物件
 	glutAddMenuEntry("Origin", 0);
 	glutAddMenuEntry("Gray", 1);
+	glutAddMenuEntry("Uniform", 2);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	glutCreateMenu(menuEvents);//建立右鍵菜單
@@ -243,6 +244,12 @@ void updateObj(int frame)
 		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/gray.frag" },//fragment shader
 		 { GL_NONE, NULL } };
 	 gray_shader = LoadShaders(gray_shaders);//讀取shader
+
+	 ShaderInfo uniform_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/uniform.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/uniform.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 uniform_shader = LoadShaders(uniform_shaders);//讀取shader
 
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
@@ -917,11 +924,17 @@ void initScreenQuad()
 
 void drawScreenQuad()
 {
-	glUseProgram(gray_shader);
+	if (pps == GRAY)
+		glUseProgram(gray_shader);
+	else if (pps == UNIFORM)
+		glUseProgram(uniform_shader);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, screen_id);
-	//this->shadow->bind(0);
-	//glUniform1i(glGetUniformLocation(gray_shader, "screen"), 0);
+	if (pps == GRAY)
+		glUniform1i(glGetUniformLocation(gray_shader, "screen"), 0);
+	else if (pps == UNIFORM)
+		glUniform1i(glGetUniformLocation(uniform_shader, "screen"), 0);
 	glBindVertexArray(screen_quad_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);

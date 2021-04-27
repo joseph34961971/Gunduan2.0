@@ -11,7 +11,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/skybox.vert
     ${SRC_DIR}shaders/skybox.frag
     ${SRC_DIR}shaders/gray.vert
-    ${SRC_DIR}shaders/gray.frag)
+    ${SRC_DIR}shaders/gray.frag
+    ${SRC_DIR}shaders/uniform.vert
+    ${SRC_DIR}shaders/uniform.frag)
 
 include_directories(${INCLUDE_DIR})
 
