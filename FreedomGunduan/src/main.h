@@ -15,14 +15,18 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-
-
-#define PARTSNUM 18
+#define PARTSNUM 11
 #define BODY 0
-#define LEFTSHOUDER 1
-#define ULEFTARM 2
-#define DLEFTARM 3
-#define LEFTHAND 4
+#define HEAD 1
+#define LEFTSHOULDER 2
+#define LEFTARM 3
+#define RIGHTSHOULDER 4
+#define RIGHTARM 5
+#define WING 6
+#define LEFTLEG 7
+#define LEFTFOOT 8
+#define RIGHTLEG 9
+#define RIGHTFOOT 10
 
 void updateModels();
 
@@ -31,7 +35,7 @@ void init();
 void ChangeSize(int w,int h);
 void display();
 void Keyboard(unsigned char key, int x, int y);
-void Mouse(int button,int state,int x,int y);
+void Mouse(int button, int state, int x, int y);
 
 void menuEvents(int option);
 void ActionMenuEvents(int option);
@@ -40,12 +44,12 @@ void ShaderMenuEvents(int option);
 
 void idle(int dummy);
 
-mat4 translate(float x,float y,float z);
-mat4 scale(float x,float y,float z);
-mat4 rotate(float body_angle,float x,float y,float z);
+mat4 translate(float x, float y, float z);
+mat4 scale(float x, float y, float z);
+mat4 rotate(float body_angle, float x, float y, float z);
 
 void Obj2Buffer();
-void load2Buffer( char* obj,int);
+void load2Buffer(char* obj, int);
 
 void updateObj(int);
 void resetObj(int);
@@ -64,12 +68,11 @@ GLuint nVBOs[PARTSNUM];
 GLuint program;
 int pNo;
 
-float angles[PARTSNUM];
-float body_position_x = 0.0;
-float body_position_y = 0.0;
-float body_angle = 0.0;
+float angles[PARTSNUM][3];
+float positions[PARTSNUM][3];
 float eyeAngley = 0.0;
 float eyedistance = 20.0;
+float eyeheight = 0.0;
 float size = 1;
 GLfloat movex,movey;
 GLint MatricesIdx;
@@ -82,19 +85,17 @@ int materialCount[PARTSNUM];
 
 std::vector<std::string> mtls[PARTSNUM];//use material
 std::vector<unsigned int> faces[PARTSNUM];//face count
-map<string,vec3> KDs;//mtl-name&Kd
-map<string,vec3> KSs;//mtl-name&Ks
+map<string, vec3> KDs;//mtl-name&Kd
+map<string, vec3> KSs;//mtl-name&Ks
 
-mat4 Projection ;
+mat4 Projection;
 mat4 View;
 mat4 Model;
 mat4 Models[PARTSNUM];
 
-#define leftHand 0
-#define rightHand 1
-#define leftFoot 2
-#define rightFoot 3
 #define WALK 1
 #define IDLE 0
 int mode;
 int action;
+const int fps = 60;
+int second_current = 0;
