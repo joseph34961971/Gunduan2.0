@@ -300,6 +300,7 @@ void display()
 	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
 	for (int i = 0; i < PARTSNUM; i++) {
 		glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
+		glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		// 1rst attribute buffer : vertices

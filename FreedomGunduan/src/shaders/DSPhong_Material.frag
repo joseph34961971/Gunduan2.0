@@ -12,7 +12,7 @@ struct MaterialInfo{
 uniform MaterialInfo Material;
 out vec4 vFragColor;
 
-//lighting color
+// lighting color
 vec4    ambientColor = vec4(0.1,0.1,0.1,1);
 vec4    diffuseColor = vec4(0.8,0.8,0.8,1);   
 vec4    specularColor = vec4(1,1,1,1);
@@ -20,7 +20,7 @@ vec4    specularColor = vec4(1,1,1,1);
 in vec3 vVaryingNormal;
 in vec3 vVaryingLightDir;
 in vec2 UV;
-float Shininess = 128.0;//for material specular
+float Shininess = 128.0; // for material specular
 
 void main(void)
 { 
@@ -41,7 +41,7 @@ void main(void)
     float spec = max(0.0, dot(normalize(vVaryingNormal), vReflection));
     if(diff != 0) {
 		spec = pow(spec, Shininess);
-		vFragColor += specularColor*vec4(Material.Ka,1)*spec;
+		vFragColor += specularColor * vec4(Material.Ka,1) * spec;
     }
 }
 	

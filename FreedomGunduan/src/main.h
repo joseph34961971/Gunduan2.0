@@ -116,3 +116,4 @@ GLuint cubemap_texture;
 void initSkybox();
 GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
 void drawSkybox();
+vec3 light_pos = vec3(-10, 0, 0);
