@@ -157,6 +157,11 @@ void resetObj(int f)
 
 void updateObj(int frame)
 {
+	if (eyeAngley < eyeAngleyGoal - 0.1f)
+		eyeAngley += 0.4f;
+	else if(eyeAngley > eyeAngleyGoal + 0.1f)
+		eyeAngley -= 0.4f;
+
 	if (action == IDLE)
 	{
 		fly_position = 1.0f * sin((((float)frame + second_current * fps) / fps * 3.1415));
@@ -624,11 +629,13 @@ void Keyboard(unsigned char key, int x, int y)
 		break;
 	case 'a':
 	case 'A':
-		eyeAngley -= 10;
+		if (eyeAngleyGoal > eyeAngley - 10)
+			eyeAngleyGoal -= 10;
 		break;
 	case 'd':
 	case 'D':
-		eyeAngley += 10;
+		if (eyeAngleyGoal < eyeAngley + 10)
+			eyeAngleyGoal += 10;
 		break;
 	case 'r':
 	case 'R':

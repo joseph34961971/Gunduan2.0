@@ -80,6 +80,7 @@ int pNo;
 float angles[PARTSNUM][3];
 float positions[PARTSNUM][3];
 float eyeAngley = 0.0;
+float eyeAngleyGoal = 0.0;
 float eyedistance = 20.0;
 float eyeheight = 0.0;
 float size = 1;
