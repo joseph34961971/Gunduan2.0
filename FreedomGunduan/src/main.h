@@ -79,9 +79,11 @@ GLuint gundaun_shader;
 GLuint skybox_shader;
 GLuint gray_shader;
 GLuint uniform_shader;
+GLuint gaussian_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
+#define GAUSSIAN 3
 int pps;
 
 float angles[PARTSNUM][3];

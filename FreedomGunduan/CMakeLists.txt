@@ -13,7 +13,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/gray.vert
     ${SRC_DIR}shaders/gray.frag
     ${SRC_DIR}shaders/uniform.vert
-    ${SRC_DIR}shaders/uniform.frag)
+    ${SRC_DIR}shaders/uniform.frag
+    ${SRC_DIR}shaders/gaussian.vert
+    ${SRC_DIR}shaders/gaussian.frag)
 
 include_directories(${INCLUDE_DIR})
 
