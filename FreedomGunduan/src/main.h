@@ -115,10 +115,15 @@ mat4 Models[PARTSNUM];
 
 #define WALK 1
 #define IDLE 0
+#define JumpingJack 2
+#define Squat 3
+#define MoonWalk 4
+#define GangnanStyle 5
 int mode = 1;
 int action;
 const int fps = 60;
 int second_current = 0;
+bool reset_action = false;
 
 std::vector<std::string> skybox_textures_faces;
 GLuint cubemap_texture;

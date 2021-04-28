@@ -32,6 +32,10 @@ int main(int argc, char** argv)
 	//加入右鍵物件
 	glutAddMenuEntry("Idle", 0);
 	glutAddMenuEntry("Walk", 1);
+	glutAddMenuEntry("Jumping Jack", 2);
+	glutAddMenuEntry("Squat", 3);
+	glutAddMenuEntry("MoonWalk", 4);
+	glutAddMenuEntry("Gangnan Style", 5);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -80,7 +84,13 @@ void idle(int dummy)
 {
 	isFrame = true;
 	int out = 0;
-	if (action == WALK || action == IDLE)
+
+	if (reset_action)
+	{
+		reset_action = false;
+		resetObj(0);
+	}
+	else
 	{
 		updateObj(dummy);
 		out = dummy + 1;
@@ -92,6 +102,7 @@ void idle(int dummy)
 				second_current = 0;
 		}
 	}
+
 	glutPostRedisplay();
 
 	glutTimerFunc(1000.0f / fps, idle, out); // fps 60
@@ -165,6 +176,8 @@ void resetObj(int f)
 		angles[RIGHTLEG][X] = 30.0f;
 		angles[RIGHTFOOT][X] = 0.0f;
 	}
+
+	second_current = 0;
 }
 
 void updateObj(int frame)
@@ -210,6 +223,22 @@ void updateObj(int frame)
 		}
 
 		fly_position = 1.0f * sin((float)frame / fps * 3.1415);
+	}
+	else if (action == JumpingJack)
+	{
+
+	}
+	else if (action == Squat)
+	{
+
+	}
+	else if (action == MoonWalk)
+	{
+
+	}
+	else if (action == GangnanStyle)
+	{
+
 	}
 }
 
@@ -712,16 +741,9 @@ void menuEvents(int option){}
 
 void ActionMenuEvents(int option)
 {
-	switch(option)
-	{
-	case 0:
-		action = IDLE;
-		resetObj(0);
-		break;
-	case 1:
-		action = WALK;
-		break;
-	}
+	action = option;
+	
+	reset_action = true;
 }
 
 void ModeMenuEvents(int option)
