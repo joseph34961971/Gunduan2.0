@@ -92,6 +92,8 @@ float eyeAngley = 0.0;
 float eyeAngleyGoal = 0.0;
 float eyedistance = 20.0;
 float eyeheight = 0.0;
+float eyeX = 0.0;
+float eyeXGoal = 0.0;
 float size = 1;
 float fly_position = 0.0f;
 GLfloat movex,movey;

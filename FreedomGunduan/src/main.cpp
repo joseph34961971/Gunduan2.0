@@ -187,6 +187,11 @@ void updateObj(int frame)
 	else if(eyeAngley > eyeAngleyGoal + 0.1f)
 		eyeAngley -= 0.4f;
 
+	if (eyeX < eyeXGoal - 0.1f)
+		eyeX += 0.4f;
+	else if (eyeX > eyeXGoal + 0.1f)
+		eyeX -= 0.4f;
+
 	if (action == IDLE)
 	{
 		fly_position = 1.0f * sin((((float)frame + second_current * fps) / fps * 3.1415));
@@ -234,7 +239,80 @@ void updateObj(int frame)
 	}
 	else if (action == MoonWalk)
 	{
+		if (second_current == 0 && frame < 45)
+		{
+			if (frame < 15)
+			{
+				angles[HEAD][Y] += 2.0f;
+				angles[LEFTSHOULDER][Z] += 1.5f;
+				angles[RIGHTSHOULDER][Z] -= 1.5f;
+			}
+			else if (frame < 30)
+			{
+				angles[HEAD][Y] -= 4.0f;
+			}
+			else
+			{
+				angles[HEAD][Y] += 2.0f;
+			}
+		}
+		else if (second_current == 0 || (second_current == 1 && frame < 45))
+		{
+			angles[BODY][Y] += 6.0f;
+		}
+		else if (second_current == 1)
+		{
+			angles[LEFTSHOULDER][Z] -= 1.5f;
+			angles[RIGHTSHOULDER][Z] += 1.5f;
+		}
+		else if ((second_current == 2 && frame < 15))
+		{
+			angles[BODY][Y] += 6.0f;
 
+			angles[LEFTSHOULDER][X] += 1.5f;
+			angles[LEFTARM][X] += 1.0f;
+
+			angles[RIGHTSHOULDER][X] -= 1.5f;
+			angles[RIGHTARM][X] -= 1.0f;
+
+			angles[LEFTLEG][X] -= 1.0f;
+			angles[LEFTFOOT][X] += 0.25f;
+
+			angles[RIGHTLEG][X] += 1.0f;
+			angles[RIGHTFOOT][X] -= 0.25f;
+		}
+		else
+		{
+			if (second_current % 2 == 0)
+			{
+				angles[LEFTSHOULDER][X] -= 1.5f;
+				angles[LEFTARM][X] -= 1.0f;
+
+				angles[RIGHTSHOULDER][X] += 1.5f;
+				angles[RIGHTARM][X] += 1.0f;
+
+				angles[LEFTLEG][X] += 1.0f;
+				angles[LEFTFOOT][X] -= 0.25f;
+
+				angles[RIGHTLEG][X] -= 1.0f;
+				angles[RIGHTFOOT][X] += 0.25f;
+			}
+			else
+			{
+				angles[LEFTSHOULDER][X] += 1.5f;
+				angles[LEFTARM][X] += 1.0f;
+
+				angles[RIGHTSHOULDER][X] -= 1.5f;
+				angles[RIGHTARM][X] -= 1.0f;
+
+				angles[LEFTLEG][X] -= 1.0f;
+				angles[LEFTFOOT][X] += 0.25f;
+
+				angles[RIGHTLEG][X] += 1.0f;
+				angles[RIGHTFOOT][X] -= 0.25f;
+			}
+			positions[BODY][X] -= 0.15f;
+		}
 	}
 	else if (action == GangnanStyle)
 	{
@@ -344,8 +422,8 @@ void display()
 
 	float eyey = DOR(eyeAngley);
 	View = lookAt(
-		vec3(eyedistance * sin(eyey), 2 + eyeheight, eyedistance * cos(eyey)), // Camera is at (0,0,20), in World Space
-		vec3(0, eyeheight, 0), // and looks at the origin
+		vec3(eyedistance * sin(eyey) + eyeX, 2 + eyeheight, eyedistance * cos(eyey)), // Camera is at (0,0,20), in World Space
+		vec3(eyeX, eyeheight, 0), // and looks at the origin
 		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 	updateModels();
@@ -542,7 +620,7 @@ void updateModels()
 	}
 
 	//Body
-	Rotatation[BODY] = rotate(angles[BODY][X], 0, 1, 0);
+	Rotatation[BODY] = rotate(angles[BODY][Y], 0, 1, 0);
 	Translation[BODY] = translate(positions[BODY][X], positions[BODY][Y] + fly_position, positions[BODY][Z]);
 	Models[BODY] = Translation[BODY] * Rotatation[BODY] * Scaling[BODY];
 	//============================================================
@@ -560,6 +638,7 @@ void updateModels()
 	//============================================================
 	
 	//ÀY
+	Rotatation[HEAD] = rotate(angles[HEAD][Y], 0, 1, 0);
 	Translation[HEAD] = translate(positions[HEAD][X], positions[HEAD][Y], positions[HEAD][Z]);
 	Models[HEAD] = Models[BODY] * Translation[HEAD] * Rotatation[HEAD];
 	//============================================================
@@ -671,15 +750,13 @@ void Keyboard(unsigned char key, int x, int y)
 	{
 	case 'u':
 	case 'U':
-		angles[BODY][X] += 5;
-		if (angles[BODY][X] >= 360) angles[BODY][X] = 0;
-		printf("beta:%f\n", angles[BODY][X]);
+		angles[BODY][Y] += 5;
+		if (angles[BODY][Y] >= 360) angles[BODY][Y] = 0;
 		break;
 	case 'o':
 	case 'O':
-		angles[BODY][X] -= 5;
-		if (angles[BODY][X] <= 0) angles[BODY][X] = 360;
-		printf("beta:%f\n", angles[BODY][X]);
+		angles[BODY][Y] -= 5;
+		if (angles[BODY][Y] <= 0) angles[BODY][Y] = 360;
 		break;
 	case 'i':
 	case 'I':
@@ -707,11 +784,21 @@ void Keyboard(unsigned char key, int x, int y)
 		break;
 	case 'a':
 	case 'A':
-		if (eyeAngleyGoal > eyeAngley - 10)
-			eyeAngleyGoal -= 10;
+		if (eyeXGoal > eyeX - 4)
+			eyeXGoal -= 4;
 		break;
 	case 'd':
 	case 'D':
+		if (eyeXGoal < eyeX + 4)
+			eyeXGoal += 4;
+		break;
+	case 'q':
+	case 'Q':
+		if (eyeAngleyGoal > eyeAngley - 10)
+			eyeAngleyGoal -= 10;
+		break;
+	case 'e':
+	case 'E':
 		if (eyeAngleyGoal < eyeAngley + 10)
 			eyeAngleyGoal += 10;
 		break;
@@ -728,10 +815,6 @@ void Keyboard(unsigned char key, int x, int y)
 		if(angles[2] == -360) angles[2] = 0;
 		movey = 0;
 		movex = 0;*/
-		break;
-	case 'q':
-		break;
-	case 'e':
 		break;
 	}
 	glutPostRedisplay();
