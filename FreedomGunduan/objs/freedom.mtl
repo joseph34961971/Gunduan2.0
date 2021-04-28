@@ -30,12 +30,12 @@ Ks 0.70 0.70 0.70
 Ns 6.00
 newmtl freedom:wire_008061138
 illum 4
-Kd 0.03 0.24 0.54
-Ka 0.03 0.24 0.54
+Kd 0.88 0.88 0.88
+Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-Ks 0.35 0.35 0.35
-Ns 32.00
+Ks 0.70 0.70 0.70
+Ns 6.00
 newmtl freedom:wire_008110134
 illum 4
 Kd 0.50 0.50 0.50
@@ -80,12 +80,10 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 newmtl freedom:wire_028149177
 illum 4
-Kd 0.11 0.58 0.69
-Ka 0.11 0.58 0.69
+Kd 0.50 0.50 0.50
+Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-Ks 0.35 0.35 0.35
-Ns 32.00
 newmtl freedom:wire_057008136
 illum 4
 Kd 0.13 0.13 0.14
@@ -110,12 +108,12 @@ Ks 0.70 0.70 0.70
 Ns 6.00
 newmtl freedom:wire_087224087
 illum 4
-Kd 0.34 0.88 0.34
-Ka 0.34 0.88 0.34
+Kd 0.88 0.88 0.88
+Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-Ks 0.35 0.35 0.35
-Ns 32.00
+Ks 0.70 0.70 0.70
+Ns 6.00
 newmtl freedom:wire_087224143
 illum 4
 Kd 0.88 0.88 0.88
@@ -174,12 +172,10 @@ Ks 0.00 0.00 0.00
 Ns 0.00
 newmtl freedom:wire_134059008
 illum 4
-Kd 0.53 0.23 0.03
-Ka 0.53 0.23 0.03
+Kd 0.50 0.50 0.50
+Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-Ks 0.35 0.35 0.35
-Ns 32.00
 newmtl freedom:wire_134110008
 illum 4
 Kd 0.50 0.50 0.50
@@ -200,12 +196,10 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 newmtl freedom:wire_141007058
 illum 4
-Kd 0.55 0.03 0.23
-Ka 0.55 0.03 0.23
+Kd 0.50 0.50 0.50
+Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-Ks 0.35 0.35 0.35
-Ns 32.00
 newmtl freedom:wire_143224087
 illum 4
 Kd 0.56 0.88 0.34
@@ -362,7 +356,7 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 newmtl freedom:wire_224198087
 illum 4
-Kd 0.13 0.13 0.14
+Kd 0.93 0.00 0.07
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
@@ -432,9 +426,49 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 Ks 0.70 0.70 0.70
 Ns 6.00
+newmtl Cilindro01SG5
+illum 4
+Kd 0.93 0.00 0.07
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.70 0.70 0.70
+Ns 6.00
+newmtl freedom:ChafCaja1287SG4
+illum 4
+Kd 0.13 0.13 0.14
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.70 0.70 0.70
+Ns 6.00
 newmtl freedom:ChafCaja1273SG5
 illum 4
 Kd 0.13 0.34 0.82
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.70 0.70 0.70
+Ns 6.00
+newmtl freedom:Caja607SG2
+illum 4
+Kd 0.88 0.88 0.88
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.70 0.70 0.70
+Ns 6.00
+newmtl freedom:Caja410SG2
+illum 4
+Kd 0.13 0.13 0.14
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.70 0.70 0.70
+Ns 6.00
+newmtl freedom:ChafCil88SG2
+illum 4
+Kd 0.88 0.88 0.88
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
