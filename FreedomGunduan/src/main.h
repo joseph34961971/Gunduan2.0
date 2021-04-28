@@ -85,6 +85,7 @@ GLuint gaussian_shader;
 #define UNIFORM 2
 #define GAUSSIAN 3
 int pps;
+bool JumpingJack_beginpose = true;
 bool GangnanStyle_rightfoot = false;
 int GangnanStyle_footcount = 0;
 bool GangnanStyle_handdown = false;
