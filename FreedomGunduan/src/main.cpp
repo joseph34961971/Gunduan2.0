@@ -178,6 +178,13 @@ void resetObj(int f)
 	}
 
 	second_current = 0;
+
+	GangnanStyle_rightfoot = false;
+	GangnanStyle_footcount = 0;
+	GangnanStyle_handdown = false;
+	GangnanStyle_handprepare = false;
+	GangnanStyle_temple = 0;
+	GangnanStyle_beginpose = true;
 }
 
 void updateObj(int frame)
