@@ -85,6 +85,12 @@ GLuint gaussian_shader;
 #define UNIFORM 2
 #define GAUSSIAN 3
 int pps;
+bool GangnanStyle_rightfoot = false;
+int GangnanStyle_footcount = 0;
+bool GangnanStyle_handdown = false;
+bool GangnanStyle_handprepare = false;
+int GangnanStyle_temple = 0;
+bool GangnanStyle_beginpose = true;
 
 float angles[PARTSNUM][3];
 float positions[PARTSNUM][3];

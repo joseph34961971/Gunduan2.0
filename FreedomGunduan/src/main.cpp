@@ -128,7 +128,7 @@ void resetObj(int f)
 
 	positions[LEFTSHOULDER][X] = -15.0f;
 	positions[LEFTSHOULDER][Y] = 19.0f;
-	positions[LEFTSHOULDER][Z] = 0.0f;
+	positions[LEFTSHOULDER][Z] = -1.0f;
 
 	positions[LEFTARM][X] = -7.0f;
 	positions[LEFTARM][Y] = -11.0f;
@@ -316,7 +316,144 @@ void updateObj(int frame)
 	}
 	else if (action == GangnanStyle)
 	{
+		if (second_current == 0 && frame < 30)
+		{
+			angles[RIGHTARM][X] -= 1.5f; // -45
+			angles[RIGHTSHOULDER][Y] -= 2.0f; // -60
 
+			angles[LEFTARM][Z] += 1.0f; // 30
+			angles[LEFTSHOULDER][X] -= 5.0f; // -150
+			angles[LEFTSHOULDER][Z] -= 1.0f; // -30
+		}
+		
+		if (frame % 30 == 0)
+		{
+			if (GangnanStyle_footcount == 3)
+			{
+				GangnanStyle_footcount = 0;
+				GangnanStyle_temple++;
+				if (GangnanStyle_temple == 2)
+				{
+					GangnanStyle_temple = 0;
+					GangnanStyle_handdown = !GangnanStyle_handdown;
+					GangnanStyle_handprepare = true;
+				}
+			}
+			else
+			{
+				GangnanStyle_rightfoot = !GangnanStyle_rightfoot;
+				GangnanStyle_footcount++;
+			}
+		}
+
+		if (GangnanStyle_handdown)
+		{
+			if (GangnanStyle_handprepare)
+			{
+				angles[LEFTARM][X] -= 6.0f; // 45 to -45
+				angles[LEFTSHOULDER][Y] += 4.0f; // 0 to 60
+
+				angles[LEFTARM][Z] -= 2.0f; // 60 to 30
+				angles[LEFTSHOULDER][X] += 10.0f; // -150 to 0
+				if (GangnanStyle_beginpose)
+					angles[LEFTSHOULDER][Z] += 2.0f; // -30 to 0
+				else
+					angles[LEFTSHOULDER][Z] += 4.0f; // -60 to 0
+				if (angles[LEFTSHOULDER][X] > -1.0f) // after 15 frames
+				{
+					GangnanStyle_handprepare = false;
+					GangnanStyle_beginpose = false;
+				}
+			}
+			else
+			{
+				if (frame % 30 < 15)
+				{
+					angles[LEFTSHOULDER][X] += 2.0f;
+					angles[RIGHTSHOULDER][X] += 2.0f;
+				}
+				else
+				{
+					angles[LEFTSHOULDER][X] -= 2.0f;
+					if (!(GangnanStyle_temple == 1 && GangnanStyle_footcount == 3))
+						angles[RIGHTSHOULDER][X] -= 2.0f;
+				}
+			}
+		}
+		else
+		{
+			if (GangnanStyle_handprepare)
+			{
+				angles[LEFTARM][X] += 6.0f; // -45 to 45
+				angles[LEFTSHOULDER][Y] -= 4.0f; // 60 to 0
+
+				angles[LEFTARM][Z] += 2.62f; // 20.636082 to 60
+				angles[LEFTSHOULDER][X] -= 8.0f; // -30 to -150
+				angles[LEFTSHOULDER][Z] -= 2.0f; // 0 to -30
+
+				if (angles[LEFTSHOULDER][X] < -149.0f) // after 15 frames
+				{
+					GangnanStyle_handprepare = false;
+				}
+			}
+			else
+			{
+				if (frame % 30 < 15)
+				{
+					angles[LEFTSHOULDER][Z] += 2.0f;
+				}
+				else
+				{
+					angles[LEFTSHOULDER][Z] -= 2.0f;
+				}
+
+				angles[LEFTARM][Z] = 60.0f + 45.0f * sin((frame / 15.0f) * 3.1415);
+				angles[LEFTARM][X] = 45.0f * cos((frame / 15.0f) * 3.1415);
+			}
+		}
+		
+		if (GangnanStyle_rightfoot)
+		{
+			if (frame % 30 < 15)
+			{
+				angles[RIGHTLEG][X] -= 2.0f;
+				angles[RIGHTLEG][Z] += 2.0f;
+				angles[RIGHTFOOT][X] += 2.0f;
+				angles[RIGHTFOOT][Z] -= 2.0f;
+
+				positions[BODY][Y] += 0.1f;
+			}
+			else
+			{
+				angles[RIGHTLEG][X] += 2.0f;
+				angles[RIGHTLEG][Z] -= 2.0f;
+				angles[RIGHTFOOT][X] -= 2.0f;
+				angles[RIGHTFOOT][Z] += 2.0f;
+
+				positions[BODY][Y] -= 0.1f;
+			}
+		}
+		else
+		{
+			if (frame % 30 < 15)
+			{
+				angles[LEFTLEG][X] -= 2.0f;
+				angles[LEFTLEG][Z] -= 2.0f;
+				angles[LEFTFOOT][X] += 2.0f;
+				angles[LEFTFOOT][Z] += 2.0f;
+
+				positions[BODY][Y] += 0.1f;
+			}
+			else
+			{
+				angles[LEFTLEG][X] += 2.0f;
+				angles[LEFTLEG][Z] += 2.0f;
+				angles[LEFTFOOT][X] -= 2.0f;
+				angles[LEFTFOOT][Z] -= 2.0f;
+
+				positions[BODY][Y] -= 0.1f;
+			}
+		}
 	}
 }
 
@@ -626,13 +763,13 @@ void updateModels()
 	//============================================================
 
 	//左肩膀
-	Rotatation[LEFTSHOULDER] = rotate(angles[LEFTSHOULDER][X], 1, 0, 0) * rotate(angles[LEFTSHOULDER][Z], 0, 0, 1);//向前旋轉*向右旋轉
+	Rotatation[LEFTSHOULDER] = rotate(angles[LEFTSHOULDER][X], 1, 0, 0) * rotate(angles[LEFTSHOULDER][Z], 0, 0, 1) * rotate(angles[LEFTSHOULDER][Y], 0, 1, 0);
 	Translation[LEFTSHOULDER] = translate(positions[LEFTSHOULDER][X], positions[LEFTSHOULDER][Y], positions[LEFTSHOULDER][Z]);//位移到左上手臂處
 	Models[LEFTSHOULDER] = Models[BODY] * Translation[LEFTSHOULDER] * Rotatation[LEFTSHOULDER];
 	//============================================================
 	
 	//左下手臂
-	Rotatation[LEFTARM] = rotate(angles[LEFTARM][X], 1, 0, 0);
+	Rotatation[LEFTARM] = rotate(angles[LEFTARM][X], 1, 0, 0) * rotate(angles[LEFTARM][Z], 0, 0, 1);
 	Translation[LEFTARM] = translate(positions[LEFTARM][X], positions[LEFTARM][Y], positions[LEFTARM][Z]); // 0 -3 0
 	Models[LEFTARM] = Models[LEFTSHOULDER] * Translation[LEFTARM] * Rotatation[LEFTARM];
 	//============================================================
@@ -644,7 +781,7 @@ void updateModels()
 	//============================================================
 
 	//右肩膀(面對畫面右邊)
-	Rotatation[RIGHTSHOULDER] = rotate(angles[RIGHTSHOULDER][X], 1, 0, 0) * rotate(angles[RIGHTSHOULDER][Z], 0, 0, 1);
+	Rotatation[RIGHTSHOULDER] = rotate(angles[RIGHTSHOULDER][X], 1, 0, 0) * rotate(angles[RIGHTSHOULDER][Z], 0, 0, 1) * rotate(angles[RIGHTSHOULDER][Y], 0, 1, 0);
 	Translation[RIGHTSHOULDER] = translate(positions[RIGHTSHOULDER][X], positions[RIGHTSHOULDER][Y], positions[RIGHTSHOULDER][Z]);
 	Models[RIGHTSHOULDER] = Models[BODY] * Translation[RIGHTSHOULDER] * Rotatation[RIGHTSHOULDER];
 	//============================================================
@@ -667,7 +804,7 @@ void updateModels()
 	//=============================================================
 
 	//左腳(面對畫面左邊)
-	Rotatation[LEFTFOOT] = rotate(angles[LEFTFOOT][X], 1, 0, 0);
+	Rotatation[LEFTFOOT] = rotate(angles[LEFTFOOT][X], 1, 0, 0) * rotate(angles[LEFTFOOT][Z], 0, 0, 1);
 	Translation[LEFTFOOT] = translate(positions[LEFTFOOT][X], positions[LEFTFOOT][Y], positions[LEFTFOOT][Z]);
 	Models[LEFTFOOT] = Models[LEFTLEG] * Translation[LEFTFOOT] * Rotatation[LEFTFOOT];
 	//=============================================================
@@ -679,7 +816,7 @@ void updateModels()
 	//=============================================================
 
 	//右腳
-	Rotatation[RIGHTFOOT] = rotate(angles[RIGHTFOOT][X], 1, 0, 0);
+	Rotatation[RIGHTFOOT] = rotate(angles[RIGHTFOOT][X], 1, 0, 0) * rotate(angles[RIGHTFOOT][Z], 0, 0, 1);
 	Translation[RIGHTFOOT] = translate(positions[RIGHTFOOT][X], positions[RIGHTFOOT][Y], positions[RIGHTFOOT][Z]);
 	Models[RIGHTFOOT] = Models[RIGHTLEG] * Translation[RIGHTFOOT] * Rotatation[RIGHTFOOT];
 	//=============================================================
