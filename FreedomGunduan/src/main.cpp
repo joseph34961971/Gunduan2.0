@@ -133,7 +133,6 @@ void resetObj(int f)
 	positions[LEFTARM][X] = -7.0f;
 	positions[LEFTARM][Y] = -11.0f;
 	positions[LEFTARM][Z] = 0.0f;
-	angles[LEFTARM][Y] = 30.0f;
 
 	positions[RIGHTSHOULDER][X] = 14.0f;
 	positions[RIGHTSHOULDER][Y] = 21.0f;
@@ -167,7 +166,6 @@ void resetObj(int f)
 	{
 		angles[LEFTSHOULDER][X] = 45.0f;
 		angles[LEFTARM][X] = -30.0f;
-		//angles[LEFTARM][Z] = -60.0f;
 
 		angles[RIGHTSHOULDER][X] = -45.0f;
 		angles[RIGHTARM][X] = -30.0f;
@@ -222,6 +220,8 @@ void updateObj(int frame)
 
 			angles[RIGHTLEG][X] -= 1.0f;
 			angles[RIGHTFOOT][X] += 0.25f;
+
+			angles[WING][X] += 0.25f;
 		}
 		else
 		{
@@ -236,6 +236,8 @@ void updateObj(int frame)
 
 			angles[RIGHTLEG][X] += 1.0f;
 			angles[RIGHTFOOT][X] -= 0.25f;
+
+			angles[WING][X] -= 0.25f;
 		}
 
 		fly_position = 1.0f * sin((float)frame / fps * 3.1415);
@@ -244,48 +246,80 @@ void updateObj(int frame)
 	{
 		if (second_current == 0 && frame < 30)
 		{
-			angles[RIGHTARM][X] -= 1.5f;
 			angles[RIGHTSHOULDER][Y] += 1.5f;
 
-			angles[LEFTARM][X] -= 1.5f;
 			angles[LEFTSHOULDER][Y] -= 1.5f;
-			angles[LEFTARM][X] += 0.5f;
 		}
 
 		if (second_current % 2 == 0)
 		{
 			angles[LEFTSHOULDER][Z] -= 1.5f;
-			angles[LEFTARM][Z] -= 1.0f;
+			angles[LEFTARM][X] -= 1.5f;
 
 			angles[RIGHTSHOULDER][Z] += 1.5f;
-			angles[RIGHTARM][Z] += 1.0f;
+			angles[RIGHTARM][X] -= 1.5f;
 
-			angles[LEFTLEG][X] += 1.0f;
-			angles[LEFTFOOT][X] -= 0.25f;
+			angles[LEFTLEG][Z] -= 0.5f;
+			angles[LEFTFOOT][Z] += 0.25f;
 
-			angles[RIGHTLEG][X] -= 1.0f;
-			angles[RIGHTFOOT][X] += 0.25f;
+			angles[RIGHTLEG][Z] += 0.5f;
+			angles[RIGHTFOOT][Z] -= 0.25f;
+
+			angles[WING][X] += 0.5f;
 		}
 		else
 		{
 			angles[LEFTSHOULDER][Z] += 1.5f;
-			angles[LEFTARM][Z] += 1.0f;
+			angles[LEFTARM][X] += 1.5f;
 
 			angles[RIGHTSHOULDER][Z] -= 1.5f;
-			angles[RIGHTARM][Z] -= 1.0f;
+			angles[RIGHTARM][X] += 1.5f;
 
-			angles[LEFTLEG][X] -= 1.0f;
-			angles[LEFTFOOT][X] += 0.25f;
+			angles[LEFTLEG][Z] += 0.5f;
+			angles[LEFTFOOT][Z] -= 0.25f;
 
-			angles[RIGHTLEG][X] += 1.0f;
-			angles[RIGHTFOOT][X] -= 0.25f;
+			angles[RIGHTLEG][Z] -= 0.5f;
+			angles[RIGHTFOOT][Z] += 0.25f;
+
+			angles[WING][X] -= 0.5f;
 		}
 
-		fly_position = 1.0f * sin((float)frame / fps * 3.1415);
+		fly_position = 3.0f * sin((float)frame / fps * 3.1415);
 	}
 	else if (action == Squat)
 	{
+		if (second_current % 2 == 0)
+		{
+			angles[RIGHTSHOULDER][X] -= 1.5f;
 
+			angles[LEFTSHOULDER][X] -= 1.5f;
+
+			angles[LEFTLEG][X] -= 1.5f;
+			angles[LEFTFOOT][X] += 1.5f;
+
+			angles[RIGHTLEG][X] -= 1.5f;
+			angles[RIGHTFOOT][X] += 1.5f;
+
+			positions[BODY][Y] -= 0.05f;
+
+			angles[WING][X] += 0.5f;
+		}
+		else
+		{
+			angles[RIGHTSHOULDER][X] += 1.5f;
+
+			angles[LEFTSHOULDER][X] += 1.5f;
+
+			angles[LEFTLEG][X] += 1.5f;
+			angles[LEFTFOOT][X] -= 1.5f;
+
+			angles[RIGHTLEG][X] += 1.5f;
+			angles[RIGHTFOOT][X] -= 1.5f;
+
+			positions[BODY][Y] += 0.05f;
+
+			angles[WING][X] -= 0.5f;
+		}
 	}
 	else if (action == MoonWalk)
 	{
@@ -843,6 +877,7 @@ void updateModels()
 	//=============================================================
 	
 	//wing
+	Rotatation[WING] = rotate(angles[WING][X], 1, 0, 0);
 	Translation[WING] = translate(positions[WING][X], positions[WING][Y], positions[WING][Z]);
 	Models[WING] = Models[BODY] * Translation[WING] * Rotatation[WING];
 	//=============================================================
