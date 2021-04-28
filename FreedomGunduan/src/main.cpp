@@ -133,6 +133,7 @@ void resetObj(int f)
 	positions[LEFTARM][X] = -7.0f;
 	positions[LEFTARM][Y] = -11.0f;
 	positions[LEFTARM][Z] = 0.0f;
+	angles[LEFTARM][Y] = 30.0f;
 
 	positions[RIGHTSHOULDER][X] = 14.0f;
 	positions[RIGHTSHOULDER][Y] = 21.0f;
@@ -166,6 +167,7 @@ void resetObj(int f)
 	{
 		angles[LEFTSHOULDER][X] = 45.0f;
 		angles[LEFTARM][X] = -30.0f;
+		//angles[LEFTARM][Z] = -60.0f;
 
 		angles[RIGHTSHOULDER][X] = -45.0f;
 		angles[RIGHTARM][X] = -30.0f;
