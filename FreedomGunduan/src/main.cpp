@@ -179,6 +179,8 @@ void resetObj(int f)
 
 	second_current = 0;
 
+	JumpingJack_beginpose = true;
+
 	GangnanStyle_rightfoot = false;
 	GangnanStyle_footcount = 0;
 	GangnanStyle_handdown = false;
@@ -238,7 +240,46 @@ void updateObj(int frame)
 	}
 	else if (action == JumpingJack)
 	{
+		if (second_current == 0 && frame < 30)
+		{
+			angles[RIGHTARM][X] -= 1.5f;
+			angles[RIGHTSHOULDER][Y] += 1.5f;
 
+			angles[LEFTARM][X] -= 1.5f;
+			angles[LEFTSHOULDER][Y] -= 1.5f;
+			angles[LEFTARM][X] += 0.5f;
+		}
+
+		if (second_current % 2 == 0)
+		{
+			angles[LEFTSHOULDER][Z] -= 1.5f;
+			angles[LEFTARM][Z] -= 1.0f;
+
+			angles[RIGHTSHOULDER][Z] += 1.5f;
+			angles[RIGHTARM][Z] += 1.0f;
+
+			angles[LEFTLEG][X] += 1.0f;
+			angles[LEFTFOOT][X] -= 0.25f;
+
+			angles[RIGHTLEG][X] -= 1.0f;
+			angles[RIGHTFOOT][X] += 0.25f;
+		}
+		else
+		{
+			angles[LEFTSHOULDER][Z] += 1.5f;
+			angles[LEFTARM][Z] += 1.0f;
+
+			angles[RIGHTSHOULDER][Z] -= 1.5f;
+			angles[RIGHTARM][Z] -= 1.0f;
+
+			angles[LEFTLEG][X] -= 1.0f;
+			angles[LEFTFOOT][X] += 0.25f;
+
+			angles[RIGHTLEG][X] += 1.0f;
+			angles[RIGHTFOOT][X] -= 0.25f;
+		}
+
+		fly_position = 1.0f * sin((float)frame / fps * 3.1415);
 	}
 	else if (action == Squat)
 	{
