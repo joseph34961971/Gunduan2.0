@@ -157,15 +157,15 @@ void resetObj(int f)
 	positions[LEFTLEG][Z] = 0.0f;
 
 	positions[LEFTFOOT][X] = -4.0f;
-	positions[LEFTFOOT][Y] = -21.0f;
-	positions[LEFTFOOT][Z] = 0.0f;
+	positions[LEFTFOOT][Y] = -31.0f;
+	positions[LEFTFOOT][Z] = 12.0f;
 
 	positions[RIGHTLEG][X] = 8.0f;
-	positions[RIGHTLEG][Y] = -9.0f;
+	positions[RIGHTLEG][Y] = -10.0f;
 	positions[RIGHTLEG][Z] = 0.0f;
 
 	positions[RIGHTFOOT][X] = 5.0f;
-	positions[RIGHTFOOT][Y] = -20.0f;
+	positions[RIGHTFOOT][Y] = -29.0f;
 	positions[RIGHTFOOT][Z] = 12.0f;
 
 	if (action == WALK)
