@@ -17,6 +17,7 @@ using namespace std;
 /*********************NEW ADDITIONS*********************/
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+//#include <AL/alut.h>
 
 using namespace glm;
 
@@ -128,6 +129,7 @@ mat4 Models[PARTSNUM];
 #define Squat 3
 #define MoonWalk 4
 #define GangnanStyle 5
+#define YoBattle 6
 int mode = 1;
 int action;
 const int fps = 60;
@@ -153,3 +155,9 @@ GLuint screen_fbo;	//frame buffer
 GLuint screen_rbo;	//attach to depth and stencil
 void initScreenQuad();
 void drawScreenQuad();
+
+//void initOpenAL();
+//ALCdevice* device = nullptr;
+//ALCcontext* context = nullptr;
+//ALuint source;
+//ALuint buffer;

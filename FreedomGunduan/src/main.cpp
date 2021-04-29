@@ -24,6 +24,7 @@ int main(int argc, char** argv)
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 	init();
+	//initOpenAL();
 	glutDisplayFunc(display);
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(Keyboard);
@@ -36,6 +37,7 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Squat", 3);
 	glutAddMenuEntry("MoonWalk", 4);
 	glutAddMenuEntry("Gangnan Style", 5);
+	glutAddMenuEntry("Yo Battle", 6);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -193,7 +195,7 @@ void updateObj(int frame)
 {
 	if (eyeAngley < eyeAngleyGoal - 0.1f)
 		eyeAngley += 0.4f;
-	else if(eyeAngley > eyeAngleyGoal + 0.1f)
+	else if (eyeAngley > eyeAngleyGoal + 0.1f)
 		eyeAngley -= 0.4f;
 
 	if (eyeX < eyeXGoal - 0.1f)
@@ -409,7 +411,7 @@ void updateObj(int frame)
 			angles[LEFTSHOULDER][X] -= 5.0f; // -150
 			angles[LEFTSHOULDER][Z] -= 1.0f; // -30
 		}
-		
+
 		if (frame % 30 == 0)
 		{
 			if (GangnanStyle_footcount == 3)
@@ -495,7 +497,7 @@ void updateObj(int frame)
 				angles[LEFTARM][X] = 45.0f * cos((frame / 15.0f) * 3.1415);
 			}
 		}
-		
+
 		if (GangnanStyle_rightfoot)
 		{
 			if (frame % 30 < 15)
@@ -537,6 +539,65 @@ void updateObj(int frame)
 
 				positions[BODY][Y] -= 0.1f;
 			}
+		}
+	}
+	else if (action == YoBattle)
+	{
+		if (second_current == 0 && frame < 30)
+		{
+			angles[LEFTARM][X] -= 2.5f; // -75
+			angles[LEFTSHOULDER][Y] += 3.0f; // 90
+
+			angles[RIGHTARM][X] -= 2.5f; // -75
+			angles[RIGHTSHOULDER][Y] -= 3.0f; // -90
+
+			angles[BODY][Z] += 0.5f; // 15
+			angles[LEFTLEG][Z] -= 0.5f; // -15 resist body
+			angles[RIGHTLEG][Z] -= 0.5f; // -15 resist body
+		}
+		else if (second_current == 0)
+		{
+			angles[RIGHTSHOULDER][Y] += 2.0f; // -90 to -30
+			angles[RIGHTSHOULDER][X] -= 2.0f; // 0 to -60
+
+			angles[BODY][X] -= 0.5f; // -15
+			angles[LEFTLEG][X] += 0.5f; // 15 resist body
+			angles[RIGHTLEG][X] += 0.5f; // 15 resist body
+		}
+		else if (second_current == 1 && frame >= 30)
+		{
+			angles[RIGHTSHOULDER][Y] -= 2.0f; // -30 to -90
+			angles[RIGHTSHOULDER][X] += 2.0f; // -60 to 0
+
+			angles[BODY][X] += 0.5f; // -15 to 0
+			angles[LEFTLEG][X] -= 0.5f; // 15 to 0 resist body
+			angles[RIGHTLEG][X] -= 0.5f; // 15 to 0 resist body
+		}
+		else if (second_current == 2 && frame < 30)
+		{
+			angles[LEFTSHOULDER][Y] -= 3.0f; // 90 to 0
+			angles[RIGHTSHOULDER][Y] += 3.0f; // -90 to 0
+			angles[LEFTARM][X] += 2.5f; // -75 to 0
+			angles[RIGHTARM][X] += 2.5f; // -75 to 0
+		}
+
+		if (second_current == 2)
+		{
+			if (frame < 10)
+			{
+				angles[LEFTLEG][Z] += 1.5f; // -15 to 0 resist body
+				angles[RIGHTLEG][Z] += 1.5f; // -15 to 0 resist body
+			}
+			else
+			{
+				positions[BODY][Y] -= 0.1f;
+				positions[BODY][X] -= 0.2f;
+			}
+
+			angles[LEFTSHOULDER][Z] -= 1.0f; // 0 to -60
+			angles[RIGHTSHOULDER][Z] += 1.0f; // 0 to 60
+
+			angles[BODY][Z] -= 1.5f; // 15 to -75
 		}
 	}
 }
@@ -841,7 +902,7 @@ void updateModels()
 	}
 
 	//Body
-	Rotatation[BODY] = rotate(angles[BODY][Y], 0, 1, 0);
+	Rotatation[BODY] = rotate(angles[BODY][X], 1, 0, 0) * rotate(angles[BODY][Y], 0, 1, 0) * rotate(angles[BODY][Z], 0, 0, 1);
 	Translation[BODY] = translate(positions[BODY][X], positions[BODY][Y] + fly_position, positions[BODY][Z]);
 	Models[BODY] = Translation[BODY] * Rotatation[BODY] * Scaling[BODY];
 	//============================================================
@@ -1282,3 +1343,54 @@ void drawScreenQuad()
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
+
+//void initOpenAL()
+//{
+//	if (!device) {
+//		//Tutorial: https://ffainelli.github.io/openal-example/
+//		device = alcOpenDevice(NULL);
+//		if (!device)
+//			puts("ERROR::NO_AUDIO_DEVICE");
+//
+//		ALboolean enumeration = alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
+//		if (enumeration == AL_FALSE)
+//			puts("Enumeration not supported");
+//		else
+//			puts("Enumeration supported");
+//
+//		context = alcCreateContext(device, NULL);
+//		if (!alcMakeContextCurrent(context))
+//			puts("Failed to make context current");
+//
+//		ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+//		alListener3f(AL_POSITION, positions[BODY][X], positions[BODY][Y], positions[BODY][Z]);
+//		alListener3f(AL_VELOCITY, 0, 0, 0);
+//		alListenerfv(AL_ORIENTATION, listenerOri);
+//
+//		alGenSources((ALuint)1, &source);
+//		alSourcef(source, AL_PITCH, 1);
+//		alSourcef(source, AL_GAIN, 0.5f);
+//		alSource3f(source, AL_POSITION, positions[BODY][X], positions[BODY][Y], positions[BODY][Z]);
+//		alSource3f(source, AL_VELOCITY, 0, 0, 0);
+//		alSourcei(source, AL_LOOPING, AL_TRUE);
+//
+//		alGenBuffers((ALuint)1, &buffer);
+//
+//		ALsizei size, freq;
+//		ALenum format;
+//		ALvoid* data;
+//		ALboolean loop = AL_TRUE;
+//
+//		//Material from: ThinMatrix
+//		alutLoadWAVFile((ALbyte*)"../FreedomGunduan/audios/rush.wav", &format, &data, &size, &freq, &loop); //music from bensound.com
+//		alBufferData(buffer, format, data, size, freq);
+//		alSourcei(source, AL_BUFFER, buffer);
+//
+//		if (format == AL_FORMAT_STEREO16 || format == AL_FORMAT_STEREO8)
+//			puts("TYPE::STEREO");
+//		else if (format == AL_FORMAT_MONO16 || format == AL_FORMAT_MONO8)
+//			puts("TYPE::MONO");
+//
+//		alSourcePlay(source);
+//	}
+//}

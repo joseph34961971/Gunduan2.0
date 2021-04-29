@@ -25,13 +25,11 @@ add_executable(FreedomGunduan
     ${SRC_DIR}main.h
     ${SRC_DIR}LoadShaders.h
     ${SRC_DIR}objloader.hpp
-    ${SRC_DIR}Gundam.h
     ${SRC_DIR}vgl.h
 
     ${SRC_DIR}main.cpp
     ${SRC_DIR}objloader.cpp
     ${SRC_DIR}targa.cpp
-    ${SRC_DIR}Gundam.cpp
 
     ${SRC_SHADER}
 )
