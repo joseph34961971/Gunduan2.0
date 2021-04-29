@@ -129,6 +129,7 @@ mat4 Models[PARTSNUM];
 #define Squat 3
 #define MoonWalk 4
 #define GangnanStyle 5
+#define YoBattle 6
 int mode = 1;
 int action;
 const int fps = 60;
