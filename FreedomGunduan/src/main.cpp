@@ -128,20 +128,22 @@ void resetObj(int f)
 	angles[RIGHTARM][Z] = 32.2f;
 
 	angles[LEFTCONNECTOR][Y] = -25.888f;
+	angles[LEFTCONNECTOR][X] = 5.0f;
 	angles[LEFTINSIDEBIGWING][Y] = 2.118f;
-	angles[LEFTGUN][Y] = -1.657f;
+	angles[LEFTGUN][Y] = 1.657f;
 	angles[LEFTOUTSIDEBIGWING][Y] = -1.487f;
 	angles[LEFTOUTSIDESMALLWING][Y] = -1.013f;
 	angles[LEFTMIDDLESMALLWING][Y] = -0.756f;
 	angles[LEFTINSIDESMALLWING][Y] = 2.77f;
 
-	angles[RIGHTCONNECTOR][Y] = 29.914f;
-	angles[RIGHTINSIDEBIGWING][Y] = 0.494f;
-	angles[RIGHTGUN][Y] = -0.561f;
-	angles[RIGHTOUTSIDEBIGWING][Y] = 2.904f;
-	angles[RIGHTOUTSIDESMALLWING][Y] = 2.891f;
-	angles[RIGHTMIDDLESMALLWING][Y] = 2.417f;
-	angles[RIGHTINSIDESMALLWING][Y] = 2.915f;
+	angles[RIGHTCONNECTOR][Y] = 20.888f;
+	angles[RIGHTCONNECTOR][X] = 5.0f;
+	angles[RIGHTINSIDEBIGWING][Y] = -2.118f;
+	angles[RIGHTGUN][Y] = -1.657f;
+	angles[RIGHTOUTSIDEBIGWING][Y] = 1.487f;
+	angles[RIGHTOUTSIDESMALLWING][Y] = 1.013f;
+	angles[RIGHTMIDDLESMALLWING][Y] = 0.756f;
+	angles[RIGHTINSIDESMALLWING][Y] = 2.77f;
 
 	positions[BODY][X] = 0.0f;
 	positions[BODY][Y] = 0.0f; // 34.0f
@@ -193,55 +195,55 @@ void resetObj(int f)
 
 	positions[LEFTINSIDEBIGWING][X] = -17.0f;
 	positions[LEFTINSIDEBIGWING][Y] = 27.0f;
-	positions[LEFTINSIDEBIGWING][Z] = -5.0f;
+	positions[LEFTINSIDEBIGWING][Z] = 3.0f;
 
 	positions[LEFTGUN][X] = -21.0f;
 	positions[LEFTGUN][Y] = 25.0f;
-	positions[LEFTGUN][Z] = -8.0f;
+	positions[LEFTGUN][Z] = 0.0f;
 
 	positions[LEFTOUTSIDEBIGWING][X] = -14.0f;
 	positions[LEFTOUTSIDEBIGWING][Y] = 27.0f;
-	positions[LEFTOUTSIDEBIGWING][Z] = -8.0f; // -10.0f
+	positions[LEFTOUTSIDEBIGWING][Z] = -3.0f;
 
 	positions[LEFTOUTSIDESMALLWING][X] = -8.0f;
 	positions[LEFTOUTSIDESMALLWING][Y] = 19.0f;
-	positions[LEFTOUTSIDESMALLWING][Z] = -8.0f;
+	positions[LEFTOUTSIDESMALLWING][Z] = -3.0f;
 
 	positions[LEFTMIDDLESMALLWING][X] = -10.0f;
 	positions[LEFTMIDDLESMALLWING][Y] = 20.0f;
-	positions[LEFTMIDDLESMALLWING][Z] = -5.0f;
+	positions[LEFTMIDDLESMALLWING][Z] = 0.0f;
 
 	positions[LEFTINSIDESMALLWING][X] = -11.0f;
 	positions[LEFTINSIDESMALLWING][Y] = 19.0f;
-	positions[LEFTINSIDESMALLWING][Z] = -2.0f;
+	positions[LEFTINSIDESMALLWING][Z] = 3.0f;
 
-	positions[RIGHTCONNECTOR][X] = 13.0f;
+	positions[RIGHTCONNECTOR][X] = 14.0f;
 	positions[RIGHTCONNECTOR][Y] = 0.0f;
 	positions[RIGHTCONNECTOR][Z] = -8.0f;
 
 	positions[RIGHTINSIDEBIGWING][X] = 16.0f;
 	positions[RIGHTINSIDEBIGWING][Y] = 25.0f;
-	positions[RIGHTINSIDEBIGWING][Z] = -6.0f;
+	positions[RIGHTINSIDEBIGWING][Z] = 3.0f;
 
 	positions[RIGHTGUN][X] = 20.0f;
 	positions[RIGHTGUN][Y] = 24.0f;
-	positions[RIGHTGUN][Z] = -12.0f;
+	positions[RIGHTGUN][Z] = -0.2f;
 
 	positions[RIGHTOUTSIDEBIGWING][X] = 13.0f;
 	positions[RIGHTOUTSIDEBIGWING][Y] = 26.0f;
-	positions[RIGHTOUTSIDEBIGWING][Z] = -12.0f; // -10.0f
+	positions[RIGHTOUTSIDEBIGWING][Z] = -3.0f;
 
 	positions[RIGHTOUTSIDESMALLWING][X] = 7.0f;
 	positions[RIGHTOUTSIDESMALLWING][Y] = 19.0f;
-	positions[RIGHTOUTSIDESMALLWING][Z] = -9.0f;
+	positions[RIGHTOUTSIDESMALLWING][Z] = -3.0f;
 
 	positions[RIGHTMIDDLESMALLWING][X] = 9.0f;
 	positions[RIGHTMIDDLESMALLWING][Y] = 20.0f;
-	positions[RIGHTMIDDLESMALLWING][Z] = -6.0f;
+	positions[RIGHTMIDDLESMALLWING][Z] = 0.0f;
 
 	positions[RIGHTINSIDESMALLWING][X] = 10.0f;
 	positions[RIGHTINSIDESMALLWING][Y] = 19.0f;
-	positions[RIGHTINSIDESMALLWING][Z] = -3.0f;
+	positions[RIGHTINSIDESMALLWING][Z] = 3.0f;
 
 	if (action == WALK)
 	{
