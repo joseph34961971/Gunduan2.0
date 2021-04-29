@@ -124,6 +124,21 @@ void resetObj(int f)
 
 	angles[RIGHTARM][Z] = 32.2f;
 
+	angles[LEFTCONNECTOR][Y] = 25.888f;
+	angles[LEFTINSIDEBIGWING][Y] = 2.118f;
+	angles[LEFTGUN][Y] = -1.657f;
+	angles[LEFTOUTSIDEBIGWING][Y] = -1.487f;
+	angles[LEFTOUTSIDESMALLWING][Y] = -1.013f;
+	angles[LEFTMIDDLESMALLWING][Y] = -0.756f;
+	angles[LEFTINSIDESMALLWING][Y] = 2.77f;
+	angles[RIGHTCONNECTOR][Y] = -29.914f;
+	angles[RIGHTINSIDEBIGWING][Y] = 2.118f;
+	angles[RIGHTGUN][Y] = -0.561f;
+	angles[RIGHTOUTSIDEBIGWING][Y] = 2.904f;
+	angles[RIGHTOUTSIDESMALLWING][Y] = 2.891f;
+	angles[RIGHTMIDDLESMALLWING][Y] = 2.417f;
+	angles[RIGHTINSIDESMALLWING][Y] = 0.494f;
+
 	positions[BODY][X] = 0.0f;
 	positions[BODY][Y] = 0.0f; // 34.0f
 	positions[BODY][Z] = 0.0f;
@@ -167,6 +182,62 @@ void resetObj(int f)
 	positions[RIGHTFOOT][X] = 5.0f;
 	positions[RIGHTFOOT][Y] = -29.0f;
 	positions[RIGHTFOOT][Z] = 12.0f;
+
+	positions[LEFTCONNECTOR][X] = -14.0f;
+	positions[LEFTCONNECTOR][Y] = 0.0f;
+	positions[LEFTCONNECTOR][Z] = -8.0f;
+
+	positions[LEFTINSIDEBIGWING][X] = -17.0f;
+	positions[LEFTINSIDEBIGWING][Y] = 27.0f;
+	positions[LEFTINSIDEBIGWING][Z] = -4.0f;
+
+	positions[LEFTGUN][X] = -21.0f;
+	positions[LEFTGUN][Y] = 25.0f;
+	positions[LEFTGUN][Z] = -11.0f;
+
+	positions[LEFTOUTSIDEBIGWING][X] = -13.0f;
+	positions[LEFTOUTSIDEBIGWING][Y] = 27.0f;
+	positions[LEFTOUTSIDEBIGWING][Z] = -16.0f; // -10.0f
+
+	positions[LEFTOUTSIDESMALLWING][X] = -9.0f;
+	positions[LEFTOUTSIDESMALLWING][Y] = 19.0f;
+	positions[LEFTOUTSIDESMALLWING][Z] = -9.0f;
+
+	positions[LEFTMIDDLESMALLWING][X] = -9.0f;
+	positions[LEFTMIDDLESMALLWING][Y] = 19.0f;
+	positions[LEFTMIDDLESMALLWING][Z] = -6.0f;
+
+	positions[LEFTINSIDESMALLWING][X] = -9.0f;
+	positions[LEFTINSIDESMALLWING][Y] = 19.0f;
+	positions[LEFTINSIDESMALLWING][Z] = -3.0f;
+
+	positions[RIGHTCONNECTOR][X] = 13.0f;
+	positions[RIGHTCONNECTOR][Y] = 0.0f;
+	positions[RIGHTCONNECTOR][Z] = -8.0f;
+
+	positions[RIGHTINSIDEBIGWING][X] = 16.0f;
+	positions[RIGHTINSIDEBIGWING][Y] = 25.0f;
+	positions[RIGHTINSIDEBIGWING][Z] = -5.0f;
+
+	positions[RIGHTGUN][X] = 20.0f;
+	positions[RIGHTGUN][Y] = 24.0f;
+	positions[RIGHTGUN][Z] = -11.0f;
+
+	positions[RIGHTOUTSIDEBIGWING][X] = 13.0f;
+	positions[RIGHTOUTSIDEBIGWING][Y] = 26.0f;
+	positions[RIGHTOUTSIDEBIGWING][Z] = -12.0f; // -10.0f
+
+	positions[RIGHTOUTSIDESMALLWING][X] = 10.0f;
+	positions[RIGHTOUTSIDESMALLWING][Y] = 19.0f;
+	positions[RIGHTOUTSIDESMALLWING][Z] = -9.0f;
+
+	positions[RIGHTMIDDLESMALLWING][X] = 10.0f;
+	positions[RIGHTMIDDLESMALLWING][Y] = 19.0f;
+	positions[RIGHTMIDDLESMALLWING][Z] = -6.0f;
+
+	positions[RIGHTINSIDESMALLWING][X] = 10.0f;
+	positions[RIGHTINSIDESMALLWING][Y] = 19.0f;
+	positions[RIGHTINSIDESMALLWING][Z] = -3.0f;
 
 	if (action == WALK)
 	{
@@ -838,12 +909,27 @@ void Obj2Buffer()
 	load2Buffer("../FreedomGunduan/objs/right_arm.obj", RIGHTSHOULDER);
 	load2Buffer("../FreedomGunduan/objs/right_hand.obj", RIGHTARM);
 
-	load2Buffer("../FreedomGunduan/objs/wing.obj", WING);
+	load2Buffer("../FreedomGunduan/objs/wingBase.obj", WING);
 
 	load2Buffer("../FreedomGunduan/objs/left_leg.obj", LEFTLEG);
 	load2Buffer("../FreedomGunduan/objs/left_foot.obj", LEFTFOOT);
 	load2Buffer("../FreedomGunduan/objs/right_leg.obj", RIGHTLEG);
 	load2Buffer("../FreedomGunduan/objs/right_foot.obj", RIGHTFOOT);
+
+	load2Buffer("../FreedomGunduan/objs/leftConnector.obj", LEFTCONNECTOR);
+	load2Buffer("../FreedomGunduan/objs/leftInsideBigWing.obj", LEFTINSIDEBIGWING);
+	load2Buffer("../FreedomGunduan/objs/leftGun.obj", LEFTGUN);
+	load2Buffer("../FreedomGunduan/objs/leftOutsideBigWing.obj", LEFTOUTSIDEBIGWING);
+	load2Buffer("../FreedomGunduan/objs/leftOusideSmallWing.obj", LEFTOUTSIDESMALLWING);
+	load2Buffer("../FreedomGunduan/objs/leftMiddleSmallWing.obj", LEFTMIDDLESMALLWING);
+	load2Buffer("../FreedomGunduan/objs/leftInsideSmallWing.obj", LEFTINSIDESMALLWING);
+	load2Buffer("../FreedomGunduan/objs/rightConnector.obj", RIGHTCONNECTOR);
+	load2Buffer("../FreedomGunduan/objs/rightInsideBigWing.obj", RIGHTINSIDEBIGWING);
+	load2Buffer("../FreedomGunduan/objs/rightGun.obj", RIGHTGUN);
+	load2Buffer("../FreedomGunduan/objs/rightOutsideBigWing.obj", RIGHTOUTSIDEBIGWING);
+	load2Buffer("../FreedomGunduan/objs/rightOutsideSmallWing.obj", RIGHTOUTSIDESMALLWING);
+	load2Buffer("../FreedomGunduan/objs/rightMiddleSmallWing.obj", RIGHTMIDDLESMALLWING);
+	load2Buffer("../FreedomGunduan/objs/rightInsideSmallWing.obj", RIGHTINSIDESMALLWING);
 
 	GLuint totalSize[3] = { 0,0,0 };
 	GLuint offset[3] = { 0,0,0 };
@@ -969,6 +1055,90 @@ void updateModels()
 	Rotatation[RIGHTFOOT] = rotate(angles[RIGHTFOOT][X], 1, 0, 0) * rotate(angles[RIGHTFOOT][Z], 0, 0, 1);
 	Translation[RIGHTFOOT] = translate(positions[RIGHTFOOT][X], positions[RIGHTFOOT][Y], positions[RIGHTFOOT][Z]);
 	Models[RIGHTFOOT] = Models[RIGHTLEG] * Translation[RIGHTFOOT] * Rotatation[RIGHTFOOT];
+	//=============================================================
+
+	//翅膀左連接器(面對畫面左邊)
+	Rotatation[LEFTCONNECTOR] = rotate(angles[LEFTCONNECTOR][Y], 0, 1, 0) * rotate(angles[LEFTCONNECTOR][X], 1, 0, 0) * rotate(angles[LEFTCONNECTOR][Z], 0, 0, 1);
+	Translation[LEFTCONNECTOR] = translate(positions[LEFTCONNECTOR][X], positions[LEFTCONNECTOR][Y], positions[LEFTCONNECTOR][Z]);
+	Models[LEFTCONNECTOR] = Models[WING] * Translation[LEFTCONNECTOR] * Rotatation[LEFTCONNECTOR];
+	//=============================================================
+
+	//左內大翅(靠近鋼彈)
+	Rotatation[LEFTINSIDEBIGWING] = rotate(angles[LEFTINSIDEBIGWING][Y], 0, 1, 0) * rotate(angles[LEFTINSIDEBIGWING][X], 1, 0, 0) * rotate(angles[LEFTINSIDEBIGWING][Z], 0, 0, 1);
+	Translation[LEFTINSIDEBIGWING] = translate(positions[LEFTINSIDEBIGWING][X], positions[LEFTINSIDEBIGWING][Y], positions[LEFTINSIDEBIGWING][Z]);
+	Models[LEFTINSIDEBIGWING] = Models[LEFTCONNECTOR] * Translation[LEFTINSIDEBIGWING] * Rotatation[LEFTINSIDEBIGWING];
+	//=============================================================
+
+	//左翅膀槍(面對畫面左邊)
+	Rotatation[LEFTGUN] = rotate(angles[LEFTGUN][Y], 0, 1, 0) * rotate(angles[LEFTGUN][X], 1, 0, 0) * rotate(angles[LEFTGUN][Z], 0, 0, 1);
+	Translation[LEFTGUN] = translate(positions[LEFTGUN][X], positions[LEFTGUN][Y], positions[LEFTGUN][Z]);
+	Models[LEFTGUN] = Models[LEFTCONNECTOR] * Translation[LEFTGUN] * Rotatation[LEFTGUN];
+	//=============================================================
+
+	//左外大翅(遠離鋼彈)
+	Rotatation[LEFTOUTSIDEBIGWING] = rotate(angles[LEFTOUTSIDEBIGWING][Y], 0, 1, 0) * rotate(angles[LEFTOUTSIDEBIGWING][X], 1, 0, 0) * rotate(angles[LEFTOUTSIDEBIGWING][Z], 0, 0, 1);
+	Translation[LEFTOUTSIDEBIGWING] = translate(positions[LEFTOUTSIDEBIGWING][X], positions[LEFTOUTSIDEBIGWING][Y], positions[LEFTOUTSIDEBIGWING][Z]);
+	Models[LEFTOUTSIDEBIGWING] = Models[LEFTCONNECTOR] * Translation[LEFTOUTSIDEBIGWING] * Rotatation[LEFTOUTSIDEBIGWING];
+	//=============================================================
+
+	//左外小翅(遠離鋼彈)
+	Rotatation[LEFTOUTSIDESMALLWING] = rotate(angles[LEFTOUTSIDESMALLWING][Y], 0, 1, 0) * rotate(angles[LEFTOUTSIDESMALLWING][X], 1, 0, 0) * rotate(angles[LEFTOUTSIDESMALLWING][Z], 0, 0, 1);
+	Translation[LEFTOUTSIDESMALLWING] = translate(positions[LEFTOUTSIDESMALLWING][X], positions[LEFTOUTSIDESMALLWING][Y], positions[LEFTOUTSIDESMALLWING][Z]);
+	Models[LEFTOUTSIDESMALLWING] = Models[LEFTCONNECTOR] * Translation[LEFTOUTSIDESMALLWING] * Rotatation[LEFTOUTSIDESMALLWING];
+	//=============================================================
+
+	//左中小翅
+	Rotatation[LEFTMIDDLESMALLWING] = rotate(angles[LEFTMIDDLESMALLWING][Y], 0, 1, 0) * rotate(angles[LEFTMIDDLESMALLWING][X], 1, 0, 0) * rotate(angles[LEFTMIDDLESMALLWING][Z], 0, 0, 1);
+	Translation[LEFTMIDDLESMALLWING] = translate(positions[LEFTMIDDLESMALLWING][X], positions[LEFTMIDDLESMALLWING][Y], positions[LEFTMIDDLESMALLWING][Z]);
+	Models[LEFTMIDDLESMALLWING] = Models[LEFTCONNECTOR] * Translation[LEFTMIDDLESMALLWING] * Rotatation[LEFTMIDDLESMALLWING];
+	//=============================================================
+
+	//左內小翅(靠近鋼彈)
+	Rotatation[LEFTINSIDESMALLWING] = rotate(angles[LEFTINSIDESMALLWING][Y], 0, 1, 0) * rotate(angles[LEFTINSIDESMALLWING][X], 1, 0, 0) * rotate(angles[LEFTINSIDESMALLWING][Z], 0, 0, 1);
+	Translation[LEFTINSIDESMALLWING] = translate(positions[LEFTINSIDESMALLWING][X], positions[LEFTINSIDESMALLWING][Y], positions[LEFTINSIDESMALLWING][Z]);
+	Models[LEFTINSIDESMALLWING] = Models[LEFTCONNECTOR] * Translation[LEFTINSIDESMALLWING] * Rotatation[LEFTINSIDESMALLWING];
+	//=============================================================
+
+	//翅膀右連接器(面對畫面右邊)
+	Rotatation[RIGHTCONNECTOR] = rotate(angles[RIGHTCONNECTOR][Y], 0, 1, 0) * rotate(angles[RIGHTCONNECTOR][X], 1, 0, 0) * rotate(angles[RIGHTCONNECTOR][Z], 0, 0, 1);
+	Translation[RIGHTCONNECTOR] = translate(positions[RIGHTCONNECTOR][X], positions[RIGHTCONNECTOR][Y], positions[RIGHTCONNECTOR][Z]);
+	Models[RIGHTCONNECTOR] = Models[WING] * Translation[RIGHTCONNECTOR] * Rotatation[RIGHTCONNECTOR];
+	//=============================================================
+
+	//右內大翅(靠近鋼彈)
+	Rotatation[RIGHTINSIDEBIGWING] = rotate(angles[RIGHTINSIDEBIGWING][Y], 0, 1, 0) * rotate(angles[RIGHTINSIDEBIGWING][X], 1, 0, 0) * rotate(angles[RIGHTINSIDEBIGWING][Z], 0, 0, 1);
+	Translation[RIGHTINSIDEBIGWING] = translate(positions[RIGHTINSIDEBIGWING][X], positions[RIGHTINSIDEBIGWING][Y], positions[RIGHTINSIDEBIGWING][Z]);
+	Models[RIGHTINSIDEBIGWING] = Models[RIGHTCONNECTOR] * Translation[RIGHTINSIDEBIGWING] * Rotatation[RIGHTINSIDEBIGWING];
+	//=============================================================
+
+	//右翅膀槍(面對畫面右邊)
+	Rotatation[RIGHTGUN] = rotate(angles[RIGHTGUN][Y], 0, 1, 0) * rotate(angles[RIGHTGUN][X], 1, 0, 0) * rotate(angles[RIGHTGUN][Z], 0, 0, 1);
+	Translation[RIGHTGUN] = translate(positions[RIGHTGUN][X], positions[RIGHTGUN][Y], positions[RIGHTGUN][Z]);
+	Models[RIGHTGUN] = Models[RIGHTCONNECTOR] * Translation[RIGHTGUN] * Rotatation[RIGHTGUN];
+	//=============================================================
+
+	//右外大膀(遠離鋼彈)
+	Rotatation[RIGHTOUTSIDEBIGWING] = rotate(angles[RIGHTOUTSIDEBIGWING][Y], 0, 1, 0) * rotate(angles[RIGHTOUTSIDEBIGWING][X], 1, 0, 0) * rotate(angles[RIGHTOUTSIDEBIGWING][Z], 0, 0, 1);
+	Translation[RIGHTOUTSIDEBIGWING] = translate(positions[RIGHTOUTSIDEBIGWING][X], positions[RIGHTOUTSIDEBIGWING][Y], positions[RIGHTOUTSIDEBIGWING][Z]);
+	Models[RIGHTOUTSIDEBIGWING] = Models[RIGHTCONNECTOR] * Translation[RIGHTOUTSIDEBIGWING] * Rotatation[RIGHTOUTSIDEBIGWING];
+	//=============================================================
+
+	//右外小膀(遠離鋼彈)
+	Rotatation[RIGHTOUTSIDESMALLWING] = rotate(angles[RIGHTOUTSIDESMALLWING][Y], 0, 1, 0) * rotate(angles[RIGHTOUTSIDESMALLWING][X], 1, 0, 0) * rotate(angles[RIGHTOUTSIDESMALLWING][Z], 0, 0, 1);
+	Translation[RIGHTOUTSIDESMALLWING] = translate(positions[RIGHTOUTSIDESMALLWING][X], positions[RIGHTOUTSIDESMALLWING][Y], positions[RIGHTOUTSIDESMALLWING][Z]);
+	Models[RIGHTOUTSIDESMALLWING] = Models[RIGHTCONNECTOR] * Translation[RIGHTOUTSIDESMALLWING] * Rotatation[RIGHTOUTSIDESMALLWING];
+	//=============================================================
+
+	//右中小膀
+	Rotatation[RIGHTMIDDLESMALLWING] = rotate(angles[RIGHTMIDDLESMALLWING][Y], 0, 1, 0) * rotate(angles[RIGHTMIDDLESMALLWING][X], 1, 0, 0) * rotate(angles[RIGHTMIDDLESMALLWING][Z], 0, 0, 1);
+	Translation[RIGHTMIDDLESMALLWING] = translate(positions[RIGHTMIDDLESMALLWING][X], positions[RIGHTMIDDLESMALLWING][Y], positions[RIGHTMIDDLESMALLWING][Z]);
+	Models[RIGHTMIDDLESMALLWING] = Models[RIGHTCONNECTOR] * Translation[RIGHTMIDDLESMALLWING] * Rotatation[RIGHTMIDDLESMALLWING];
+	//=============================================================
+
+	//右內小膀
+	Rotatation[RIGHTINSIDESMALLWING] = rotate(angles[RIGHTINSIDESMALLWING][Y], 0, 1, 0) * rotate(angles[RIGHTINSIDESMALLWING][X], 1, 0, 0) * rotate(angles[RIGHTINSIDESMALLWING][Z], 0, 0, 1);
+	Translation[RIGHTINSIDESMALLWING] = translate(positions[RIGHTINSIDESMALLWING][X], positions[RIGHTINSIDESMALLWING][Y], positions[RIGHTINSIDESMALLWING][Z]);
+	Models[RIGHTINSIDESMALLWING] = Models[RIGHTCONNECTOR] * Translation[RIGHTINSIDESMALLWING] * Rotatation[RIGHTINSIDESMALLWING];
 	//=============================================================
 }
 
