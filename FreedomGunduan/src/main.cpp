@@ -119,6 +119,10 @@ void resetObj(int f)
 			angles[i][j] = 0.0f;
 		}
 	}
+	angles[LEFTARM][Y] = -22.2f;
+	angles[LEFTARM][Z] = -26.8f;
+
+	angles[RIGHTARM][Z] = 32.2f;
 
 	positions[BODY][X] = 0.0f;
 	positions[BODY][Y] = 0.0f; // 34.0f
@@ -132,7 +136,7 @@ void resetObj(int f)
 	positions[LEFTSHOULDER][Y] = 19.0f;
 	positions[LEFTSHOULDER][Z] = -1.0f;
 
-	positions[LEFTARM][X] = -7.0f;
+	positions[LEFTARM][X] = -8.1f;
 	positions[LEFTARM][Y] = -11.0f;
 	positions[LEFTARM][Z] = 0.0f;
 
@@ -914,7 +918,7 @@ void updateModels()
 	//============================================================
 	
 	//左下手臂
-	Rotatation[LEFTARM] = rotate(angles[LEFTARM][X], 1, 0, 0) * rotate(angles[LEFTARM][Z], 0, 0, 1);
+	Rotatation[LEFTARM] = rotate(angles[LEFTARM][Z], 0, 0, 1) * rotate(angles[LEFTARM][Y], 0, 1, 0) * rotate(angles[LEFTARM][X], 1, 0, 0);
 	Translation[LEFTARM] = translate(positions[LEFTARM][X], positions[LEFTARM][Y], positions[LEFTARM][Z]); // 0 -3 0
 	Models[LEFTARM] = Models[LEFTSHOULDER] * Translation[LEFTARM] * Rotatation[LEFTARM];
 	//============================================================
@@ -932,7 +936,7 @@ void updateModels()
 	//============================================================
 	
 	//右手(面對畫面右邊)
-	Rotatation[RIGHTARM] = rotate(angles[RIGHTARM][X], 1, 0, 0);
+	Rotatation[RIGHTARM] = rotate(angles[RIGHTARM][Z], 0, 0, 1) * rotate(angles[RIGHTARM][Y], 0, 1, 0) * rotate(angles[RIGHTARM][X], 1, 0, 0);
 	Translation[RIGHTARM] = translate(positions[RIGHTARM][X], positions[RIGHTARM][Y], positions[RIGHTARM][Z]);
 	Models[RIGHTARM] = Models[RIGHTSHOULDER] * Translation[RIGHTARM] * Rotatation[RIGHTARM];
 	//=============================================================
