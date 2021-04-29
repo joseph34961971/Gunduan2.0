@@ -24,6 +24,7 @@ int main(int argc, char** argv)
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 	init();
+	//initOpenAL();
 	glutDisplayFunc(display);
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(Keyboard);
@@ -1282,3 +1283,54 @@ void drawScreenQuad()
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
+
+//void initOpenAL()
+//{
+//	if (!device) {
+//		//Tutorial: https://ffainelli.github.io/openal-example/
+//		device = alcOpenDevice(NULL);
+//		if (!device)
+//			puts("ERROR::NO_AUDIO_DEVICE");
+//
+//		ALboolean enumeration = alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
+//		if (enumeration == AL_FALSE)
+//			puts("Enumeration not supported");
+//		else
+//			puts("Enumeration supported");
+//
+//		context = alcCreateContext(device, NULL);
+//		if (!alcMakeContextCurrent(context))
+//			puts("Failed to make context current");
+//
+//		ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+//		alListener3f(AL_POSITION, positions[BODY][X], positions[BODY][Y], positions[BODY][Z]);
+//		alListener3f(AL_VELOCITY, 0, 0, 0);
+//		alListenerfv(AL_ORIENTATION, listenerOri);
+//
+//		alGenSources((ALuint)1, &source);
+//		alSourcef(source, AL_PITCH, 1);
+//		alSourcef(source, AL_GAIN, 0.5f);
+//		alSource3f(source, AL_POSITION, positions[BODY][X], positions[BODY][Y], positions[BODY][Z]);
+//		alSource3f(source, AL_VELOCITY, 0, 0, 0);
+//		alSourcei(source, AL_LOOPING, AL_TRUE);
+//
+//		alGenBuffers((ALuint)1, &buffer);
+//
+//		ALsizei size, freq;
+//		ALenum format;
+//		ALvoid* data;
+//		ALboolean loop = AL_TRUE;
+//
+//		//Material from: ThinMatrix
+//		alutLoadWAVFile((ALbyte*)"../FreedomGunduan/audios/rush.wav", &format, &data, &size, &freq, &loop); //music from bensound.com
+//		alBufferData(buffer, format, data, size, freq);
+//		alSourcei(source, AL_BUFFER, buffer);
+//
+//		if (format == AL_FORMAT_STEREO16 || format == AL_FORMAT_STEREO8)
+//			puts("TYPE::STEREO");
+//		else if (format == AL_FORMAT_MONO16 || format == AL_FORMAT_MONO8)
+//			puts("TYPE::MONO");
+//
+//		alSourcePlay(source);
+//	}
+//}

@@ -17,6 +17,7 @@ using namespace std;
 /*********************NEW ADDITIONS*********************/
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+//#include <AL/alut.h>
 
 using namespace glm;
 
@@ -153,3 +154,9 @@ GLuint screen_fbo;	//frame buffer
 GLuint screen_rbo;	//attach to depth and stencil
 void initScreenQuad();
 void drawScreenQuad();
+
+//void initOpenAL();
+//ALCdevice* device = nullptr;
+//ALCcontext* context = nullptr;
+//ALuint source;
+//ALuint buffer;
