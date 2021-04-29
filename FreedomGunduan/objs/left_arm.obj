@@ -1,6 +1,6 @@
 # This file uses centimeters as units for non-parametric coordinates.
 
-mtllib left_arm.mtl
+mtllib freedom.mtl
 g default
 v -13.095947 -17.674316 0.190903
 v -12.634277 -17.905273 0.190201
