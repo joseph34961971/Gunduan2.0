@@ -1,6 +1,6 @@
 # This file uses centimeters as units for non-parametric coordinates.
 
-mtllib leftConnector.mtl
+mtllib freedom.mtl
 g default
 v -20.372294 3.845215 -0.439642
 v -20.346915 3.862793 1.180569
@@ -2560,8 +2560,8 @@ vn 0.679567 0.733384 -0.018354
 vn 0.679567 0.733384 -0.018354
 vn 0.695451 0.718336 -0.018482
 s off
-g wing:ChafCaja1295 leftConnector
-usemtl wing:wire_006134006
+g freedom:ChafCaja1295 leftConnector
+usemtl freedom:wire_006134006
 f 3/1/1 2/2/2 1/3/3
 f 1/3/4 4/4/5 3/1/6
 f 6/5/7 5/6/8 3/1/9
@@ -6120,8 +6120,8 @@ vn -0.003167 -0.999938 0.010652
 vn -0.003167 -0.999938 0.010652
 vn -0.003167 -0.999938 0.010652
 s off
-g leftConnector wing:ChafCaja1296
-usemtl wing:wire_006134006
+g leftConnector freedom:ChafCaja1296
+usemtl freedom:wire_006134006
 f 266/805/1489 267/806/1490 268/807/1491
 f 268/807/1492 269/808/1493 266/805/1494
 f 268/807/1495 270/809/1496 271/810/1497
