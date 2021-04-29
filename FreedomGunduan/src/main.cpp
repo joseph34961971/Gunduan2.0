@@ -132,7 +132,7 @@ void resetObj(int f)
 	positions[HEAD][Y] = 26.0f;
 	positions[HEAD][Z] = 0;
 
-	positions[LEFTSHOULDER][X] = -15.0f;
+	positions[LEFTSHOULDER][X] = -12.0f;
 	positions[LEFTSHOULDER][Y] = 19.0f;
 	positions[LEFTSHOULDER][Z] = -1.0f;
 
@@ -411,9 +411,9 @@ void updateObj(int frame)
 			angles[RIGHTARM][X] -= 1.5f; // -45
 			angles[RIGHTSHOULDER][Y] -= 2.0f; // -60
 
-			angles[LEFTARM][Z] += 1.0f; // 30
-			angles[LEFTSHOULDER][X] -= 5.0f; // -150
-			angles[LEFTSHOULDER][Z] -= 1.0f; // -30
+			//angles[LEFTARM][Z] += 1.0f; // 30
+			angles[LEFTSHOULDER][X] -= 4.5f; // -135
+			//angles[LEFTSHOULDER][Z] -= 1.0f; // -30
 		}
 
 		if (frame % 30 == 0)
@@ -443,13 +443,13 @@ void updateObj(int frame)
 				angles[LEFTARM][X] -= 6.0f; // 45 to -45
 				angles[LEFTSHOULDER][Y] += 4.0f; // 0 to 60
 
-				angles[LEFTARM][Z] -= 2.0f; // 60 to 30
-				angles[LEFTSHOULDER][X] += 10.0f; // -150 to 0
-				if (GangnanStyle_beginpose)
-					angles[LEFTSHOULDER][Z] += 2.0f; // -30 to 0
-				else
-					angles[LEFTSHOULDER][Z] += 4.0f; // -60 to 0
-				if (angles[LEFTSHOULDER][X] > -1.0f) // after 15 frames
+				//angles[LEFTARM][Z] -= 2.0f; // 60 to 30
+				angles[LEFTSHOULDER][X] += 7.0f; // -135 to -30
+				//if (GangnanStyle_beginpose)
+				//	angles[LEFTSHOULDER][Z] += 2.0f; // -30 to 0
+				//else
+				//	angles[LEFTSHOULDER][Z] += 4.0f; // -60 to 0
+				if (angles[LEFTSHOULDER][X] > -31.0f) // after 15 frames
 				{
 					GangnanStyle_handprepare = false;
 					GangnanStyle_beginpose = false;
@@ -477,11 +477,11 @@ void updateObj(int frame)
 				angles[LEFTARM][X] += 6.0f; // -45 to 45
 				angles[LEFTSHOULDER][Y] -= 4.0f; // 60 to 0
 
-				angles[LEFTARM][Z] += 2.62f; // 20.636082 to 60
-				angles[LEFTSHOULDER][X] -= 8.0f; // -30 to -150
-				angles[LEFTSHOULDER][Z] -= 2.0f; // 0 to -30
+				//angles[LEFTARM][Z] += 2.62f; // 20.636082 to 60
+				angles[LEFTSHOULDER][X] -= 5.0f; // -60 to -135
+				//angles[LEFTSHOULDER][Z] -= 2.0f; // 0 to -30
 
-				if (angles[LEFTSHOULDER][X] < -149.0f) // after 15 frames
+				if (angles[LEFTSHOULDER][X] < -134.0f) // after 15 frames
 				{
 					GangnanStyle_handprepare = false;
 				}
@@ -497,8 +497,8 @@ void updateObj(int frame)
 					angles[LEFTSHOULDER][Z] -= 2.0f;
 				}
 
-				angles[LEFTARM][Z] = 60.0f + 45.0f * sin((frame / 15.0f) * 3.1415);
-				angles[LEFTARM][X] = 45.0f * cos((frame / 15.0f) * 3.1415);
+				angles[LEFTSHOULDER][Z] = 35.0f * sin((frame / 15.0f) * 3.1415);
+				angles[LEFTARM][X] = 35.0f * cos((frame / 15.0f) * 3.1415);
 			}
 		}
 
