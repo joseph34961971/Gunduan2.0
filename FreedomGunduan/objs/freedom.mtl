@@ -418,7 +418,7 @@ Kd 0.50 0.50 0.50
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-newmtl ChafCaja814SG4
+newmtl freedom:ChafCaja814SG4
 illum 4
 Kd 0.13 0.13 0.14
 Ka 0.00 0.00 0.00
@@ -426,7 +426,7 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 Ks 0.70 0.70 0.70
 Ns 6.00
-newmtl Cilindro01SG5
+newmtl freedom:Cilindro01SG5
 illum 4
 Kd 0.93 0.00 0.07
 Ka 0.00 0.00 0.00
