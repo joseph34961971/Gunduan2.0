@@ -95,6 +95,7 @@ GLuint skybox_shader;
 GLuint gray_shader;
 GLuint uniform_shader;
 GLuint gaussian_shader;
+GLuint basic_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
@@ -144,6 +145,7 @@ mat4 Models[PARTSNUM];
 #define MoonWalk 4
 #define GangnanStyle 5
 #define YoBattle 6
+#define Opening 7
 int mode = 1;
 int action;
 const int fps = 60;
@@ -169,6 +171,16 @@ GLuint screen_fbo;	//frame buffer
 GLuint screen_rbo;	//attach to depth and stencil
 void initScreenQuad();
 void drawScreenQuad();
+
+void drawEarth();
+GLint loadTexture(string path);
+GLuint earth_vao;
+size_t earth_indices_size;
+std::string earth_obj_path = "SPHERE";
+GLint earth_texture;
+GLuint sphereGenerator(int subdivision_level);
+void drawShpere(GLuint VertexArrayID, int indices_size);
+vec3 earth_pos;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;

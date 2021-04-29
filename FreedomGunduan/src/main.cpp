@@ -38,6 +38,7 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("MoonWalk", 4);
 	glutAddMenuEntry("Gangnan Style", 5);
 	glutAddMenuEntry("Yo Battle", 6);
+	glutAddMenuEntry("Opening Pose", 7);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -112,6 +113,8 @@ void idle(int dummy)
 
 void resetObj(int f)
 {
+	light_pos = vec3(-10, 0, 0);
+
 	for (int i = 0; i < PARTSNUM; i++)
 	{
 		for (int j = 0; j < 3; j++)
@@ -676,6 +679,49 @@ void updateObj(int frame)
 			angles[BODY][Z] -= 1.5f; // 15 to -75
 		}
 	}
+	else if (action == Opening)
+	{
+		if (second_current == 0 && frame == 0)
+		{
+			earth_pos = vec3(70, 0, -10);
+		}
+
+		if (second_current == 0 && frame < 15)
+		{
+			angles[HEAD][Y] -= 4.0f;
+			angles[HEAD][X] -= 1.0f;
+
+			angles[LEFTSHOULDER][X] -= 12.0f;
+
+			angles[BODY][Y] += 1.0f;
+
+			angles[LEFTLEG][Z] -= 1.0f;
+			angles[LEFTFOOT][X] += 1.0f;
+			angles[RIGHTLEG][Z] += 3.0f;
+			angles[RIGHTFOOT][X] += 3.0f;
+
+			positions[BODY][X] += 0.3f;
+			positions[BODY][Y] += 0.3f;
+			positions[BODY][Z] += 0.3f;
+
+			earth_pos.x -= 2.0f;
+			earth_pos.y -= 2.0f;
+		}
+		else if (second_current == 0 && frame >= 30 && frame < 35)
+		{
+			angles[LEFTSHOULDER][X] += 27.0f;
+			angles[LEFTSHOULDER][Y] -= 6.0f;
+			angles[LEFTSHOULDER][Z] -= 9.0f;
+			angles[LEFTARM][X] -= 1.0f;
+
+			earth_pos.x -= 8.0f;
+			earth_pos.y += 6.0f;
+		}
+		else if (second_current == 0 && frame == 59)
+		{
+			light_pos = vec3(positions[BODY][X] - 20, positions[BODY][Y], positions[BODY][Z] - 20);
+		}
+	}
 }
 
  GLuint M_KaID;
@@ -723,6 +769,12 @@ void updateObj(int frame)
 		 { GL_NONE, NULL } };
 	 gaussian_shader = LoadShaders(gaussian_shaders);//讀取shader
 
+	 ShaderInfo basic_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/simple.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/simple.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 basic_shader = LoadShaders(basic_shaders);//讀取shader
+
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
 	 MatricesIdx = glGetUniformBlockIndex(gundaun_shader, "MatVP");
@@ -757,6 +809,16 @@ void updateObj(int frame)
 	 glBindBufferRange(GL_UNIFORM_BUFFER, /*binding point*/0, UBO, 0, UBOsize);
 	 glUniformBlockBinding(gundaun_shader, MatricesIdx, 0);
 	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	 //UBO
+	 glGenBuffers(1, &UBO);
+	 glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+	 glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4) * 2, NULL, GL_STATIC_DRAW);
+	 glBindBufferRange(GL_UNIFORM_BUFFER, /*binding point*/0, UBO, 0, sizeof(mat4) * 2);
+	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	 earth_vao = sphereGenerator(4);
+	 earth_texture = loadTexture("../FreedomGunduan/images/earth.bmp");
 
 	 initSkybox();
 
@@ -872,6 +934,11 @@ void display()
 	}//end for loop for updating and drawing model
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	if (action == Opening)
+	{
+		drawEarth();
+	}
 
 	drawSkybox();
 
@@ -1012,7 +1079,7 @@ void updateModels()
 	//============================================================
 	
 	//頭
-	Rotatation[HEAD] = rotate(angles[HEAD][Y], 0, 1, 0);
+	Rotatation[HEAD] = rotate(angles[HEAD][X], 1, 0, 0) * rotate(angles[HEAD][Y], 0, 1, 0);
 	Translation[HEAD] = translate(positions[HEAD][X], positions[HEAD][Y], positions[HEAD][Z]);
 	Models[HEAD] = Models[BODY] * Translation[HEAD] * Rotatation[HEAD];
 	//============================================================
@@ -1518,6 +1585,180 @@ void drawScreenQuad()
 	glBindVertexArray(0);
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
+}
+
+void drawEarth()
+{
+	glUseProgram(basic_shader);
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, earth_pos);
+	model_matrix = scale(model_matrix, vec3(30, 30, 30));
+	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "Model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, earth_texture);
+	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	drawShpere(earth_vao, earth_indices_size);
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+GLint loadTexture(string path)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	int width, height;
+	unsigned char* image;
+	image = stbi_load(path.c_str(), &width, &height, 0, 0);
+	if (image)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		stbi_image_free(image);
+	}
+	else
+	{
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+		stbi_image_free(image);
+	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return textureID;
+}
+
+GLuint sphereGenerator(int subdivision_level)
+{
+	vector<vec3> indexed_vertices;
+	vector<vec3> indexed_normals;
+	vector<vec2> indexed_uvs;
+	std::vector<unsigned short> indices;
+
+	int d_angle = 90.0 / pow(2.0f, subdivision_level);
+	unsigned short indices_index = 0;
+	float r = 0.5f;
+	float sphere_x, sphere_y, sphere_z;
+	for (int phi = -90; phi < 90; phi += d_angle)
+	{
+		for (int theta = 0; theta < 360; theta += d_angle)
+		{
+			sphere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)theta));
+			sphere_y = r * glm::sin(glm::radians((float)phi));
+			sphere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)theta));
+			indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
+			indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
+			indexed_uvs.push_back(glm::vec2(theta / 360.0f, phi / 180.0f + 0.5f));
+
+			sphere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)(theta + d_angle)));
+			sphere_y = r * glm::sin(glm::radians((float)phi));
+			sphere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)(theta + d_angle)));
+			indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
+			indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
+			indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, phi / 180.0f + 0.5f));
+
+			sphere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)(theta + d_angle)));
+			sphere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
+			sphere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)(theta + d_angle)));
+			indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
+			indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
+			indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+
+			sphere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)theta));
+			sphere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
+			sphere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)theta));
+			indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
+			indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
+			indexed_uvs.push_back(glm::vec2(theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+
+			indices.push_back(indices_index);
+			indices.push_back(indices_index + 1);
+			indices.push_back(indices_index + 2);
+			indices.push_back(indices_index);
+			indices.push_back(indices_index + 2);
+			indices.push_back(indices_index + 3);
+			indices_index += 4;
+		}
+	}
+
+	GLuint VertexArrayID;
+	GLuint vertexbuffer;
+	GLuint uvbuffer;
+	GLuint normalbuffer;
+	GLuint elementbuffer;
+
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+	// Load it into a VBO
+	glGenBuffers(1, &vertexbuffer);
+	glGenBuffers(1, &normalbuffer);
+	glGenBuffers(1, &uvbuffer);
+	glGenBuffers(1, &elementbuffer); // Generate a buffer for the indices as well
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(
+		0,                  // attribute
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		3 * sizeof(GLfloat),                  // stride
+		(GLvoid*)0            // array buffer offset
+	);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+	glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec3), &indexed_normals[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(
+		1,                                // attribute
+		3,                                // size
+		GL_FLOAT,                         // type
+		GL_FALSE,                         // normalized?
+		3 * sizeof(GLfloat),                                // stride
+		(GLvoid*)0                          // array buffer offset
+	);
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(
+		2,                                // attribute
+		2,                                // size
+		GL_FLOAT,                         // type
+		GL_FALSE,                         // normalized?
+		2 * sizeof(GLfloat),                                // stride
+		(GLvoid*)0                          // array buffer offset
+	);
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
+	earth_indices_size = indices.size();
+
+	// Unbind VAO
+	glBindVertexArray(0);
+
+	return VertexArrayID;
+}
+
+void drawShpere(GLuint VertexArrayID, int indices_size)
+{
+	//bind VAO
+	glBindVertexArray(VertexArrayID);
+
+	// Draw the triangles !
+	glDrawElements(
+		GL_TRIANGLES,      // mode
+		indices_size,    // count
+		GL_UNSIGNED_SHORT,   // type
+		(GLvoid*)0           // element array buffer offset
+	);
+
+	//unbind VAO
+	glBindVertexArray(0);
 }
 
 //void initOpenAL()
