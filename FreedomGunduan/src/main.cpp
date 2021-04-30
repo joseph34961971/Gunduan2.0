@@ -39,6 +39,7 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Gangnan Style", 5);
 	glutAddMenuEntry("Yo Battle", 6);
 	glutAddMenuEntry("Opening Pose", 7);
+	glutAddMenuEntry("Shoot", 8);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -117,6 +118,8 @@ void idle(int dummy)
 void resetObj(int f)
 {
 	light_pos = vec3(-10, 0, 0);
+
+	shooting = false;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -727,6 +730,56 @@ void updateObj(int frame)
 			light_pos = vec3(positions[BODY][X] - 20, positions[BODY][Y], positions[BODY][Z] - 20);
 		}
 	}
+	else if (action == Shoot)
+	{
+		if (second_current == 0 && frame < 15)
+		{
+			angles[LEFTINSIDEBIGWING][Z] -= 8.0f;
+			angles[LEFTINSIDESMALLWING][Z] -= 6.0f;
+			angles[LEFTMIDDLESMALLWING][Z] -= 4.0f;
+			angles[LEFTOUTSIDEBIGWING][Z] -= 2.0f;
+
+			angles[RIGHTINSIDEBIGWING][Z] += 8.0f;
+			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
+			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
+			angles[RIGHTOUTSIDEBIGWING][Z] += 2.0f;
+		}
+		else if (second_current == 0 && frame < 30)
+		{
+			angles[LEFTFOOT][X] += 2.0f;
+			angles[RIGHTFOOT][X] += 2.0f;
+		}
+		else if (second_current == 1 && frame < 30)
+		{
+			angles[BODY][Z] += 12.0f;
+		}
+		else if (second_current == 1 && frame >= 45)
+		{
+			angles[LEFTSHOULDER][X] -= 12.0f;
+			angles[LEFTSHOULDER][Z] += 1.5f;
+		}
+		else if (second_current == 2 && frame < 5)
+		{
+			angles[LEFTSHOULDER][X] += 22.0f;
+			angles[LEFTARM][Y] += 10.0f;
+		}
+		else if (second_current == 2 && frame == 10)
+		{
+			//shooting = true;
+			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5, -66, 27, 1));
+			beam_scale = vec3(0.2, 0.2, 0.2);
+		}
+		else if (second_current == 2 && frame >= 10 && frame < 20)
+		{
+			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5 - (frame - 9) * 1.47, -66 - (frame - 9) * beam_speed, 27 + (frame - 9) * beam_speed * 0.37, 1)); //14.700020 74.000000
+			beam_scale = vec3(0.2, 0.2, 0.2 * (frame - 9) * beam_speed); 
+		}
+		/*else
+		{
+			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5 - 10 * xx, -66 - 10 * beam_speed, 27 + 10 * yy, 1));
+			printf("%f %f\n", xx, yy);
+		}*/
+	}
 }
 
  GLuint M_KaID;
@@ -828,8 +881,9 @@ void updateObj(int frame)
 	 glBindBufferRange(GL_UNIFORM_BUFFER, /*binding point*/0, UBO, 0, sizeof(mat4) * 2);
 	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	 earth_vao = sphereGenerator(4);
+	 sphere_vao = sphereGenerator(4);
 	 earth_texture = loadTexture("../FreedomGunduan/images/earth.bmp");
+	 beam_texture = loadTexture("../FreedomGunduan/images/beam.bmp");
 
 	 initSkybox();
 
@@ -969,6 +1023,11 @@ void display()
 	if (action == Opening)
 	{
 		drawEarth();
+	}
+
+	if (shooting)
+	{
+		drawBeam();
 	}
 
 	drawSkybox();
@@ -1318,18 +1377,22 @@ void Keyboard(unsigned char key, int x, int y)
 	case 'i':
 	case 'I':
 		eyeheight -= 2;
+		//yy += 0.02f;
 		break;
 	case 'k':
 	case 'K':
 		eyeheight += 2;
+		//yy -= 0.02f;
 		break;
 	case 'j':
 	case 'J':
 		positions[BODY][X] += 1;
+		//xx -= 0.02f;
 		break;
 	case 'l':
 	case 'L':
 		positions[BODY][X] -= 1;
+		//xx += 0.02f;
 		break;
 	case 'w':
 	case 'W':
@@ -1631,7 +1694,7 @@ void drawEarth()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, earth_texture);
 	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
-	drawShpere(earth_vao, earth_indices_size);
+	drawShpere(sphere_vao, sphere_indices_size);
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -1769,7 +1832,7 @@ GLuint sphereGenerator(int subdivision_level)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
-	earth_indices_size = indices.size();
+	sphere_indices_size = indices.size();
 
 	// Unbind VAO
 	glBindVertexArray(0);
@@ -1792,6 +1855,22 @@ void drawShpere(GLuint VertexArrayID, int indices_size)
 
 	//unbind VAO
 	glBindVertexArray(0);
+}
+
+void drawBeam()
+{
+	glUseProgram(basic_shader);
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, beam_pos);
+	model_matrix = scale(model_matrix, beam_scale);
+	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, beam_texture);
+	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	drawShpere(sphere_vao, sphere_indices_size);
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 }
 
 //void initOpenAL()

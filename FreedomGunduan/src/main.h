@@ -151,6 +151,7 @@ mat4 Models[PARTSNUM];
 #define GangnanStyle 5
 #define YoBattle 6
 #define Opening 7
+#define Shoot 8
 int mode = 1;
 int action;
 const int fps = 60;
@@ -179,14 +180,21 @@ void drawScreenQuad();
 
 void drawEarth();
 GLint loadTexture(string path);
-GLuint earth_vao;
-size_t earth_indices_size;
-std::string earth_obj_path = "SPHERE";
-GLint earth_texture;
+GLuint sphere_vao;
+size_t sphere_indices_size;
 GLuint sphereGenerator(int subdivision_level);
 void drawShpere(GLuint VertexArrayID, int indices_size);
+GLint earth_texture;
 vec3 earth_pos;
 vec3 earth_pos_begin = vec3(70, 0, -50);
+
+void drawBeam();
+GLint beam_texture;
+vec3 beam_pos;
+vec3 beam_scale;
+bool shooting = false;
+float beam_speed = 20.0f;
+float xx = 1.47, yy = 7.4;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;
