@@ -544,6 +544,8 @@ void updateObj(int frame)
 
 				angles[RIGHTLEG][X] -= 1.0f;
 				angles[RIGHTFOOT][X] += 0.25f;
+
+				angles[WING][X] += 0.5f;
 			}
 			else
 			{
@@ -558,6 +560,8 @@ void updateObj(int frame)
 
 				angles[RIGHTLEG][X] += 1.0f;
 				angles[RIGHTFOOT][X] -= 0.25f;
+
+				angles[WING][X] -= 0.5f;
 			}
 			positions[BODY][X] -= 0.15f;
 		}
@@ -818,6 +822,9 @@ void updateObj(int frame)
 			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
 			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
 			angles[RIGHTOUTSIDESMALLWING][Z] += 2.0f;
+
+			angles[LEFTLEGGUN][X] -= 7.0f;
+			angles[RIGHTLEGGUN][X] -= 7.0f;
 		}
 		else if (second_current == 0 && frame < 30)
 		{
