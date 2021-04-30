@@ -737,15 +737,16 @@ void updateObj(int frame)
 			angles[LEFTINSIDEBIGWING][Z] -= 8.0f;
 			angles[LEFTINSIDESMALLWING][Z] -= 6.0f;
 			angles[LEFTMIDDLESMALLWING][Z] -= 4.0f;
-			angles[LEFTOUTSIDEBIGWING][Z] -= 2.0f;
+			angles[LEFTOUTSIDESMALLWING][Z] -= 2.0f;
 
 			angles[RIGHTINSIDEBIGWING][Z] += 8.0f;
 			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
 			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
-			angles[RIGHTOUTSIDEBIGWING][Z] += 2.0f;
+			angles[RIGHTOUTSIDESMALLWING][Z] += 2.0f;
 		}
 		else if (second_current == 0 && frame < 30)
 		{
+			angles[WING][X] += 1.5f;
 			angles[LEFTFOOT][X] += 2.0f;
 			angles[RIGHTFOOT][X] += 2.0f;
 		}
