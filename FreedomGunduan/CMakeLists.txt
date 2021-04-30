@@ -17,7 +17,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/gaussian.vert
     ${SRC_DIR}shaders/gaussian.frag
     ${SRC_DIR}shaders/simple.vert
-    ${SRC_DIR}shaders/simple.frag)
+    ${SRC_DIR}shaders/simple.frag
+    ${SRC_DIR}shaders/diamond_surface.vert
+    ${SRC_DIR}shaders/diamond_surface.frag)
 
 include_directories(${INCLUDE_DIR})
 

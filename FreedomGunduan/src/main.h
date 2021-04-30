@@ -96,6 +96,7 @@ GLuint gray_shader;
 GLuint uniform_shader;
 GLuint gaussian_shader;
 GLuint basic_shader;
+GLuint diamond_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
@@ -138,6 +139,10 @@ mat4 View;
 mat4 Model;
 mat4 Models[PARTSNUM];
 
+#define DIAMONDREFLECT 2
+#define DIAMONDREFRACT 3
+#define DIAMOND 4
+
 #define WALK 1
 #define IDLE 0
 #define JumpingJack 2
@@ -146,6 +151,7 @@ mat4 Models[PARTSNUM];
 #define GangnanStyle 5
 #define YoBattle 6
 #define Opening 7
+#define Shoot 8
 int mode = 1;
 int action;
 const int fps = 60;
@@ -158,7 +164,7 @@ GLuint cubemap_texture;
 void initSkybox();
 GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
 void drawSkybox();
-vec3 light_pos = vec3(-10, 0, 0);
+vec3 light_pos = vec3(0, 50, 0);
 
 GLuint screen_id;
 bool load_screen = false;
@@ -174,13 +180,21 @@ void drawScreenQuad();
 
 void drawEarth();
 GLint loadTexture(string path);
-GLuint earth_vao;
-size_t earth_indices_size;
-std::string earth_obj_path = "SPHERE";
-GLint earth_texture;
+GLuint sphere_vao;
+size_t sphere_indices_size;
 GLuint sphereGenerator(int subdivision_level);
 void drawShpere(GLuint VertexArrayID, int indices_size);
+GLint earth_texture;
 vec3 earth_pos;
+vec3 earth_pos_begin = vec3(70, 0, -50);
+
+void drawBeam();
+GLint beam_texture;
+vec3 beam_pos;
+vec3 beam_scale;
+bool shooting = false;
+float beam_speed = 20.0f;
+float xx = 1.47, yy = 7.4;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;

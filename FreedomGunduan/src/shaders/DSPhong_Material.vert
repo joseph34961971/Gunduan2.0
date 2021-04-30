@@ -14,7 +14,7 @@ uniform MatVP{
 	mat4 View;
 	mat4 Projection;
 };
-uniform mat4 Model;
+uniform mat4 u_model;
 
 // Color to fragment program
 out vec3 vVaryingNormal;
@@ -23,8 +23,8 @@ out vec2 UV;
 
 void main(void) 
 { 
-	mat4 MVP = Projection * View * Model;
-	mat4 MV = View * Model;
+	mat4 MVP = Projection * View * u_model;
+	mat4 MV = View * u_model;
 	
     // Get surface normal in eye coordinates
 	mat3 normalMatrix = mat3(MV);//normal matrix is MV matrix's 3*3 excluding 'w' 

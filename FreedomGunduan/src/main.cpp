@@ -39,12 +39,16 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Gangnan Style", 5);
 	glutAddMenuEntry("Yo Battle", 6);
 	glutAddMenuEntry("Opening Pose", 7);
+	glutAddMenuEntry("Shoot", 8);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
 	//加入右鍵物件
 	glutAddMenuEntry("Line", 0);
 	glutAddMenuEntry("Fill", 1);
+	glutAddMenuEntry("Diamond Reflect", 2);
+	glutAddMenuEntry("Diamond Refract", 3);
+	glutAddMenuEntry("Diamond", 4);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	PPMenu = glutCreateMenu(PPSMenuEvents);//建立右鍵菜單
@@ -114,6 +118,8 @@ void idle(int dummy)
 void resetObj(int f)
 {
 	light_pos = vec3(-10, 0, 0);
+
+	shooting = false;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -685,7 +691,7 @@ void updateObj(int frame)
 	{
 		if (second_current == 0 && frame == 0)
 		{
-			earth_pos = vec3(70, 0, -10);
+			earth_pos = earth_pos_begin;
 		}
 
 		if (second_current == 0 && frame < 15)
@@ -723,6 +729,56 @@ void updateObj(int frame)
 		{
 			light_pos = vec3(positions[BODY][X] - 20, positions[BODY][Y], positions[BODY][Z] - 20);
 		}
+	}
+	else if (action == Shoot)
+	{
+		if (second_current == 0 && frame < 15)
+		{
+			angles[LEFTINSIDEBIGWING][Z] -= 8.0f;
+			angles[LEFTINSIDESMALLWING][Z] -= 6.0f;
+			angles[LEFTMIDDLESMALLWING][Z] -= 4.0f;
+			angles[LEFTOUTSIDEBIGWING][Z] -= 2.0f;
+
+			angles[RIGHTINSIDEBIGWING][Z] += 8.0f;
+			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
+			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
+			angles[RIGHTOUTSIDEBIGWING][Z] += 2.0f;
+		}
+		else if (second_current == 0 && frame < 30)
+		{
+			angles[LEFTFOOT][X] += 2.0f;
+			angles[RIGHTFOOT][X] += 2.0f;
+		}
+		else if (second_current == 1 && frame < 30)
+		{
+			angles[BODY][Z] += 12.0f;
+		}
+		else if (second_current == 1 && frame >= 45)
+		{
+			angles[LEFTSHOULDER][X] -= 12.0f;
+			angles[LEFTSHOULDER][Z] += 1.5f;
+		}
+		else if (second_current == 2 && frame < 5)
+		{
+			angles[LEFTSHOULDER][X] += 22.0f;
+			angles[LEFTARM][Y] += 10.0f;
+		}
+		else if (second_current == 2 && frame == 10)
+		{
+			//shooting = true;
+			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5, -66, 27, 1));
+			beam_scale = vec3(0.2, 0.2, 0.2);
+		}
+		else if (second_current == 2 && frame >= 10 && frame < 20)
+		{
+			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5 - (frame - 9) * 1.47, -66 - (frame - 9) * beam_speed, 27 + (frame - 9) * beam_speed * 0.37, 1)); //14.700020 74.000000
+			beam_scale = vec3(0.2, 0.2, 0.2 * (frame - 9) * beam_speed); 
+		}
+		/*else
+		{
+			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5 - 10 * xx, -66 - 10 * beam_speed, 27 + 10 * yy, 1));
+			printf("%f %f\n", xx, yy);
+		}*/
 	}
 }
 
@@ -777,10 +833,16 @@ void updateObj(int frame)
 		 { GL_NONE, NULL } };
 	 basic_shader = LoadShaders(basic_shaders);//讀取shader
 
+	 ShaderInfo diamond_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/diamond_surface.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/diamond_surface.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 diamond_shader = LoadShaders(diamond_shaders);//讀取shader
+
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
 	 MatricesIdx = glGetUniformBlockIndex(gundaun_shader, "MatVP");
-	 ModelID = glGetUniformLocation(gundaun_shader, "Model");
+	 ModelID = glGetUniformLocation(gundaun_shader, "u_model");
 	 M_KaID = glGetUniformLocation(gundaun_shader, "Material.Ka");
 	 M_KdID = glGetUniformLocation(gundaun_shader, "Material.Kd");
 	 M_KsID = glGetUniformLocation(gundaun_shader, "Material.Ks");
@@ -819,8 +881,9 @@ void updateObj(int frame)
 	 glBindBufferRange(GL_UNIFORM_BUFFER, /*binding point*/0, UBO, 0, sizeof(mat4) * 2);
 	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	 earth_vao = sphereGenerator(4);
+	 sphere_vao = sphereGenerator(4);
 	 earth_texture = loadTexture("../FreedomGunduan/images/earth.bmp");
+	 beam_texture = loadTexture("../FreedomGunduan/images/beam.bmp");
 
 	 initSkybox();
 
@@ -877,11 +940,28 @@ void display()
 		renderScreenBegin();
 
 	glBindVertexArray(VAO);
-	glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
+	if (mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)
+	{
+		glUseProgram(diamond_shader);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture);
+		glUniform1i(glGetUniformLocation(diamond_shader, "skybox"), 0);
+		glUniform1i(glGetUniformLocation(diamond_shader, "mode"), mode - DIAMONDREFLECT);
+	}
+	else
+		glUseProgram(gundaun_shader); //uniform參數數值前必須先use shader
+
 	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
 	for (int i = 0; i < PARTSNUM; i++) {
-		glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
-		glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
+		if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND))
+		{
+			glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
+			glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
+		}
+		else
+		{
+			glUniformMatrix4fv(glGetUniformLocation(diamond_shader, "u_model"), 1, GL_FALSE, &Models[i][0][0]);
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		// 1rst attribute buffer : vertices
@@ -925,21 +1005,29 @@ void display()
 		for (int j = 0; j < mtls[i].size(); j++) {//
 			mtlname = mtls[i][j];
 			//find the material diffuse color in map:KDs by material name.
-			glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
-			glUniform3fv(M_KsID, 1, &Ks[0]);
-			//          (primitive   , glVertexID base , vertex count    )
+			if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND))
+			{
+				glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
+				glUniform3fv(M_KsID, 1, &Ks[0]);
+			}
 			glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
 			//we draw triangles by giving the glVertexID base and vertex count is face count*3
 			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
 		}//end for loop for draw one part of the robot	
 
 	}//end for loop for updating and drawing model
+	glUseProgram(0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	if (action == Opening)
 	{
 		drawEarth();
+	}
+
+	if (shooting)
+	{
+		drawBeam();
 	}
 
 	drawSkybox();
@@ -1289,18 +1377,22 @@ void Keyboard(unsigned char key, int x, int y)
 	case 'i':
 	case 'I':
 		eyeheight -= 2;
+		//yy += 0.02f;
 		break;
 	case 'k':
 	case 'K':
 		eyeheight += 2;
+		//yy -= 0.02f;
 		break;
 	case 'j':
 	case 'J':
 		positions[BODY][X] += 1;
+		//xx -= 0.02f;
 		break;
 	case 'l':
 	case 'L':
 		positions[BODY][X] -= 1;
+		//xx += 0.02f;
 		break;
 	case 'w':
 	case 'W':
@@ -1355,6 +1447,8 @@ void ActionMenuEvents(int option)
 	action = option;
 	
 	reset_action = true;
+
+	earth_pos = earth_pos_begin;
 }
 
 void ModeMenuEvents(int option)
@@ -1594,13 +1688,13 @@ void drawEarth()
 	glUseProgram(basic_shader);
 	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, earth_pos);
-	model_matrix = scale(model_matrix, vec3(30, 30, 30));
-	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "Model"), 1, GL_FALSE, &model_matrix[0][0]);
+	model_matrix = scale(model_matrix, vec3(60, 60, 60));
+	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, earth_texture);
 	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
-	drawShpere(earth_vao, earth_indices_size);
+	drawShpere(sphere_vao, sphere_indices_size);
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -1677,11 +1771,11 @@ GLuint sphereGenerator(int subdivision_level)
 			indexed_uvs.push_back(glm::vec2(theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
 
 			indices.push_back(indices_index);
-			indices.push_back(indices_index + 1);
+			indices.push_back(indices_index + 3);
 			indices.push_back(indices_index + 2);
 			indices.push_back(indices_index);
 			indices.push_back(indices_index + 2);
-			indices.push_back(indices_index + 3);
+			indices.push_back(indices_index + 1);
 			indices_index += 4;
 		}
 	}
@@ -1738,7 +1832,7 @@ GLuint sphereGenerator(int subdivision_level)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
-	earth_indices_size = indices.size();
+	sphere_indices_size = indices.size();
 
 	// Unbind VAO
 	glBindVertexArray(0);
@@ -1761,6 +1855,22 @@ void drawShpere(GLuint VertexArrayID, int indices_size)
 
 	//unbind VAO
 	glBindVertexArray(0);
+}
+
+void drawBeam()
+{
+	glUseProgram(basic_shader);
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, beam_pos);
+	model_matrix = scale(model_matrix, beam_scale);
+	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, beam_texture);
+	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	drawShpere(sphere_vao, sphere_indices_size);
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 }
 
 //void initOpenAL()
