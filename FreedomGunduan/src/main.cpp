@@ -443,6 +443,16 @@ void updateObj(int frame)
 			positions[BODY][Y] -= 0.075f;
 
 			angles[WING][X] += 0.5f;
+
+			angles[LEFTINSIDEBIGWING][Z] -= 1.0f;
+			angles[LEFTINSIDESMALLWING][Z] -= 0.8f;
+			angles[LEFTMIDDLESMALLWING][Z] -= 0.6f;
+			angles[LEFTOUTSIDESMALLWING][Z] -= 0.4f;
+
+			angles[RIGHTINSIDEBIGWING][Z] += 1.0f;
+			angles[RIGHTINSIDESMALLWING][Z] += 0.8f;
+			angles[RIGHTMIDDLESMALLWING][Z] += 0.6f;
+			angles[RIGHTOUTSIDESMALLWING][Z] += 0.4f;
 		}
 		else
 		{
@@ -463,6 +473,16 @@ void updateObj(int frame)
 			positions[BODY][Y] += 0.075f;
 
 			angles[WING][X] -= 0.5f;
+
+			angles[LEFTINSIDEBIGWING][Z] += 1.0f;
+			angles[LEFTINSIDESMALLWING][Z] += 0.8f;
+			angles[LEFTMIDDLESMALLWING][Z] += 0.6f;
+			angles[LEFTOUTSIDESMALLWING][Z] += 0.4f;
+
+			angles[RIGHTINSIDEBIGWING][Z] -= 1.0f;
+			angles[RIGHTINSIDESMALLWING][Z] -= 0.8f;
+			angles[RIGHTMIDDLESMALLWING][Z] -= 0.6f;
+			angles[RIGHTOUTSIDESMALLWING][Z] -= 0.4f;
 		}
 	}
 	else if (action == MoonWalk)
