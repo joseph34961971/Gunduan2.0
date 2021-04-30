@@ -133,6 +133,9 @@ void resetObj(int f)
 
 	angles[RIGHTARM][Z] = 32.2f;
 
+	angles[LEFTLEGARMOR][Z] = -20.456f;
+	angles[RIGHTLEGARMOR][Z] = 21.505f;
+
 	angles[LEFTCONNECTOR][Y] = -25.888f;
 	angles[LEFTCONNECTOR][X] = 5.0f;
 	angles[LEFTINSIDEBIGWING][Y] = 2.118f;
@@ -183,6 +186,14 @@ void resetObj(int f)
 	positions[LEFTLEG][Y] = -8.0f;
 	positions[LEFTLEG][Z] = 0.0f;
 
+	positions[LEFTLEGARMOR][X] = -6.0f;
+	positions[LEFTLEGARMOR][Y] = 8.0f;
+	positions[LEFTLEGARMOR][Z] = 2.0f;
+
+	positions[LEFTLEGGUN][X] = 0.0f;
+	positions[LEFTLEGGUN][Y] = -2.778f;
+	positions[LEFTLEGGUN][Z] = 4.025f;
+
 	positions[LEFTFOOT][X] = -4.0f;
 	positions[LEFTFOOT][Y] = -31.0f;
 	positions[LEFTFOOT][Z] = 12.0f;
@@ -190,6 +201,14 @@ void resetObj(int f)
 	positions[RIGHTLEG][X] = 8.0f;
 	positions[RIGHTLEG][Y] = -10.0f;
 	positions[RIGHTLEG][Z] = 0.0f;
+
+	positions[RIGHTLEGARMOR][X] = 6.0f;
+	positions[RIGHTLEGARMOR][Y] = 9.0f;
+	positions[RIGHTLEGARMOR][Z] = 3.0f;
+
+	positions[RIGHTLEGGUN][X] = 0.0f;
+	positions[RIGHTLEGGUN][Y] = -2.778f;
+	positions[RIGHTLEGGUN][Z] = 5.0f;
 
 	positions[RIGHTFOOT][X] = 5.0f;
 	positions[RIGHTFOOT][Y] = -29.0f;
@@ -311,6 +330,8 @@ void updateObj(int frame)
 			angles[RIGHTFOOT][X] += 0.25f;
 
 			angles[WING][X] += 0.25f;
+
+			//angles[LEFTLEGARMOR][X] += 5.0f;
 		}
 		else
 		{
@@ -327,6 +348,8 @@ void updateObj(int frame)
 			angles[RIGHTFOOT][X] -= 0.25f;
 
 			angles[WING][X] -= 0.25f;
+
+			//angles[LEFTLEGARMOR][X] -= 5.0f;
 		}
 
 		fly_position = 1.0f * sin((float)frame / fps * 3.1415);
@@ -1069,9 +1092,14 @@ void Obj2Buffer()
 
 	load2Buffer("../FreedomGunduan/objs/wingBase.obj", WING);
 
-	load2Buffer("../FreedomGunduan/objs/left_leg.obj", LEFTLEG);
+	load2Buffer("../FreedomGunduan/objs/leftLeg.obj", LEFTLEG);
+	load2Buffer("../FreedomGunduan/objs/leftLegArmor.obj", LEFTLEGARMOR);
+	load2Buffer("../FreedomGunduan/objs/leftLegGun.obj", LEFTLEGGUN);
 	load2Buffer("../FreedomGunduan/objs/left_foot.obj", LEFTFOOT);
-	load2Buffer("../FreedomGunduan/objs/right_leg.obj", RIGHTLEG);
+
+	load2Buffer("../FreedomGunduan/objs/rightLeg.obj", RIGHTLEG);
+	load2Buffer("../FreedomGunduan/objs/rightLegArmor.obj", RIGHTLEGARMOR);
+	load2Buffer("../FreedomGunduan/objs/rightLegGun.obj", RIGHTLEGGUN);
 	load2Buffer("../FreedomGunduan/objs/right_foot.obj", RIGHTFOOT);
 
 	load2Buffer("../FreedomGunduan/objs/leftConnector.obj", LEFTCONNECTOR);
@@ -1198,6 +1226,18 @@ void updateModels()
 	Models[LEFTLEG] = Models[BODY] * Translation[LEFTLEG] * Rotatation[LEFTLEG];
 	//=============================================================
 
+	//¥ª»LñZ¥Ò
+	Rotatation[LEFTLEGARMOR] = rotate(angles[LEFTLEGARMOR][X], 1, 0, 0) * rotate(angles[LEFTLEGARMOR][Z], 0, 0, 1) * rotate(angles[LEFTLEGARMOR][Y], 0, 1, 0);
+	Translation[LEFTLEGARMOR] = translate(positions[LEFTLEGARMOR][X], positions[LEFTLEGARMOR][Y], positions[LEFTLEGARMOR][Z]);
+	Models[LEFTLEGARMOR] = Models[LEFTLEG] * Translation[LEFTLEGARMOR] * Rotatation[LEFTLEGARMOR];
+	//=============================================================
+
+	//¥ª»Lºj
+	Rotatation[LEFTLEGGUN] = rotate(angles[LEFTLEGGUN][X], 1, 0, 0) * rotate(angles[LEFTLEGGUN][Z], 0, 0, 1) * rotate(angles[LEFTLEGGUN][Y], 0, 1, 0);
+	Translation[LEFTLEGGUN] = translate(positions[LEFTLEGGUN][X], positions[LEFTLEGGUN][Y], positions[LEFTLEGGUN][Z]);
+	Models[LEFTLEGGUN] = Models[LEFTLEGARMOR] * Translation[LEFTLEGGUN] * Rotatation[LEFTLEGGUN];
+	//=============================================================
+
 	//¥ª¸}(­±¹ïµe­±¥ªÃä)
 	Rotatation[LEFTFOOT] = rotate(angles[LEFTFOOT][X], 1, 0, 0) * rotate(angles[LEFTFOOT][Z], 0, 0, 1);
 	Translation[LEFTFOOT] = translate(positions[LEFTFOOT][X], positions[LEFTFOOT][Y], positions[LEFTFOOT][Z]);
@@ -1208,6 +1248,18 @@ void updateModels()
 	Rotatation[RIGHTLEG] = rotate(angles[RIGHTLEG][X], 1, 0, 0) * rotate(angles[RIGHTLEG][Z], 0, 0, 1);
 	Translation[RIGHTLEG] = translate(positions[RIGHTLEG][X], positions[RIGHTLEG][Y], positions[RIGHTLEG][Z]);
 	Models[RIGHTLEG] = Models[BODY] * Translation[RIGHTLEG] * Rotatation[RIGHTLEG];
+	//=============================================================
+
+	//¥k»LñZ¥Ò
+	Rotatation[RIGHTLEGARMOR] = rotate(angles[RIGHTLEGARMOR][X], 1, 0, 0) * rotate(angles[RIGHTLEGARMOR][Z], 0, 0, 1) * rotate(angles[RIGHTLEGARMOR][Y], 0, 1, 0);
+	Translation[RIGHTLEGARMOR] = translate(positions[RIGHTLEGARMOR][X], positions[RIGHTLEGARMOR][Y], positions[RIGHTLEGARMOR][Z]);
+	Models[RIGHTLEGARMOR] = Models[RIGHTLEG] * Translation[RIGHTLEGARMOR] * Rotatation[RIGHTLEGARMOR];
+	//=============================================================
+
+	//¥k»Lºj
+	Rotatation[RIGHTLEGGUN] = rotate(angles[RIGHTLEGGUN][X], 1, 0, 0) * rotate(angles[RIGHTLEGGUN][Z], 0, 0, 1) * rotate(angles[RIGHTLEGGUN][Y], 0, 1, 0);
+	Translation[RIGHTLEGGUN] = translate(positions[RIGHTLEGGUN][X], positions[RIGHTLEGGUN][Y], positions[RIGHTLEGGUN][Z]);
+	Models[RIGHTLEGGUN] = Models[RIGHTLEGARMOR] * Translation[RIGHTLEGGUN] * Rotatation[RIGHTLEGGUN];
 	//=============================================================
 
 	//¥k¸}
