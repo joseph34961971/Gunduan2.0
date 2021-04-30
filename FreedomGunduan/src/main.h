@@ -163,7 +163,7 @@ GLuint cubemap_texture;
 void initSkybox();
 GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
 void drawSkybox();
-vec3 light_pos = vec3(-10, 0, 0);
+vec3 light_pos = vec3(0, 50, 0);
 
 GLuint screen_id;
 bool load_screen = false;
@@ -186,6 +186,7 @@ GLint earth_texture;
 GLuint sphereGenerator(int subdivision_level);
 void drawShpere(GLuint VertexArrayID, int indices_size);
 vec3 earth_pos;
+vec3 earth_pos_begin = vec3(70, 0, -50);
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;

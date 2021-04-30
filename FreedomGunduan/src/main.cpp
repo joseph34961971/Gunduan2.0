@@ -688,7 +688,7 @@ void updateObj(int frame)
 	{
 		if (second_current == 0 && frame == 0)
 		{
-			earth_pos = vec3(70, 0, -10);
+			earth_pos = earth_pos_begin;
 		}
 
 		if (second_current == 0 && frame < 15)
@@ -1385,7 +1385,7 @@ void ActionMenuEvents(int option)
 	
 	reset_action = true;
 
-	earth_pos = vec3(70, 0, -10);
+	earth_pos = earth_pos_begin;
 }
 
 void ModeMenuEvents(int option)
@@ -1625,7 +1625,7 @@ void drawEarth()
 	glUseProgram(basic_shader);
 	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, earth_pos);
-	model_matrix = scale(model_matrix, vec3(30, 30, 30));
+	model_matrix = scale(model_matrix, vec3(60, 60, 60));
 	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
 	glActiveTexture(GL_TEXTURE0);
@@ -1708,11 +1708,11 @@ GLuint sphereGenerator(int subdivision_level)
 			indexed_uvs.push_back(glm::vec2(theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
 
 			indices.push_back(indices_index);
-			indices.push_back(indices_index + 1);
+			indices.push_back(indices_index + 3);
 			indices.push_back(indices_index + 2);
 			indices.push_back(indices_index);
 			indices.push_back(indices_index + 2);
-			indices.push_back(indices_index + 3);
+			indices.push_back(indices_index + 1);
 			indices_index += 4;
 		}
 	}
