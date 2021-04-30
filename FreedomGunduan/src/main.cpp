@@ -746,6 +746,8 @@ void updateObj(int frame)
 		}
 		else if (second_current == 0 && frame < 30)
 		{
+			positions[BODY][Y] -= 0.05f;
+
 			angles[WING][X] += 1.5f;
 			angles[LEFTFOOT][X] += 2.0f;
 			angles[RIGHTFOOT][X] += 2.0f;
