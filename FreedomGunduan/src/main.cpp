@@ -383,7 +383,7 @@ void updateObj(int frame)
 			angles[RIGHTLEG][X] -= 1.5f;
 			angles[RIGHTFOOT][X] += 1.5f;
 
-			positions[BODY][Y] -= 0.05f;
+			positions[BODY][Y] -= 0.075f;
 
 			angles[WING][X] += 0.5f;
 		}
@@ -399,7 +399,7 @@ void updateObj(int frame)
 			angles[RIGHTLEG][X] += 1.5f;
 			angles[RIGHTFOOT][X] -= 1.5f;
 
-			positions[BODY][Y] += 0.05f;
+			positions[BODY][Y] += 0.075f;
 
 			angles[WING][X] -= 0.5f;
 		}
