@@ -96,6 +96,7 @@ GLuint gray_shader;
 GLuint uniform_shader;
 GLuint gaussian_shader;
 GLuint basic_shader;
+GLuint diamond_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
@@ -137,6 +138,10 @@ mat4 Projection;
 mat4 View;
 mat4 Model;
 mat4 Models[PARTSNUM];
+
+#define DIAMONDREFLECT 2
+#define DIAMONDREFRACT 3
+#define DIAMOND 4
 
 #define WALK 1
 #define IDLE 0

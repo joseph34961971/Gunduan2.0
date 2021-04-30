@@ -45,6 +45,9 @@ int main(int argc, char** argv)
 	//加入右鍵物件
 	glutAddMenuEntry("Line", 0);
 	glutAddMenuEntry("Fill", 1);
+	glutAddMenuEntry("Diamond Reflect", 2);
+	glutAddMenuEntry("Diamond Refract", 3);
+	glutAddMenuEntry("Diamond", 4);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	PPMenu = glutCreateMenu(PPSMenuEvents);//建立右鍵菜單
@@ -777,10 +780,16 @@ void updateObj(int frame)
 		 { GL_NONE, NULL } };
 	 basic_shader = LoadShaders(basic_shaders);//讀取shader
 
+	 ShaderInfo diamond_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/diamond_surface.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/diamond_surface.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 diamond_shader = LoadShaders(diamond_shaders);//讀取shader
+
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
 	 MatricesIdx = glGetUniformBlockIndex(gundaun_shader, "MatVP");
-	 ModelID = glGetUniformLocation(gundaun_shader, "Model");
+	 ModelID = glGetUniformLocation(gundaun_shader, "u_model");
 	 M_KaID = glGetUniformLocation(gundaun_shader, "Material.Ka");
 	 M_KdID = glGetUniformLocation(gundaun_shader, "Material.Kd");
 	 M_KsID = glGetUniformLocation(gundaun_shader, "Material.Ks");
@@ -877,11 +886,28 @@ void display()
 		renderScreenBegin();
 
 	glBindVertexArray(VAO);
-	glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
+	if (mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)
+	{
+		glUseProgram(diamond_shader);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture);
+		glUniform1i(glGetUniformLocation(diamond_shader, "skybox"), 0);
+		glUniform1i(glGetUniformLocation(diamond_shader, "mode"), mode - DIAMONDREFLECT);
+	}
+	else
+		glUseProgram(gundaun_shader); //uniform參數數值前必須先use shader
+
 	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
 	for (int i = 0; i < PARTSNUM; i++) {
-		glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
-		glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
+		if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND))
+		{
+			glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
+			glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
+		}
+		else
+		{
+			glUniformMatrix4fv(glGetUniformLocation(diamond_shader, "u_model"), 1, GL_FALSE, &Models[i][0][0]);
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		// 1rst attribute buffer : vertices
@@ -925,15 +951,18 @@ void display()
 		for (int j = 0; j < mtls[i].size(); j++) {//
 			mtlname = mtls[i][j];
 			//find the material diffuse color in map:KDs by material name.
-			glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
-			glUniform3fv(M_KsID, 1, &Ks[0]);
-			//          (primitive   , glVertexID base , vertex count    )
+			if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND))
+			{
+				glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
+				glUniform3fv(M_KsID, 1, &Ks[0]);
+			}
 			glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
 			//we draw triangles by giving the glVertexID base and vertex count is face count*3
 			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
 		}//end for loop for draw one part of the robot	
 
 	}//end for loop for updating and drawing model
+	glUseProgram(0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -1355,6 +1384,8 @@ void ActionMenuEvents(int option)
 	action = option;
 	
 	reset_action = true;
+
+	earth_pos = vec3(70, 0, -10);
 }
 
 void ModeMenuEvents(int option)
@@ -1595,7 +1626,7 @@ void drawEarth()
 	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, earth_pos);
 	model_matrix = scale(model_matrix, vec3(30, 30, 30));
-	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "Model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, earth_texture);
