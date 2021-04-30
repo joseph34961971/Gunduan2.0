@@ -373,11 +373,23 @@ void updateObj(int frame)
 
 			angles[LEFTLEG][Z] -= 0.5f;
 			angles[LEFTFOOT][Z] += 0.25f;
+			angles[LEFTLEGARMOR][Z] -= 0.25f;
 
 			angles[RIGHTLEG][Z] += 0.5f;
 			angles[RIGHTFOOT][Z] -= 0.25f;
+			angles[RIGHTLEGARMOR][Z] += 0.25f;
 
-			angles[WING][X] += 0.5f;
+			angles[WING][X] += 0.75f;
+
+			angles[LEFTINSIDEBIGWING][Z] -= 2.0f;
+			angles[LEFTINSIDESMALLWING][Z] -= 1.5f;
+			angles[LEFTMIDDLESMALLWING][Z] -= 1.0f;
+			angles[LEFTOUTSIDESMALLWING][Z] -= 0.5f;
+
+			angles[RIGHTINSIDEBIGWING][Z] += 2.0f;
+			angles[RIGHTINSIDESMALLWING][Z] += 1.5f;
+			angles[RIGHTMIDDLESMALLWING][Z] += 1.0f;
+			angles[RIGHTOUTSIDESMALLWING][Z] += 0.5f;
 		}
 		else
 		{
@@ -389,11 +401,23 @@ void updateObj(int frame)
 
 			angles[LEFTLEG][Z] += 0.5f;
 			angles[LEFTFOOT][Z] -= 0.25f;
+			angles[LEFTLEGARMOR][Z] += 0.25f;
 
 			angles[RIGHTLEG][Z] -= 0.5f;
 			angles[RIGHTFOOT][Z] += 0.25f;
+			angles[RIGHTLEGARMOR][Z] -= 0.25f;
 
-			angles[WING][X] -= 0.5f;
+			angles[WING][X] -= 0.75f;
+
+			angles[LEFTINSIDEBIGWING][Z] += 2.0f;
+			angles[LEFTINSIDESMALLWING][Z] += 1.5f;
+			angles[LEFTMIDDLESMALLWING][Z] += 1.0f;
+			angles[LEFTOUTSIDESMALLWING][Z] += 0.5f;
+
+			angles[RIGHTINSIDEBIGWING][Z] -= 2.0f;
+			angles[RIGHTINSIDESMALLWING][Z] -= 1.5f;
+			angles[RIGHTMIDDLESMALLWING][Z] -= 1.0f;
+			angles[RIGHTOUTSIDESMALLWING][Z] -= 0.5f;
 		}
 
 		fly_position = 3.0f * sin((float)frame / fps * 3.1415);
@@ -407,9 +431,13 @@ void updateObj(int frame)
 			angles[LEFTSHOULDER][X] -= 1.5f;
 
 			angles[LEFTLEG][X] -= 1.5f;
+			angles[LEFTLEGARMOR][X] += 1.2f;
+			angles[LEFTLEGARMOR][Z] -= 0.5f;
 			angles[LEFTFOOT][X] += 1.5f;
 
 			angles[RIGHTLEG][X] -= 1.5f;
+			angles[RIGHTLEGARMOR][X] += 1.2f;
+			angles[RIGHTLEGARMOR][Z] += 0.5f;
 			angles[RIGHTFOOT][X] += 1.5f;
 
 			positions[BODY][Y] -= 0.075f;
@@ -423,9 +451,13 @@ void updateObj(int frame)
 			angles[LEFTSHOULDER][X] += 1.5f;
 
 			angles[LEFTLEG][X] += 1.5f;
+			angles[LEFTLEGARMOR][X] -= 1.2f;
+			angles[LEFTLEGARMOR][Z] += 0.5;
 			angles[LEFTFOOT][X] -= 1.5f;
 
 			angles[RIGHTLEG][X] += 1.5f;
+			angles[RIGHTLEGARMOR][X] -= 1.2f;
+			angles[RIGHTLEGARMOR][Z] -= 0.5;
 			angles[RIGHTFOOT][X] -= 1.5f;
 
 			positions[BODY][Y] += 0.075f;
