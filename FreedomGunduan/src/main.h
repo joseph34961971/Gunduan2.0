@@ -196,10 +196,10 @@ vec3 earth_pos_begin = vec3(70, 0, -50);
 void drawBeam();
 GLint beam_texture;
 vec3 beam_pos;
+vec3 beam_offset;
 vec3 beam_scale;
 bool shooting = false;
-float beam_speed = 20.0f;
-float xx = 1.47, yy = 7.4;
+float beam_speed = 15.0f;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;

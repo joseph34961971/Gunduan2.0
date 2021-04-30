@@ -760,15 +760,18 @@ void updateObj(int frame)
 			angles[LEFTINSIDEBIGWING][Z] -= 8.0f;
 			angles[LEFTINSIDESMALLWING][Z] -= 6.0f;
 			angles[LEFTMIDDLESMALLWING][Z] -= 4.0f;
-			angles[LEFTOUTSIDEBIGWING][Z] -= 2.0f;
+			angles[LEFTOUTSIDESMALLWING][Z] -= 2.0f;
 
 			angles[RIGHTINSIDEBIGWING][Z] += 8.0f;
 			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
 			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
-			angles[RIGHTOUTSIDEBIGWING][Z] += 2.0f;
+			angles[RIGHTOUTSIDESMALLWING][Z] += 2.0f;
 		}
 		else if (second_current == 0 && frame < 30)
 		{
+			positions[BODY][Y] -= 0.05f;
+
+			angles[WING][X] += 1.5f;
 			angles[LEFTFOOT][X] += 2.0f;
 			angles[RIGHTFOOT][X] += 2.0f;
 		}
@@ -786,22 +789,50 @@ void updateObj(int frame)
 			angles[LEFTSHOULDER][X] += 22.0f;
 			angles[LEFTARM][Y] += 10.0f;
 		}
-		else if (second_current == 2 && frame == 10)
+		
+		// shoot first beam
+		if (second_current == 2 && frame == 10)
 		{
-			//shooting = true;
-			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5, -66, 27, 1));
-			beam_scale = vec3(0.2, 0.2, 0.2);
+			shooting = true;
+			beam_pos = vec3(Models[LEFTARM] * vec4(-2.161, -62.734, 25.61, 1));
+			beam_scale = vec3(0.25, 0.25, 0.25);
 		}
-		else if (second_current == 2 && frame >= 10 && frame < 20)
+		if (second_current == 2 && frame > 10 && frame < 20)
 		{
-			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5 - (frame - 9) * 1.47, -66 - (frame - 9) * beam_speed, 27 + (frame - 9) * beam_speed * 0.37, 1)); //14.700020 74.000000
-			beam_scale = vec3(0.2, 0.2, 0.2 * (frame - 9) * beam_speed); 
+			beam_scale = vec3(0.25, 0.25, 0.25 * (frame - 10) * beam_speed * 8);
 		}
-		/*else
+		if (second_current == 2 && frame > 10)
 		{
-			beam_pos = vec3(Models[LEFTARM] * vec4(-2.5 - 10 * xx, -66 - 10 * beam_speed, 27 + 10 * yy, 1));
-			printf("%f %f\n", xx, yy);
-		}*/
+			beam_offset = vec3(0, 0, (frame - 10) * beam_speed);
+		}
+
+		// shoot second beam
+		if (second_current == 2 && frame == 40)
+		{
+			beam_scale = vec3(0.25, 0.25, 0.25);
+		}
+		if (second_current == 2 && frame > 40 && frame < 50)
+		{
+			beam_scale = vec3(0.25, 0.25, 0.25 * (frame - 40) * beam_speed * 8);
+		}
+		if (second_current == 2 && frame > 40)
+		{
+			beam_offset = vec3(0, 0, (frame - 40) * beam_speed);
+		}
+
+		// shoot third beam
+		if (second_current == 3 && frame == 10)
+		{
+			beam_scale = vec3(0.25, 0.25, 0.25);
+		}
+		if (second_current == 3 && frame > 10 && frame < 20)
+		{
+			beam_scale = vec3(0.25, 0.25, 0.25 * (frame - 10) * beam_speed * 8);
+		}
+		if (second_current == 3 && frame > 10)
+		{
+			beam_offset = vec3(0, 0, (frame - 10) * beam_speed);
+		}
 	}
 }
 
@@ -1429,22 +1460,18 @@ void Keyboard(unsigned char key, int x, int y)
 	case 'i':
 	case 'I':
 		eyeheight -= 2;
-		//yy += 0.02f;
 		break;
 	case 'k':
 	case 'K':
 		eyeheight += 2;
-		//yy -= 0.02f;
 		break;
 	case 'j':
 	case 'J':
 		positions[BODY][X] += 1;
-		//xx -= 0.02f;
 		break;
 	case 'l':
 	case 'L':
 		positions[BODY][X] -= 1;
-		//xx += 0.02f;
 		break;
 	case 'w':
 	case 'W':
@@ -1914,6 +1941,11 @@ void drawBeam()
 	glUseProgram(basic_shader);
 	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, beam_pos);
+	vec3 beam_rotate = vec3(Models[LEFTARM] * vec4(24.380f, 23.491f, 1.979f, 1));
+	model_matrix = rotate(model_matrix, beam_rotate.x, vec3(1, 0, 0));
+	model_matrix = rotate(model_matrix, beam_rotate.y, vec3(0, 1, 0));
+	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
+	model_matrix = translate(model_matrix, beam_offset);
 	model_matrix = scale(model_matrix, beam_scale);
 	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
