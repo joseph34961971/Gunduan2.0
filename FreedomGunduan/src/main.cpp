@@ -79,7 +79,7 @@ void ChangeSize(int w, int h)
 	screen_width = w;
 	screen_height = h;
 	initScreenRender();
-	Projection = perspective(80.0f, (float)w / h, 0.1f, 100.0f);
+	Projection = perspective(80.0f, (float)w / h, 0.1f, 500.0f);
 }
 
 void Mouse(int button, int state, int x, int y)
@@ -308,6 +308,13 @@ void updateObj(int frame)
 		eyeX += 0.4f;
 	else if (eyeX > eyeXGoal + 0.1f)
 		eyeX -= 0.4f;
+
+	for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
+	{
+		asteroids_pos[asteroids_index].z -= gundam_speed;
+		if (asteroids_pos[asteroids_index].z < -500.0f)
+			asteroids_pos[asteroids_index].z += 1000.0f;
+	}
 
 	if (action == IDLE)
 	{
@@ -788,7 +795,7 @@ void updateObj(int frame)
 			angles[RIGHTFOOT][X] += 3.0f;
 
 			positions[BODY][X] += 0.3f;
-			positions[BODY][Y] += 0.3f;
+			positions[BODY][Y] += 0.2f;
 			positions[BODY][Z] += 0.3f;
 
 			earth_pos.x -= 2.0f;
@@ -823,11 +830,13 @@ void updateObj(int frame)
 			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
 			angles[RIGHTOUTSIDESMALLWING][Z] += 2.0f;
 
-			angles[LEFTLEGGUN][X] -= 7.0f;
-			angles[RIGHTLEGGUN][X] -= 7.0f;
+			/*angles[LEFTLEGGUN][X] -= 7.0f;
+			angles[RIGHTLEGGUN][X] -= 7.0f;*/
 		}
 		else if (second_current == 0 && frame < 30)
 		{
+			gundam_speed = 5.0f;
+
 			positions[BODY][Y] -= 0.05f;
 
 			angles[WING][X] += 1.5f;
@@ -905,10 +914,18 @@ void updateObj(int frame)
 	 pps = 0;
 	 action = WALK;
 	 resetObj(0); // initial angles array
+	 for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
+	 {
+		 asteroids_species[asteroids_index] = rand() % ASTEROIDNUM;
+		 do
+		 {
+			 asteroids_pos[asteroids_index] = vec3(rand() % 200 - 100, rand() % 200 - 100, rand() % 1000 - 500);
+		 } while (distance(vec2(asteroids_pos[asteroids_index].x, asteroids_pos[asteroids_index].y), vec2(positions[BODY][X], positions[BODY][Y])) < 50.0f);
+		 asteroids_scale[asteroids_index] = vec3(rand() % 6);
+	 }
 
 	 //VAO
 	 glGenVertexArrays(1, &VAO);
-	 glBindVertexArray(VAO);
 
 	 ShaderInfo shaders[] = {
 		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/DSPhong_Material.vert" },//vertex shader
@@ -963,7 +980,7 @@ void updateObj(int frame)
 	 M_KdID = M_KaID + 1;
 	 M_KsID = M_KaID + 2;
 
-	 Projection = glm::perspective(80.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+	 Projection = glm::perspective(80.0f, 4.0f / 3.0f, 0.1f, 500.0f);
 	 //glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
 
 	 // Camera matrix
@@ -997,6 +1014,14 @@ void updateObj(int frame)
 	 sphere_vao = sphereGenerator(4);
 	 earth_texture = loadTexture("../FreedomGunduan/images/earth.bmp");
 	 beam_texture = loadTexture("../FreedomGunduan/images/beam.bmp");
+	 asteroids_textures[0] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_1_Color.bmp");
+	 asteroids_textures[1] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_2_Color.bmp");
+	 asteroids_textures[2] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_3_Color.bmp");
+	 asteroids_textures[3] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_4_Color.bmp");
+	 asteroids_textures[4] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_5_Color.bmp");
+	 asteroids_textures[5] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_6_Color.bmp");
+
+	 glGenVertexArrays(1, &asteroids_VAO);
 
 	 initSkybox();
 
@@ -1052,7 +1077,6 @@ void display()
 	if (pps != ORIGIN)
 		renderScreenBegin();
 
-	glBindVertexArray(VAO);
 	if (mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)
 	{
 		glUseProgram(diamond_shader);
@@ -1066,6 +1090,7 @@ void display()
 
 	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
 	for (int i = 0; i < PARTSNUM; i++) {
+		glBindVertexArray(VAO);
 		if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND))
 		{
 			glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
@@ -1128,7 +1153,10 @@ void display()
 			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
 		}//end for loop for draw one part of the robot	
 
+	//unbind VAO
+		glBindVertexArray(0);
 	}//end for loop for updating and drawing model
+
 	glUseProgram(0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -1141,6 +1169,11 @@ void display()
 	if (shooting)
 	{
 		drawBeam();
+	}
+
+	if (action != Opening)
+	{
+		drawAsteroids();
 	}
 
 	drawSkybox();
@@ -1164,7 +1197,7 @@ void Obj2Buffer()
 	std::vector<std::string> Materials;//mtl-name
 	std::string texture;
 	loadMTL("../FreedomGunduan/objs/freedom.mtl", Kds, Kas, Kss, Materials, texture);
-	//printf("%d\n",texture);
+
 	for (int i = 0; i < Materials.size(); i++) {
 		string mtlname = Materials[i];
 		//  name            vec3
@@ -1253,6 +1286,31 @@ void Obj2Buffer()
 		glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 	}
 	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+
+	std::vector<vec3> asteroids_Kds;
+	std::vector<vec3> asteroids_Kas;
+	std::vector<vec3> asteroids_Kss;
+	std::vector<std::string> asteroids_Materials;//mtl-name
+	std::string asteroids_texture;
+	loadMTL("../FreedomGunduan/objs/asteroids/Asteroid_Small_6X.mtl", asteroids_Kds, asteroids_Kas, asteroids_Kss, asteroids_Materials, asteroids_texture);
+
+	for (int i = 0; i < asteroids_Materials.size(); i++) {
+		string mtlname = asteroids_Materials[i];
+		//  name            vec3
+		asteroids_KDs[mtlname] = asteroids_Kds[i];
+	}
+
+	std::vector<vec3> vertices;
+	std::vector<vec2> uvs;
+	std::vector<vec3> normals; // Won't be used at the moment.
+	std::vector<unsigned int> materialIndices;
+
+	load2AsteroidBuffer("../FreedomGunduan/objs/asteroids/Asteroid_Small_1.obj", 0);
+	load2AsteroidBuffer("../FreedomGunduan/objs/asteroids/Asteroid_Small_2.obj", 1);
+	load2AsteroidBuffer("../FreedomGunduan/objs/asteroids/Asteroid_Small_3.obj", 2);
+	load2AsteroidBuffer("../FreedomGunduan/objs/asteroids/Asteroid_Small_4.obj", 3);
+	load2AsteroidBuffer("../FreedomGunduan/objs/asteroids/Asteroid_Small_5.obj", 4);
+	load2AsteroidBuffer("../FreedomGunduan/objs/asteroids/Asteroid_Small_6.obj", 5);
 }
 
 void updateModels()
@@ -1587,6 +1645,8 @@ void ActionMenuEvents(int option)
 	reset_action = true;
 
 	earth_pos = earth_pos_begin;
+
+	gundam_speed = 0.5f;
 }
 
 void ModeMenuEvents(int option)
@@ -1885,28 +1945,28 @@ GLuint sphereGenerator(int subdivision_level)
 			sphere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)theta));
 			indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
 			indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
-			indexed_uvs.push_back(glm::vec2(theta / 360.0f, phi / 180.0f + 0.5f));
+			indexed_uvs.push_back(glm::vec2(1.0 - theta / 360.0f, phi / 180.0f + 0.5f));
 
 			sphere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)(theta + d_angle)));
 			sphere_y = r * glm::sin(glm::radians((float)phi));
 			sphere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)(theta + d_angle)));
 			indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
 			indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
-			indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, phi / 180.0f + 0.5f));
+			indexed_uvs.push_back(glm::vec2(1.0 - (theta + d_angle) / 360.0f, phi / 180.0f + 0.5f));
 
 			sphere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)(theta + d_angle)));
 			sphere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
 			sphere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)(theta + d_angle)));
 			indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
 			indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
-			indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+			indexed_uvs.push_back(glm::vec2(1.0 - (theta + d_angle) / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
 
 			sphere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)theta));
 			sphere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
 			sphere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)theta));
 			indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
 			indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
-			indexed_uvs.push_back(glm::vec2(theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+			indexed_uvs.push_back(glm::vec2(1.0 - theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
 
 			indices.push_back(indices_index);
 			indices.push_back(indices_index + 3);
@@ -1919,6 +1979,13 @@ GLuint sphereGenerator(int subdivision_level)
 	}
 
 	GLuint VertexArrayID;
+	VAOProcess(VertexArrayID, indexed_vertices, indexed_normals, indexed_uvs, indices, sphere_indices_size);
+
+	return VertexArrayID;
+}
+
+void VAOProcess(GLuint& VertexArrayID, vector<vec3> indexed_vertices, vector<vec3> indexed_normals, vector<vec2> indexed_uvs, std::vector<unsigned short> indices, size_t& indices_size)
+{
 	GLuint vertexbuffer;
 	GLuint uvbuffer;
 	GLuint normalbuffer;
@@ -1970,12 +2037,10 @@ GLuint sphereGenerator(int subdivision_level)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
-	sphere_indices_size = indices.size();
+	indices_size = indices.size();
 
 	// Unbind VAO
 	glBindVertexArray(0);
-
-	return VertexArrayID;
 }
 
 void drawShpere(GLuint VertexArrayID, int indices_size)
@@ -2012,6 +2077,94 @@ void drawBeam()
 	glBindTexture(GL_TEXTURE_2D, beam_texture);
 	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
 	drawShpere(sphere_vao, sphere_indices_size);
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void load2AsteroidBuffer(char* obj, int i)
+{
+	std::vector<vec3> vertices;
+	std::vector<vec2> uvs;
+	std::vector<vec3> normals; // Won't be used at the moment.
+
+	bool res = loadOBJ(obj, vertices, uvs, normals, asteroids_faces[i], asteroids_mtls[i]);
+	if (!res) printf("load failed\n");
+
+	glGenBuffers(1, &asteroids_VBOs[i]);
+	glBindBuffer(GL_ARRAY_BUFFER, asteroids_VBOs[i]);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec3), &vertices[0], GL_STATIC_DRAW);
+	asteroids_vertices_size[i] = vertices.size();
+
+	glGenBuffers(1, &asteroids_uVBOs[i]);
+	glBindBuffer(GL_ARRAY_BUFFER, asteroids_uVBOs[i]);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(vec2), &uvs[0], GL_STATIC_DRAW);
+	asteroids_uvs_size[i] = uvs.size();
+
+	glGenBuffers(1, &asteroids_nVBOs[i]);
+	glBindBuffer(GL_ARRAY_BUFFER, asteroids_nVBOs[i]);
+	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(vec3), &normals[0], GL_STATIC_DRAW);
+	asteroids_normals_size[i] = normals.size();
+}
+
+void drawAsteroids()
+{
+	glUseProgram(basic_shader);
+	for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
+	{
+		glBindVertexArray(asteroids_VAO);
+
+		mat4 model_matrix = mat4();
+		model_matrix = translate(model_matrix, asteroids_pos[asteroids_index]);
+		model_matrix = scale(model_matrix, asteroids_scale[asteroids_index]);
+		glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, asteroids_textures[asteroids_species[asteroids_index]]);
+		glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, asteroids_VBOs[asteroids_species[asteroids_index]]);
+		// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0,				//location
+			3,				//vec3
+			GL_FLOAT,			//type
+			GL_FALSE,			//not normalized
+			0,				//strip
+			(void*)0);//buffer offset
+
+		// 2nd attribute buffer : normals
+		glEnableVertexAttribArray(1);//location 2 :vec3 Normal
+		glBindBuffer(GL_ARRAY_BUFFER, asteroids_nVBOs[asteroids_species[asteroids_index]]);
+		glVertexAttribPointer(1,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)0);
+
+		// 3rd attribute buffer : UVs
+		glEnableVertexAttribArray(2);//location 3 :vec2 UV
+		glBindBuffer(GL_ARRAY_BUFFER, asteroids_uVBOs[asteroids_species[asteroids_index]]);
+		glVertexAttribPointer(2,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)0);
+
+		int vertexIDoffset = 0;//glVertexID's offset 
+		string mtlname;//material name
+		for (int j = 0; j < asteroids_mtls[asteroids_species[asteroids_index]].size(); j++) {//
+			mtlname = asteroids_mtls[asteroids_species[asteroids_index]][j];
+			//find the material diffuse color in map:KDs by material name.
+
+			glDrawArrays(GL_TRIANGLES, vertexIDoffset, asteroids_faces[asteroids_species[asteroids_index]][j + 1] * 3);
+			//we draw triangles by giving the glVertexID base and vertex count is face count*3
+			vertexIDoffset += asteroids_faces[asteroids_species[asteroids_index]][j + 1] * 3;//glVertexID's base offset is face count*3
+		}//end for loop for draw one part of the robot	
+	//unbind VAO
+		glBindVertexArray(0);
+	}
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
