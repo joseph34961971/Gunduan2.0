@@ -95,6 +95,7 @@ GLuint screen_quad_VBO;
 GLuint VBOs[PARTSNUM];
 GLuint uVBOs[PARTSNUM];
 GLuint nVBOs[PARTSNUM];
+GLuint asteroids_VAO;
 GLuint gundaun_shader;
 GLuint skybox_shader;
 GLuint gray_shader;
@@ -102,6 +103,7 @@ GLuint uniform_shader;
 GLuint gaussian_shader;
 GLuint basic_shader;
 GLuint diamond_shader;
+GLuint texture_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
@@ -157,6 +159,7 @@ mat4 Models[PARTSNUM];
 #define YoBattle 6
 #define Opening 7
 #define Shoot 8
+#define AllShoot 9
 int mode = 1;
 int action;
 const int fps = 60;
@@ -188,6 +191,7 @@ GLint loadTexture(string path);
 GLuint sphere_vao;
 size_t sphere_indices_size;
 GLuint sphereGenerator(int subdivision_level);
+void VAOProcess(GLuint& VertexArrayID, vector<vec3> indexed_vertices, vector<vec3> indexed_normals, vector<vec2> indexed_uvs, std::vector<unsigned short> indices, size_t& indices_size);
 void drawShpere(GLuint VertexArrayID, int indices_size);
 GLint earth_texture;
 vec3 earth_pos;
@@ -200,6 +204,25 @@ vec3 beam_offset;
 vec3 beam_scale;
 bool shooting = false;
 float beam_speed = 15.0f;
+
+#define ASTEROIDNUM 6
+std::vector<std::string> asteroids_mtls[ASTEROIDNUM];//use material
+std::vector<unsigned int> asteroids_faces[ASTEROIDNUM];//face count
+map<string, vec3> asteroids_KDs;//mtl-name&Kd
+GLuint asteroids_VBOs[ASTEROIDNUM];
+GLuint asteroids_uVBOs[ASTEROIDNUM];
+GLuint asteroids_nVBOs[ASTEROIDNUM];
+int asteroids_vertices_size[ASTEROIDNUM];
+int asteroids_uvs_size[ASTEROIDNUM];
+int asteroids_normals_size[ASTEROIDNUM];
+void load2AsteroidBuffer(char* obj, int i);
+GLint asteroids_textures[ASTEROIDNUM];
+void drawAsteroids();
+#define ASTEROIDAMOUNT 500
+vec3 asteroids_pos[ASTEROIDAMOUNT];
+vec3 asteroids_scale[ASTEROIDAMOUNT];
+int asteroids_species[ASTEROIDAMOUNT];
+float gundam_speed = 0.5f;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;

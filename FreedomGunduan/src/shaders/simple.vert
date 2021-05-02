@@ -26,7 +26,7 @@ void main()
 
     v_out.position = vec3(u_model * vec4(position, 1.0f));
     v_out.normal = mat3(transpose(inverse(u_model))) * normal;
-    v_out.texture_coordinate = vec2(1.0 - texture_coordinate.x, 1.0 - texture_coordinate.y);
+    v_out.texture_coordinate = vec2(texture_coordinate.x, 1.0 - texture_coordinate.y);
 
     // Get vertex position in eye coordinates
     vec4 vPosition4 = u_view * u_model * vec4(position, 1);
