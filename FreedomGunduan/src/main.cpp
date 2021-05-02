@@ -1608,13 +1608,13 @@ void Keyboard(unsigned char key, int x, int y)
 	{
 	case 'u':
 	case 'U':
-		angles[BODY][Y] += 5;
-		if (angles[BODY][Y] >= 360) angles[BODY][Y] = 0;
+		/*angles[BODY][Y] += 5;
+		if (angles[BODY][Y] >= 360) angles[BODY][Y] = 0;*/
 		break;
 	case 'o':
 	case 'O':
-		angles[BODY][Y] -= 5;
-		if (angles[BODY][Y] <= 0) angles[BODY][Y] = 360;
+		/*angles[BODY][Y] -= 5;
+		if (angles[BODY][Y] <= 0) angles[BODY][Y] = 360;*/
 		break;
 	case 'i':
 	case 'I':

@@ -202,12 +202,12 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 newmtl freedom:wire_143224087
 illum 4
-Kd 0.56 0.88 0.34
-Ka 0.56 0.88 0.34
+Kd 0.88 0.88 0.88
+Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-Ks 0.35 0.35 0.35
-Ns 32.00
+Ks 0.70 0.70 0.70
+Ns 6.00
 newmtl freedom:wire_145028177
 illum 4
 Kd 0.50 0.50 0.50
@@ -509,6 +509,38 @@ Ns 6.00
 newmtl freedom:ChafCaja1303SG5
 illum 4
 Kd 0.13 0.13 0.14
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.70 0.70 0.70
+Ns 6.00
+newmtl freedom:phong1SG
+illum 4
+Kd 0.94 0.00 0.07
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 6.00
+newmtl freedom:phong2SG
+illum 4
+Kd 0.88 0.88 0.88
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 6.00
+newmtl freedom:phong3SG
+illum 4
+Kd 0.32 0.32 0.32
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 6.00
+newmtl freedom:ChafCaja1272SG4
+illum 4
+Kd 0.13 0.34 0.82
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
