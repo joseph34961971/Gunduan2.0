@@ -203,7 +203,6 @@ void resetObj(int f)
 	positions[LEFTLEGGUNPOINT][Y] = -43.0f;
 	positions[LEFTLEGGUNPOINT][Z] = -11.0f;
 
-
 	positions[LEFTFOOT][X] = -4.0f;
 	positions[LEFTFOOT][Y] = -31.0f;
 	positions[LEFTFOOT][Z] = 12.0f;
@@ -926,6 +925,8 @@ void updateObj(int frame)
 
 			angles[LEFTLEGGUNBARREL][X] -= 7.0f;
 			angles[RIGHTLEGGUNBARREL][X] -= 7.0f;
+			angles[LEFTLEGGUNSTOCK][X] += 4.0f;
+			angles[RIGHTLEGGUNSTOCK][X] += 4.0f;
 
 			angles[LEFTSHOULDER][X] -= 12.0f;
 			angles[LEFTSHOULDER][Z] += 1.5f;
@@ -937,6 +938,12 @@ void updateObj(int frame)
 
 			angles[LEFTSHOULDER][X] += 11.0f;
 			angles[LEFTARM][Y] += 5.0f;
+
+			angles[LEFTLEGGUNPOINT][X] -= 18.0f;
+			angles[RIGHTLEGGUNPOINT][X] -= 18.0f;
+
+			positions[LEFTLEGGUNPOINT][Z] += 0.3f;
+			positions[RIGHTLEGGUNPOINT][Z] += 0.3f;
 		}
 
 		// shoot first beam
