@@ -40,6 +40,7 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Yo Battle", 6);
 	glutAddMenuEntry("Opening Pose", 7);
 	glutAddMenuEntry("Shoot", 8);
+	glutAddMenuEntry("All Shoot", 9);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -829,9 +830,6 @@ void updateObj(int frame)
 			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
 			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
 			angles[RIGHTOUTSIDESMALLWING][Z] += 2.0f;
-
-			/*angles[LEFTLEGGUN][X] -= 7.0f;
-			angles[RIGHTLEGGUN][X] -= 7.0f;*/
 		}
 		else if (second_current == 0 && frame < 30)
 		{
@@ -857,7 +855,7 @@ void updateObj(int frame)
 			angles[LEFTSHOULDER][X] += 22.0f;
 			angles[LEFTARM][Y] += 10.0f;
 		}
-		
+
 		// shoot first beam
 		if (second_current == 2 && frame == 10)
 		{
@@ -902,6 +900,44 @@ void updateObj(int frame)
 			beam_offset = vec3(0, 0, (frame - 10) * beam_speed);
 		}
 	}
+	else if (action == AllShoot)
+	{
+		if (second_current == 0 && frame < 15)
+		{
+			angles[LEFTGUN][Z] -= 12.0f;
+			angles[RIGHTGUN][Z] += 12.0f;
+
+			angles[LEFTLEGGUN][X] -= 7.0f;
+			angles[RIGHTLEGGUN][X] -= 7.0f;
+
+			angles[LEFTSHOULDER][X] -= 12.0f;
+			angles[LEFTSHOULDER][Z] += 1.5f;
+		}
+		else if (second_current == 0 && frame >= 20 && frame < 30)
+		{
+			angles[LEFTGUN][X] += 8.5f;
+			angles[RIGHTGUN][X] += 8.5f;
+
+			angles[LEFTSHOULDER][X] += 11.0f;
+			angles[LEFTARM][Y] += 5.0f;
+		}
+
+		// shoot first beam
+		if (second_current == 0 && frame == 40)
+		{
+			shooting = true;
+			beam_pos = vec3(Models[LEFTARM] * vec4(-2.161, -62.734, 25.61, 1));
+			beam_scale = vec3(0.25, 0.25, 0.25);
+		}
+		if (second_current == 0 && frame > 40)
+		{
+			beam_scale = vec3(0.5, 0.5, 0.5 * (frame - 40) * beam_speed * 4);
+		}
+		if (second_current == 0 && frame > 40)
+		{
+			beam_offset = vec3(0, 0, (frame - 40) * beam_speed);
+		}
+	}
 }
 
  GLuint M_KaID;
@@ -921,7 +957,7 @@ void updateObj(int frame)
 		 {
 			 asteroids_pos[asteroids_index] = vec3(rand() % 200 - 100, rand() % 200 - 100, rand() % 1000 - 500);
 		 } while (distance(vec2(asteroids_pos[asteroids_index].x, asteroids_pos[asteroids_index].y), vec2(positions[BODY][X], positions[BODY][Y])) < 50.0f);
-		 asteroids_scale[asteroids_index] = vec3(rand() % 6);
+		 asteroids_scale[asteroids_index] = vec3(rand() % 8);
 	 }
 
 	 //VAO
@@ -968,6 +1004,12 @@ void updateObj(int frame)
 		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/diamond_surface.frag" },//fragment shader
 		 { GL_NONE, NULL } };
 	 diamond_shader = LoadShaders(diamond_shaders);//讀取shader
+
+	 ShaderInfo texture_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/texture.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/texture.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 texture_shader = LoadShaders(texture_shaders);//讀取shader
 
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
@@ -1883,12 +1925,11 @@ void drawScreenQuad()
 
 void drawEarth()
 {
-	glUseProgram(basic_shader);
+	glUseProgram(texture_shader);
 	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, earth_pos);
 	model_matrix = scale(model_matrix, vec3(60, 60, 60));
 	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, earth_texture);
 	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
@@ -2062,7 +2103,7 @@ void drawShpere(GLuint VertexArrayID, int indices_size)
 
 void drawBeam()
 {
-	glUseProgram(basic_shader);
+	glUseProgram(texture_shader);
 	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, beam_pos);
 	vec3 beam_rotate = vec3(Models[LEFTARM] * vec4(24.380f, 23.491f, 1.979f, 1));
@@ -2072,7 +2113,6 @@ void drawBeam()
 	model_matrix = translate(model_matrix, beam_offset);
 	model_matrix = scale(model_matrix, beam_scale);
 	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, beam_texture);
 	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);

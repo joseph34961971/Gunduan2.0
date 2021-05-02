@@ -95,6 +95,7 @@ GLuint screen_quad_VBO;
 GLuint VBOs[PARTSNUM];
 GLuint uVBOs[PARTSNUM];
 GLuint nVBOs[PARTSNUM];
+GLuint asteroids_VAO;
 GLuint gundaun_shader;
 GLuint skybox_shader;
 GLuint gray_shader;
@@ -102,7 +103,7 @@ GLuint uniform_shader;
 GLuint gaussian_shader;
 GLuint basic_shader;
 GLuint diamond_shader;
-GLuint asteroids_VAO;
+GLuint texture_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
@@ -158,6 +159,7 @@ mat4 Models[PARTSNUM];
 #define YoBattle 6
 #define Opening 7
 #define Shoot 8
+#define AllShoot 9
 int mode = 1;
 int action;
 const int fps = 60;

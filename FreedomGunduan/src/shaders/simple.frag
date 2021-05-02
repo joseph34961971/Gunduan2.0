@@ -12,7 +12,7 @@ in V_OUT
 uniform sampler2D u_texture;
 
 // lighting color
-vec3    ambientColor = vec3(0.1,0.1,0.1);
+vec3    ambientColor = vec3(0.5,0.5,0.5);
 vec3    diffuseColor = vec3(0.8,0.8,0.8);   
 vec3    specularColor = vec3(1,1,1);
 float   Shininess = 128.0; // for material specular
@@ -39,6 +39,5 @@ vec3 CalcDirLight(vec3 normal, vec3 viewDir)
 
 void main()
 {   
-    //f_color = vec4(CalcDirLight(f_in.normal, f_in.viewDir), 1);
-    f_color = texture(u_texture, f_in.texture_coordinate);
+    f_color = vec4(CalcDirLight(f_in.normal, f_in.viewDir), 1);
 }
