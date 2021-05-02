@@ -191,9 +191,17 @@ void resetObj(int f)
 	positions[LEFTLEGARMOR][Y] = 8.0f;
 	positions[LEFTLEGARMOR][Z] = 2.0f;
 
-	positions[LEFTLEGGUN][X] = 0.0f;
-	positions[LEFTLEGGUN][Y] = -2.778f;
-	positions[LEFTLEGGUN][Z] = 4.025f;
+	positions[LEFTLEGGUNSTOCK][X] = 0.0f;
+	positions[LEFTLEGGUNSTOCK][Y] = -7.0f;
+	positions[LEFTLEGGUNSTOCK][Z] = -5.0f;
+
+	positions[LEFTLEGGUNBARREL][X] = 0.0f;
+	positions[LEFTLEGGUNBARREL][Y] = -2.778f;
+	positions[LEFTLEGGUNBARREL][Z] = 4.025f;
+
+	positions[LEFTLEGGUNPOINT][X] = 2.0f;
+	positions[LEFTLEGGUNPOINT][Y] = -43.0f;
+	positions[LEFTLEGGUNPOINT][Z] = -11.0f;
 
 	positions[LEFTFOOT][X] = -4.0f;
 	positions[LEFTFOOT][Y] = -31.0f;
@@ -207,9 +215,17 @@ void resetObj(int f)
 	positions[RIGHTLEGARMOR][Y] = 9.0f;
 	positions[RIGHTLEGARMOR][Z] = 3.0f;
 
-	positions[RIGHTLEGGUN][X] = 0.0f;
-	positions[RIGHTLEGGUN][Y] = -2.778f;
-	positions[RIGHTLEGGUN][Z] = 5.0f;
+	positions[RIGHTLEGGUNSTOCK][X] = 0.0f;
+	positions[RIGHTLEGGUNSTOCK][Y] = -7.0f;
+	positions[RIGHTLEGGUNSTOCK][Z] = -4.0f;
+
+	positions[RIGHTLEGGUNBARREL][X] = 0.0f;
+	positions[RIGHTLEGGUNBARREL][Y] = -2.778f;
+	positions[RIGHTLEGGUNBARREL][Z] = 5.0f;
+
+	positions[RIGHTLEGGUNPOINT][X] = 0.0f;
+	positions[RIGHTLEGGUNPOINT][Y] = -44.0f;
+	positions[RIGHTLEGGUNPOINT][Z] = -10.0f;
 
 	positions[RIGHTFOOT][X] = 5.0f;
 	positions[RIGHTFOOT][Y] = -29.0f;
@@ -907,8 +923,10 @@ void updateObj(int frame)
 			angles[LEFTGUN][Z] -= 12.0f;
 			angles[RIGHTGUN][Z] += 12.0f;
 
-			angles[LEFTLEGGUN][X] -= 7.0f;
-			angles[RIGHTLEGGUN][X] -= 7.0f;
+			angles[LEFTLEGGUNBARREL][X] -= 7.0f;
+			angles[RIGHTLEGGUNBARREL][X] -= 7.0f;
+			angles[LEFTLEGGUNSTOCK][X] += 4.0f;
+			angles[RIGHTLEGGUNSTOCK][X] += 4.0f;
 
 			angles[LEFTSHOULDER][X] -= 12.0f;
 			angles[LEFTSHOULDER][Z] += 1.5f;
@@ -920,6 +938,12 @@ void updateObj(int frame)
 
 			angles[LEFTSHOULDER][X] += 11.0f;
 			angles[LEFTARM][Y] += 5.0f;
+
+			angles[LEFTLEGGUNPOINT][X] -= 18.0f;
+			angles[RIGHTLEGGUNPOINT][X] -= 18.0f;
+
+			positions[LEFTLEGGUNPOINT][Z] += 0.3f;
+			positions[RIGHTLEGGUNPOINT][Z] += 0.3f;
 		}
 
 		// shoot first beam
@@ -1259,12 +1283,18 @@ void Obj2Buffer()
 
 	load2Buffer("../FreedomGunduan/objs/leftLeg.obj", LEFTLEG);
 	load2Buffer("../FreedomGunduan/objs/leftLegArmor.obj", LEFTLEGARMOR);
-	load2Buffer("../FreedomGunduan/objs/leftLegGun.obj", LEFTLEGGUN);
+	load2Buffer("../FreedomGunduan/objs/leftLegGunStock.obj", LEFTLEGGUNSTOCK);
+	load2Buffer("../FreedomGunduan/objs/leftLegGunBarrel.obj", LEFTLEGGUNBARREL);
+	load2Buffer("../FreedomGunduan/objs/leftLegGunPoint.obj", LEFTLEGGUNPOINT);
+	load2Buffer("../FreedomGunduan/objs/leftLegSaber.obj", LEFTLEGSABER);
 	load2Buffer("../FreedomGunduan/objs/left_foot.obj", LEFTFOOT);
 
 	load2Buffer("../FreedomGunduan/objs/rightLeg.obj", RIGHTLEG);
 	load2Buffer("../FreedomGunduan/objs/rightLegArmor.obj", RIGHTLEGARMOR);
-	load2Buffer("../FreedomGunduan/objs/rightLegGun.obj", RIGHTLEGGUN);
+	load2Buffer("../FreedomGunduan/objs/rightLegGunStock.obj", RIGHTLEGGUNSTOCK);
+	load2Buffer("../FreedomGunduan/objs/rightLegGunBarrel.obj", RIGHTLEGGUNBARREL);
+	load2Buffer("../FreedomGunduan/objs/rightLegGunPoint.obj", RIGHTLEGGUNPOINT);
+	load2Buffer("../FreedomGunduan/objs/rightLegSaber.obj", RIGHTLEGSABER);
 	load2Buffer("../FreedomGunduan/objs/right_foot.obj", RIGHTFOOT);
 
 	load2Buffer("../FreedomGunduan/objs/leftConnector.obj", LEFTCONNECTOR);
@@ -1422,10 +1452,28 @@ void updateModels()
 	Models[LEFTLEGARMOR] = Models[LEFTLEG] * Translation[LEFTLEGARMOR] * Rotatation[LEFTLEGARMOR];
 	//=============================================================
 
-	//¥ª»Lºj
-	Rotatation[LEFTLEGGUN] = rotate(angles[LEFTLEGGUN][X], 1, 0, 0) * rotate(angles[LEFTLEGGUN][Z], 0, 0, 1) * rotate(angles[LEFTLEGGUN][Y], 0, 1, 0);
-	Translation[LEFTLEGGUN] = translate(positions[LEFTLEGGUN][X], positions[LEFTLEGGUN][Y], positions[LEFTLEGGUN][Z]);
-	Models[LEFTLEGGUN] = Models[LEFTLEGARMOR] * Translation[LEFTLEGGUN] * Rotatation[LEFTLEGGUN];
+	//¥ª»Lºj¦«
+	Rotatation[LEFTLEGGUNSTOCK] = rotate(angles[LEFTLEGGUNSTOCK][X], 1, 0, 0) * rotate(angles[LEFTLEGGUNSTOCK][Z], 0, 0, 1) * rotate(angles[LEFTLEGGUNSTOCK][Y], 0, 1, 0);
+	Translation[LEFTLEGGUNSTOCK] = translate(positions[LEFTLEGGUNSTOCK][X], positions[LEFTLEGGUNSTOCK][Y], positions[LEFTLEGGUNSTOCK][Z]);
+	Models[LEFTLEGGUNSTOCK] = Models[LEFTLEGARMOR] * Translation[LEFTLEGGUNSTOCK] * Rotatation[LEFTLEGGUNSTOCK];
+	//=============================================================
+
+	//¥ª»LºjºÞ
+	Rotatation[LEFTLEGGUNBARREL] = rotate(angles[LEFTLEGGUNBARREL][X], 1, 0, 0) * rotate(angles[LEFTLEGGUNBARREL][Z], 0, 0, 1) * rotate(angles[LEFTLEGGUNBARREL][Y], 0, 1, 0);
+	Translation[LEFTLEGGUNBARREL] = translate(positions[LEFTLEGGUNBARREL][X], positions[LEFTLEGGUNBARREL][Y], positions[LEFTLEGGUNBARREL][Z]);
+	Models[LEFTLEGGUNBARREL] = Models[LEFTLEGARMOR] * Translation[LEFTLEGGUNBARREL] * Rotatation[LEFTLEGGUNBARREL];
+	//=============================================================
+
+	//¥ª»Lºj¤f
+	Rotatation[LEFTLEGGUNPOINT] = rotate(angles[LEFTLEGGUNPOINT][X], 1, 0, 0) * rotate(angles[LEFTLEGGUNPOINT][Z], 0, 0, 1) * rotate(angles[LEFTLEGGUNPOINT][Y], 0, 1, 0);
+	Translation[LEFTLEGGUNPOINT] = translate(positions[LEFTLEGGUNPOINT][X], positions[LEFTLEGGUNPOINT][Y], positions[LEFTLEGGUNPOINT][Z]);
+	Models[LEFTLEGGUNPOINT] = Models[LEFTLEGGUNBARREL] * Translation[LEFTLEGGUNPOINT] * Rotatation[LEFTLEGGUNPOINT];
+	//=============================================================
+
+	//¥ª»L¥ú¼C
+	Rotatation[LEFTLEGSABER] = rotate(angles[LEFTLEGSABER][X], 1, 0, 0) * rotate(angles[LEFTLEGSABER][Z], 0, 0, 1) * rotate(angles[LEFTLEGSABER][Y], 0, 1, 0);
+	Translation[LEFTLEGSABER] = translate(positions[LEFTLEGSABER][X], positions[LEFTLEGSABER][Y], positions[LEFTLEGSABER][Z]);
+	Models[LEFTLEGSABER] = Models[LEFTLEGARMOR] * Translation[LEFTLEGSABER] * Rotatation[LEFTLEGSABER];
 	//=============================================================
 
 	//¥ª¸}(­±¹ïµe­±¥ªÃä)
@@ -1446,10 +1494,28 @@ void updateModels()
 	Models[RIGHTLEGARMOR] = Models[RIGHTLEG] * Translation[RIGHTLEGARMOR] * Rotatation[RIGHTLEGARMOR];
 	//=============================================================
 
-	//¥k»Lºj
-	Rotatation[RIGHTLEGGUN] = rotate(angles[RIGHTLEGGUN][X], 1, 0, 0) * rotate(angles[RIGHTLEGGUN][Z], 0, 0, 1) * rotate(angles[RIGHTLEGGUN][Y], 0, 1, 0);
-	Translation[RIGHTLEGGUN] = translate(positions[RIGHTLEGGUN][X], positions[RIGHTLEGGUN][Y], positions[RIGHTLEGGUN][Z]);
-	Models[RIGHTLEGGUN] = Models[RIGHTLEGARMOR] * Translation[RIGHTLEGGUN] * Rotatation[RIGHTLEGGUN];
+	//¥k»Lºj¦«
+	Rotatation[RIGHTLEGGUNSTOCK] = rotate(angles[RIGHTLEGGUNSTOCK][X], 1, 0, 0) * rotate(angles[RIGHTLEGGUNSTOCK][Z], 0, 0, 1) * rotate(angles[RIGHTLEGGUNSTOCK][Y], 0, 1, 0);
+	Translation[RIGHTLEGGUNSTOCK] = translate(positions[RIGHTLEGGUNSTOCK][X], positions[RIGHTLEGGUNSTOCK][Y], positions[RIGHTLEGGUNSTOCK][Z]);
+	Models[RIGHTLEGGUNSTOCK] = Models[RIGHTLEGARMOR] * Translation[RIGHTLEGGUNSTOCK] * Rotatation[RIGHTLEGGUNSTOCK];
+	//=============================================================
+
+	//¥k»LºjºÞ
+	Rotatation[RIGHTLEGGUNBARREL] = rotate(angles[RIGHTLEGGUNBARREL][X], 1, 0, 0) * rotate(angles[RIGHTLEGGUNBARREL][Z], 0, 0, 1) * rotate(angles[RIGHTLEGGUNBARREL][Y], 0, 1, 0);
+	Translation[RIGHTLEGGUNBARREL] = translate(positions[RIGHTLEGGUNBARREL][X], positions[RIGHTLEGGUNBARREL][Y], positions[RIGHTLEGGUNBARREL][Z]);
+	Models[RIGHTLEGGUNBARREL] = Models[RIGHTLEGARMOR] * Translation[RIGHTLEGGUNBARREL] * Rotatation[RIGHTLEGGUNBARREL];
+	//=============================================================
+
+	//¥k»Lºj¤f
+	Rotatation[RIGHTLEGGUNPOINT] = rotate(angles[RIGHTLEGGUNPOINT][X], 1, 0, 0) * rotate(angles[RIGHTLEGGUNPOINT][Z], 0, 0, 1) * rotate(angles[RIGHTLEGGUNPOINT][Y], 0, 1, 0);
+	Translation[RIGHTLEGGUNPOINT] = translate(positions[RIGHTLEGGUNPOINT][X], positions[RIGHTLEGGUNPOINT][Y], positions[RIGHTLEGGUNPOINT][Z]);
+	Models[RIGHTLEGGUNPOINT] = Models[RIGHTLEGGUNBARREL] * Translation[RIGHTLEGGUNPOINT] * Rotatation[RIGHTLEGGUNPOINT];
+	//=============================================================
+
+	//¥k»L¥ú¼C
+	Rotatation[RIGHTLEGSABER] = rotate(angles[RIGHTLEGSABER][X], 1, 0, 0) * rotate(angles[RIGHTLEGSABER][Z], 0, 0, 1) * rotate(angles[RIGHTLEGSABER][Y], 0, 1, 0);
+	Translation[RIGHTLEGSABER] = translate(positions[RIGHTLEGSABER][X], positions[RIGHTLEGSABER][Y], positions[RIGHTLEGSABER][Z]);
+	Models[RIGHTLEGSABER] = Models[RIGHTLEGARMOR] * Translation[RIGHTLEGSABER] * Rotatation[RIGHTLEGSABER];
 	//=============================================================
 
 	//¥k¸}
