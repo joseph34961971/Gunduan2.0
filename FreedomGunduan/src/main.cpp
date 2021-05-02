@@ -939,8 +939,8 @@ void updateObj(int frame)
 			angles[LEFTSHOULDER][X] += 11.0f;
 			angles[LEFTARM][Y] += 5.0f;
 
-			angles[LEFTLEGGUNPOINT][X] -= 18.0f;
-			angles[RIGHTLEGGUNPOINT][X] -= 18.0f;
+			angles[LEFTLEGGUNPOINT][X] += 18.0f;
+			angles[RIGHTLEGGUNPOINT][X] += 18.0f;
 
 			positions[LEFTLEGGUNPOINT][Z] += 0.3f;
 			positions[RIGHTLEGGUNPOINT][Z] += 0.3f;
