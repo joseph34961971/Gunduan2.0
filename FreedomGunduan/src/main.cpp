@@ -121,6 +121,7 @@ void resetObj(int f)
 	light_pos = vec3(-10, 0, 0);
 
 	rifle_shooting = false;
+	cannon_shooting = false;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -841,11 +842,13 @@ void updateObj(int frame)
 			angles[LEFTINSIDESMALLWING][Z] -= 6.0f;
 			angles[LEFTMIDDLESMALLWING][Z] -= 4.0f;
 			angles[LEFTOUTSIDESMALLWING][Z] -= 2.0f;
+			angles[LEFTOUTSIDEBIGWING][Z] -= 4.0f;
 
 			angles[RIGHTINSIDEBIGWING][Z] += 8.0f;
 			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
 			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
 			angles[RIGHTOUTSIDESMALLWING][Z] += 2.0f;
+			angles[RIGHTOUTSIDEBIGWING][Z] += 4.0f;
 		}
 		else if (second_current == 0 && frame < 30)
 		{
