@@ -134,6 +134,10 @@ void resetObj(int f)
 	angles[LEFTARM][Y] = -22.2f;
 	angles[LEFTARM][Z] = -26.8f;
 
+	angles[LEFTARMGUN][X] = 1.102f;
+	angles[LEFTARMGUN][Y] = -24.925f;
+	angles[LEFTARMGUN][Z] = 8.339f;
+
 	angles[RIGHTARM][Z] = 32.2f;
 
 	angles[LEFTLEGARMOR][Z] = -20.456f;
@@ -172,6 +176,10 @@ void resetObj(int f)
 	positions[LEFTARM][X] = -8.1f;
 	positions[LEFTARM][Y] = -11.0f;
 	positions[LEFTARM][Z] = 0.0f;
+
+	positions[LEFTARMGUN][X] = 2.0f;
+	positions[LEFTARMGUN][Y] = -25.0f;
+	positions[LEFTARMGUN][Z] = 3.0f;
 
 	positions[RIGHTSHOULDER][X] = 14.0f;
 	positions[RIGHTSHOULDER][Y] = 21.0f;
@@ -929,8 +937,8 @@ void updateObj(int frame)
 
 			angles[LEFTLEGGUNBARREL][X] -= 7.0f;
 			angles[RIGHTLEGGUNBARREL][X] -= 7.0f;
-			angles[LEFTLEGGUNSTOCK][X] += 4.0f;
-			angles[RIGHTLEGGUNSTOCK][X] += 4.0f;
+			angles[LEFTLEGGUNSTOCK][X] += 4.5f;
+			angles[RIGHTLEGGUNSTOCK][X] += 4.5f;
 
 			angles[LEFTSHOULDER][X] -= 12.0f;
 			angles[LEFTSHOULDER][Z] += 1.5f;
@@ -1328,6 +1336,7 @@ void Obj2Buffer()
 
 	load2Buffer("../FreedomGunduan/objs/left_arm.obj", LEFTSHOULDER);
 	load2Buffer("../FreedomGunduan/objs/left_hand.obj", LEFTARM);
+	load2Buffer("../FreedomGunduan/objs/leftHandGun.obj", LEFTARMGUN);
 	load2Buffer("../FreedomGunduan/objs/right_arm.obj", RIGHTSHOULDER);
 	load2Buffer("../FreedomGunduan/objs/right_hand.obj", RIGHTARM);
 
@@ -1462,10 +1471,16 @@ void updateModels()
 	Models[LEFTSHOULDER] = Models[BODY] * Translation[LEFTSHOULDER] * Rotatation[LEFTSHOULDER];
 	//============================================================
 	
-	//左下手臂
+	//左手
 	Rotatation[LEFTARM] = rotate(angles[LEFTARM][Z], 0, 0, 1) * rotate(angles[LEFTARM][Y], 0, 1, 0) * rotate(angles[LEFTARM][X], 1, 0, 0);
 	Translation[LEFTARM] = translate(positions[LEFTARM][X], positions[LEFTARM][Y], positions[LEFTARM][Z]); // 0 -3 0
 	Models[LEFTARM] = Models[LEFTSHOULDER] * Translation[LEFTARM] * Rotatation[LEFTARM];
+	//============================================================
+
+	//左手槍
+	Rotatation[LEFTARMGUN] = rotate(angles[LEFTARMGUN][Z], 0, 0, 1) * rotate(angles[LEFTARMGUN][Y], 0, 1, 0) * rotate(angles[LEFTARMGUN][X], 1, 0, 0);
+	Translation[LEFTARMGUN] = translate(positions[LEFTARMGUN][X], positions[LEFTARMGUN][Y], positions[LEFTARMGUN][Z]); // 0 -3 0
+	Models[LEFTARMGUN] = Models[LEFTARM] * Translation[LEFTARMGUN] * Rotatation[LEFTARMGUN];
 	//============================================================
 	
 	//頭
