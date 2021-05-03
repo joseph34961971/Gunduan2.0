@@ -122,6 +122,7 @@ void resetObj(int f)
 
 	rifle_shooting = false;
 	cannon_shooting = false;
+	railgun_shooting = false;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -961,26 +962,45 @@ void updateObj(int frame)
 			lcannon_beam_scale = vec3(0.5, 0.5, 0.5);
 			rcannon_beam_pos = vec3(Models[RIGHTGUN] * vec4(40.410, -101.951, 0.335, 1));
 			rcannon_beam_scale = vec3(0.5, 0.5, 0.5);
+
+			railgun_shooting = true;
+			lrailgun_beam_pos = vec3(Models[LEFTLEGGUNPOINT] * vec4(-1.873, 41.98, 18.142, 1));
+			lrailgun_beam_scale = vec3(0.5, 0.5, 0.5);
+			rrailgun_beam_pos = vec3(Models[RIGHTLEGGUNPOINT] * vec4(-0.07, 42.5, 17.622, 1));
+			rrailgun_beam_scale = vec3(0.5, 0.5, 0.5);
 		}
 		if (second_current == 1)
 		{
+			positions[BODY][Z] -= 0.05f;
+			rifle_beam_pos = vec3(Models[LEFTARM] * vec4(-2.161, -62.734, 25.61, 1));
+			lcannon_beam_pos = vec3(Models[LEFTGUN] * vec4(-40.441, -102.426, -0.431, 1));
+			rcannon_beam_pos = vec3(Models[RIGHTGUN] * vec4(40.410, -101.951, 0.335, 1));
+			lrailgun_beam_pos = vec3(Models[LEFTLEGGUNPOINT] * vec4(-1.873, 41.98, 18.142, 1));
+			rrailgun_beam_pos = vec3(Models[RIGHTLEGGUNPOINT] * vec4(-0.07, 42.5, 17.622, 1));
+
 			rifle_beam_scale = vec3(0.5, 0.5, 0.5 * frame * beam_speed * 4);
 			lcannon_beam_scale = vec3(8.0, 8.0, 0.5 * frame * beam_speed * 4);
 			rcannon_beam_scale = vec3(8.0, 8.0, 0.5 * frame * beam_speed * 4);
+			lrailgun_beam_scale = vec3(4.0, 4.0, 0.5 * frame * beam_speed * 4);
+			rrailgun_beam_scale = vec3(4.0, 4.0, 0.5 * frame * beam_speed * 4);
 		}
 		if (second_current == 1)
 		{
 			rifle_beam_offset = vec3(0, 0, frame * beam_speed);
 			lcannon_beam_offset = vec3(0, 0, frame * beam_speed);
 			rcannon_beam_offset = vec3(0, 0, frame * beam_speed);
+			lrailgun_beam_offset = vec3(0, 0, frame * beam_speed);
+			rrailgun_beam_offset = vec3(0, 0, frame * beam_speed);
 		}
 
-		/*if (second_current == 2)
+		if (second_current == 2)
 		{
 			rifle_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
 			lcannon_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
 			rcannon_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
-		}*/
+			lrailgun_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
+			rrailgun_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
+		}
 	}
 }
 
@@ -1101,6 +1121,7 @@ void updateObj(int frame)
 	 earth_texture = loadTexture("../FreedomGunduan/images/earth.bmp");
 	 rifle_beam_texture = loadTexture("../FreedomGunduan/images/rifle_beam.bmp");
 	 cannon_beam_texture = loadTexture("../FreedomGunduan/images/cannon_beam.bmp");
+	 railgun_beam_texture = loadTexture("../FreedomGunduan/images/railgun_beam.bmp");
 	 asteroids_textures[0] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_1_Color.bmp");
 	 asteroids_textures[1] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_2_Color.bmp");
 	 asteroids_textures[2] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_3_Color.bmp");
@@ -1261,6 +1282,11 @@ void display()
 	if (cannon_shooting)
 	{
 		drawCannonBeam();
+	}
+
+	if (railgun_shooting)
+	{
+		drawRailgunBeam();
 	}
 
 	if (action != Opening)
@@ -2241,6 +2267,41 @@ void drawCannonBeam()
 	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, cannon_beam_texture);
+	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	drawShpere(sphere_vao, sphere_indices_size);
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void drawRailgunBeam()
+{
+	glUseProgram(texture_shader);
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, lrailgun_beam_pos);
+	vec3 beam_rotate = vec3(Models[LEFTLEGGUNPOINT] * vec4(15.0f, 0.0f, 0.0f, 1));
+	model_matrix = rotate(model_matrix, beam_rotate.x, vec3(1, 0, 0));
+	model_matrix = rotate(model_matrix, beam_rotate.y, vec3(0, 1, 0));
+	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
+	model_matrix = translate(model_matrix, lrailgun_beam_offset);
+	model_matrix = scale(model_matrix, lrailgun_beam_scale);
+	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, railgun_beam_texture);
+	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	drawShpere(sphere_vao, sphere_indices_size);
+
+	model_matrix = mat4();
+	model_matrix = translate(model_matrix, rrailgun_beam_pos);
+	beam_rotate = vec3(Models[RIGHTLEGGUNPOINT] * vec4(-10.0f, 0.0f, 0.0f, 1));
+	model_matrix = rotate(model_matrix, beam_rotate.x, vec3(1, 0, 0));
+	model_matrix = rotate(model_matrix, beam_rotate.y, vec3(0, 1, 0));
+	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
+	model_matrix = translate(model_matrix, rrailgun_beam_offset);
+	model_matrix = scale(model_matrix, rrailgun_beam_scale);
+	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, railgun_beam_texture);
 	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
 	drawShpere(sphere_vao, sphere_indices_size);
 

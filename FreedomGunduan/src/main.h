@@ -205,6 +205,7 @@ vec3 earth_pos_begin = vec3(70, 0, -50);
 
 void drawRifleBeam();
 void drawCannonBeam();
+void drawRailgunBeam();
 GLint rifle_beam_texture;
 vec3 rifle_beam_pos;
 vec3 rifle_beam_offset;
@@ -219,6 +220,14 @@ vec3 rcannon_beam_pos;
 vec3 rcannon_beam_offset;
 vec3 rcannon_beam_scale;
 bool cannon_shooting = false;
+GLint railgun_beam_texture;
+vec3 lrailgun_beam_pos;
+vec3 lrailgun_beam_offset;
+vec3 lrailgun_beam_scale;
+vec3 rrailgun_beam_pos;
+vec3 rrailgun_beam_offset;
+vec3 rrailgun_beam_scale;
+bool railgun_shooting = false;
 
 #define ASTEROIDNUM 6
 std::vector<std::string> asteroids_mtls[ASTEROIDNUM];//use material
