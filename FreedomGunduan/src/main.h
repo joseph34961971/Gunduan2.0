@@ -203,13 +203,22 @@ GLint earth_texture;
 vec3 earth_pos;
 vec3 earth_pos_begin = vec3(70, 0, -50);
 
-void drawBeam();
-GLint beam_texture;
-vec3 beam_pos;
-vec3 beam_offset;
-vec3 beam_scale;
-bool shooting = false;
+void drawRifleBeam();
+void drawCannonBeam();
+GLint rifle_beam_texture;
+vec3 rifle_beam_pos;
+vec3 rifle_beam_offset;
+vec3 rifle_beam_scale;
+bool rifle_shooting = false;
 float beam_speed = 15.0f;
+GLint cannon_beam_texture;
+vec3 lcannon_beam_pos;
+vec3 lcannon_beam_offset;
+vec3 lcannon_beam_scale;
+vec3 rcannon_beam_pos;
+vec3 rcannon_beam_offset;
+vec3 rcannon_beam_scale;
+bool cannon_shooting = false;
 
 #define ASTEROIDNUM 6
 std::vector<std::string> asteroids_mtls[ASTEROIDNUM];//use material
