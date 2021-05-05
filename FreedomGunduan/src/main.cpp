@@ -2245,10 +2245,10 @@ void drawRifleBeam()
 	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
 	model_matrix = translate(model_matrix, rifle_beam_offset);
 	model_matrix = scale(model_matrix, rifle_beam_scale);
-	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(texture_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, rifle_beam_texture);
-	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	glUniform1i(glGetUniformLocation(texture_shader, "u_texture"), 0);
 	drawShpere(sphere_vao, sphere_indices_size);
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
@@ -2265,10 +2265,10 @@ void drawCannonBeam()
 	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
 	model_matrix = translate(model_matrix, lcannon_beam_offset);
 	model_matrix = scale(model_matrix, lcannon_beam_scale);
-	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(texture_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, cannon_beam_texture);
-	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	glUniform1i(glGetUniformLocation(texture_shader, "u_texture"), 0);
 	drawShpere(sphere_vao, sphere_indices_size);
 
 	model_matrix = mat4();
@@ -2276,13 +2276,13 @@ void drawCannonBeam()
 	beam_rotate = vec3(Models[RIGHTGUN] * vec4(60.0f, 0.0f, 50.0f, 1));
 	model_matrix = rotate(model_matrix, beam_rotate.x, vec3(1, 0, 0));
 	model_matrix = rotate(model_matrix, beam_rotate.y, vec3(0, 1, 0));
-	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
+	model_matrix = rotate(model_matrix, beam_rotate.z + 180.0f, vec3(0, 0, 1));
 	model_matrix = translate(model_matrix, rcannon_beam_offset);
 	model_matrix = scale(model_matrix, rcannon_beam_scale);
-	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(texture_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, cannon_beam_texture);
-	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	glUniform1i(glGetUniformLocation(texture_shader, "u_texture"), 0);
 	drawShpere(sphere_vao, sphere_indices_size);
 
 	//unbind shader(switch to fixed pipeline)
@@ -2300,10 +2300,10 @@ void drawRailgunBeam()
 	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
 	model_matrix = translate(model_matrix, lrailgun_beam_offset);
 	model_matrix = scale(model_matrix, lrailgun_beam_scale);
-	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(texture_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, railgun_beam_texture);
-	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	glUniform1i(glGetUniformLocation(texture_shader, "u_texture"), 0);
 	drawShpere(sphere_vao, sphere_indices_size);
 
 	model_matrix = mat4();
@@ -2314,10 +2314,10 @@ void drawRailgunBeam()
 	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
 	model_matrix = translate(model_matrix, rrailgun_beam_offset);
 	model_matrix = scale(model_matrix, rrailgun_beam_scale);
-	glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(texture_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, railgun_beam_texture);
-	glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+	glUniform1i(glGetUniformLocation(texture_shader, "u_texture"), 0);
 	drawShpere(sphere_vao, sphere_indices_size);
 
 	//unbind shader(switch to fixed pipeline)
