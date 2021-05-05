@@ -136,7 +136,7 @@ void resetObj(int f)
 
 	angles[LEFTARMGUN][X] = 1.102f;
 	angles[LEFTARMGUN][Y] = -24.925f;
-	angles[LEFTARMGUN][Z] = 8.339f;
+	angles[LEFTARMGUN][Z] = 0.0f;
 
 	angles[RIGHTARM][Z] = 32.2f;
 
@@ -160,6 +160,10 @@ void resetObj(int f)
 	angles[RIGHTOUTSIDESMALLWING][Y] = 1.013f;
 	angles[RIGHTMIDDLESMALLWING][Y] = 0.756f;
 	angles[RIGHTINSIDESMALLWING][Y] = 2.77f;
+
+	rifle_beam_angles[X] = -22.134f;
+	rifle_beam_angles[Y] = 0.584f;
+	rifle_beam_angles[Z] = 0.0f;
 
 	positions[BODY][X] = 0.0f;
 	positions[BODY][Y] = 0.0f; // 34.0f
@@ -296,6 +300,10 @@ void resetObj(int f)
 	positions[RIGHTINSIDESMALLWING][X] = 11.5f;
 	positions[RIGHTINSIDESMALLWING][Y] = 4.0f;
 	positions[RIGHTINSIDESMALLWING][Z] = 3.0f;
+
+	rifle_beam_positions[X] = 0.389f;
+	rifle_beam_positions[Y] = -37.872f;
+	rifle_beam_positions[Z] = 22.017f;
 
 	if (action == WALK)
 	{
@@ -888,44 +896,48 @@ void updateObj(int frame)
 		if (second_current == 2 && frame == 10)
 		{
 			rifle_shooting = true;
-			rifle_beam_pos = vec3(Models[LEFTARM] * vec4(-2.161, -62.734, 25.61, 1));
-			rifle_beam_scale = vec3(0.25, 0.25, 0.25);
+			rifle_beam_scale = vec3(2.0, 2.0, 2.0);
 		}
 		if (second_current == 2 && frame > 10 && frame < 20)
 		{
-			rifle_beam_scale = vec3(0.25, 0.25, 0.25 * (frame - 10) * beam_speed * 8);
+			rifle_beam_scale = vec3(2.0, 2.0 * (frame - 10) * beam_speed, 2.0);
 		}
 		if (second_current == 2 && frame > 10)
 		{
-			rifle_beam_offset = vec3(0, 0, (frame - 10) * beam_speed);
+			rifle_beam_offset = vec3(0, -(frame - 10) * beam_speed, 0);
 		}
 
 		// shoot second beam
 		if (second_current == 2 && frame == 40)
 		{
-			rifle_beam_scale = vec3(0.25, 0.25, 0.25);
+			rifle_beam_scale = vec3(2.0, 2.0, 2.0);
 		}
 		if (second_current == 2 && frame > 40 && frame < 50)
 		{
-			rifle_beam_scale = vec3(0.25, 0.25, 0.25 * (frame - 40) * beam_speed * 8);
+			rifle_beam_scale = vec3(2.0, 2.0 * (frame - 40) * beam_speed, 2.0);
 		}
 		if (second_current == 2 && frame > 40)
 		{
-			rifle_beam_offset = vec3(0, 0, (frame - 40) * beam_speed);
+			rifle_beam_offset = vec3(0, -(frame - 40) * beam_speed, 0);
 		}
 
 		// shoot third beam
 		if (second_current == 3 && frame == 10)
 		{
-			rifle_beam_scale = vec3(0.25, 0.25, 0.25);
+			rifle_beam_scale = vec3(2.0, 2.0, 2.0);
 		}
 		if (second_current == 3 && frame > 10 && frame < 20)
 		{
-			rifle_beam_scale = vec3(0.25, 0.25, 0.25 * (frame - 10) * beam_speed * 8);
+			rifle_beam_scale = vec3(2.0, 2.0 * (frame - 10) * beam_speed, 2.0);
 		}
 		if (second_current == 3 && frame > 10)
 		{
-			rifle_beam_offset = vec3(0, 0, (frame - 10) * beam_speed);
+			rifle_beam_offset = vec3(0, -(frame - 10) * beam_speed, 0);
+		}
+
+		if (second_current == 4)
+		{
+			rifle_shooting = false;
 		}
 	}
 	else if (action == AllShoot)
@@ -962,8 +974,7 @@ void updateObj(int frame)
 		if (second_current == 0 && frame == 50)
 		{
 			rifle_shooting = true;
-			rifle_beam_pos = vec3(Models[LEFTARM] * vec4(-2.161, -62.734, 25.61, 1));
-			rifle_beam_scale = vec3(0.25, 0.25, 0.25);
+			rifle_beam_scale = vec3(0.5, 0.5, 0.5);
 
 			cannon_shooting = true;
 			lcannon_beam_pos = vec3(Models[LEFTGUN] * vec4(-40.441, -102.426, -0.431, 1));
@@ -980,13 +991,12 @@ void updateObj(int frame)
 		if (second_current == 1)
 		{
 			positions[BODY][Z] -= 0.05f;
-			rifle_beam_pos = vec3(Models[LEFTARM] * vec4(-2.161, -62.734, 25.61, 1));
 			lcannon_beam_pos = vec3(Models[LEFTGUN] * vec4(-40.441, -102.426, -0.431, 1));
 			rcannon_beam_pos = vec3(Models[RIGHTGUN] * vec4(40.410, -101.951, 0.335, 1));
 			lrailgun_beam_pos = vec3(Models[LEFTLEGGUNPOINT] * vec4(-1.873, 41.98, 18.142, 1));
 			rrailgun_beam_pos = vec3(Models[RIGHTLEGGUNPOINT] * vec4(-0.07, 42.5, 17.622, 1));
 
-			rifle_beam_scale = vec3(0.5, 0.5, 0.5 * frame * beam_speed * 4);
+			rifle_beam_scale = vec3(2.0, 2.0 * frame * beam_speed, 2.0);
 			lcannon_beam_scale = vec3(8.0, 8.0, 0.5 * frame * beam_speed * 4);
 			rcannon_beam_scale = vec3(8.0, 8.0, 0.5 * frame * beam_speed * 4);
 			lrailgun_beam_scale = vec3(4.0, 4.0, 0.5 * frame * beam_speed * 4);
@@ -994,7 +1004,7 @@ void updateObj(int frame)
 		}
 		if (second_current == 1)
 		{
-			rifle_beam_offset = vec3(0, 0, frame * beam_speed);
+			rifle_beam_offset = vec3(0, -frame * beam_speed, 0);
 			lcannon_beam_offset = vec3(0, 0, frame * beam_speed);
 			rcannon_beam_offset = vec3(0, 0, frame * beam_speed);
 			lrailgun_beam_offset = vec3(0, 0, frame * beam_speed);
@@ -1003,11 +1013,18 @@ void updateObj(int frame)
 
 		if (second_current == 2)
 		{
-			rifle_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
+			rifle_beam_offset = vec3(0, -(frame + 60) * beam_speed, 0);
 			lcannon_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
 			rcannon_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
 			lrailgun_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
 			rrailgun_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
+		}
+
+		if (second_current == 3)
+		{
+			rifle_shooting = false;
+			cannon_shooting = false;
+			railgun_shooting = false;
 		}
 	}
 }
@@ -1674,6 +1691,13 @@ void updateModels()
 	Translation[RIGHTINSIDESMALLWING] = translate(positions[RIGHTINSIDESMALLWING][X], positions[RIGHTINSIDESMALLWING][Y], positions[RIGHTINSIDESMALLWING][Z]);
 	Models[RIGHTINSIDESMALLWING] = Models[RIGHTCONNECTOR] * Translation[RIGHTINSIDESMALLWING] * Rotatation[RIGHTINSIDESMALLWING];
 	//=============================================================
+
+	mat4 rifle_beam_Rotatation = rotate(rifle_beam_angles[X], 1, 0, 0) * rotate(rifle_beam_angles[Y], 0, 1, 0) * rotate(rifle_beam_angles[Z], 0, 0, 1);
+	//mat4 rifle_beam_Translation = translate(rifle_beam_positions[X] + rifle_beam_offset.x, rifle_beam_positions[Y] + rifle_beam_offset.y, rifle_beam_positions[Z] + rifle_beam_offset.z);
+	mat4 rifle_beam_Translation = translate(rifle_beam_positions[X], rifle_beam_positions[Y], rifle_beam_positions[Z]);
+	mat4 rifle_beam_Baias = translate(rifle_beam_offset.x, rifle_beam_offset.y, rifle_beam_offset.z);
+	mat4 rifle_beam_Scaling = scale(rifle_beam_scale.x, rifle_beam_scale.y, rifle_beam_scale.z);
+	rifle_beam_model = Models[LEFTARMGUN] * rifle_beam_Translation * rifle_beam_Rotatation * rifle_beam_Baias * rifle_beam_Scaling;
 }
 
 void load2Buffer(char* obj,int i)
@@ -2237,15 +2261,7 @@ void drawShpere(GLuint VertexArrayID, int indices_size)
 void drawRifleBeam()
 {
 	glUseProgram(texture_shader);
-	mat4 model_matrix = mat4();
-	model_matrix = translate(model_matrix, rifle_beam_pos);
-	vec3 beam_rotate = vec3(Models[LEFTARM] * vec4(24.380f, 23.491f, 1.979f, 1));
-	model_matrix = rotate(model_matrix, beam_rotate.x, vec3(1, 0, 0));
-	model_matrix = rotate(model_matrix, beam_rotate.y, vec3(0, 1, 0));
-	model_matrix = rotate(model_matrix, beam_rotate.z, vec3(0, 0, 1));
-	model_matrix = translate(model_matrix, rifle_beam_offset);
-	model_matrix = scale(model_matrix, rifle_beam_scale);
-	glUniformMatrix4fv(glGetUniformLocation(texture_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(texture_shader, "u_model"), 1, GL_FALSE, &rifle_beam_model[0][0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, rifle_beam_texture);
 	glUniform1i(glGetUniformLocation(texture_shader, "u_texture"), 0);
