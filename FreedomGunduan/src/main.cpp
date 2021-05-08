@@ -1499,7 +1499,7 @@ void updateModels()
 	Models[LEFTARM] = Models[LEFTSHOULDER] * Translation[LEFTARM] * Rotatation[LEFTARM];
 	//============================================================
 
-	//¥ª¤â
+	//¥ª®±ÀY
 	Rotatation[LEFTFIST] = rotate(angles[LEFTFIST][Z], 0, 0, 1) * rotate(angles[LEFTFIST][Y], 0, 1, 0) * rotate(angles[LEFTFIST][X], 1, 0, 0);
 	Translation[LEFTFIST] = translate(positions[LEFTFIST][X], positions[LEFTFIST][Y], positions[LEFTFIST][Z]); // 0 -3 0
 	Models[LEFTFIST] = Models[LEFTARM] * Translation[LEFTFIST] * Rotatation[LEFTFIST];
