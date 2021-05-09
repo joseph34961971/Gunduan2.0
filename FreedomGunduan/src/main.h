@@ -167,6 +167,7 @@ mat4 Models[PARTSNUM];
 #define Opening 7
 #define Shoot 8
 #define AllShoot 9
+#define DrawSaber 10
 int mode = 1;
 int action;
 const int fps = 60;
@@ -250,6 +251,8 @@ vec3 asteroids_pos[ASTEROIDAMOUNT];
 vec3 asteroids_scale[ASTEROIDAMOUNT];
 int asteroids_species[ASTEROIDAMOUNT];
 float gundam_speed = 0.5f;
+
+bool drawRifle;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;

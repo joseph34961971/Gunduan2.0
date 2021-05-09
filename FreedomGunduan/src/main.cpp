@@ -41,6 +41,7 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Opening Pose", 7);
 	glutAddMenuEntry("Shoot", 8);
 	glutAddMenuEntry("All Shoot", 9);
+	glutAddMenuEntry("Draw Saber", 10); 
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -123,6 +124,8 @@ void resetObj(int f)
 	rifle_shooting = false;
 	cannon_shooting = false;
 	railgun_shooting = false;
+
+	drawRifle = true;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -1027,6 +1030,40 @@ void updateObj(int frame)
 			railgun_shooting = false;
 		}
 	}
+	else if (action == DrawSaber)
+	{
+		if (second_current == 0 && frame < 15)
+		{
+			angles[LEFTINSIDEBIGWING][Z] -= 8.0f;
+			angles[LEFTINSIDESMALLWING][Z] -= 6.0f;
+			angles[LEFTMIDDLESMALLWING][Z] -= 4.0f;
+			angles[LEFTOUTSIDESMALLWING][Z] -= 2.0f;
+			angles[LEFTOUTSIDEBIGWING][Z] -= 4.0f;
+
+			angles[RIGHTINSIDEBIGWING][Z] += 8.0f;
+			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
+			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
+			angles[RIGHTOUTSIDESMALLWING][Z] += 2.0f;
+			angles[RIGHTOUTSIDEBIGWING][Z] += 4.0f;
+		}
+		else if (second_current == 0 && frame < 30)
+		{
+			drawRifle = false;
+
+			gundam_speed = 5.0f;
+
+			positions[BODY][Y] -= 0.05f;
+
+			//angles[BODY][Y] += 1.0f;
+
+			angles[LEFTSHOULDER][Y] += 6.0f;
+			angles[LEFTARM][X] -= 4.0f;
+
+			angles[WING][X] += 1.5f;
+			angles[LEFTFOOT][X] += 2.0f;
+			angles[RIGHTFOOT][X] += 2.0f;
+		}
+	}
 }
 
  GLuint M_KaID;
@@ -1039,6 +1076,7 @@ void updateObj(int frame)
 	 pps = 0;
 	 action = WALK;
 	 resetObj(0); // initial angles array
+
 	 for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
 	 {
 		 asteroids_species[asteroids_index] = rand() % ASTEROIDNUM;
@@ -1281,7 +1319,8 @@ void display()
 				glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
 				glUniform3fv(M_KsID, 1, &Ks[0]);
 			}
-			glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
+			if (!(i == LEFTARMGUN && !drawRifle))
+				glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
 			//we draw triangles by giving the glVertexID base and vertex count is face count*3
 			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
 		}//end for loop for draw one part of the robot	
