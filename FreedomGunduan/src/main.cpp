@@ -248,6 +248,10 @@ void resetObj(int f)
 	positions[RIGHTLEGGUNPOINT][Y] = -44.0f;
 	positions[RIGHTLEGGUNPOINT][Z] = -10.0f;
 
+	positions[RIGHTLEGBLADE][X] = -0.5f;
+	positions[RIGHTLEGBLADE][Y] = 0.0f;
+	positions[RIGHTLEGBLADE][Z] = -4.0f;
+
 	positions[RIGHTFOOT][X] = 5.0f;
 	positions[RIGHTFOOT][Y] = -29.0f;
 	positions[RIGHTFOOT][Z] = 12.0f;
@@ -1417,6 +1421,7 @@ void Obj2Buffer()
 	load2Buffer("../FreedomGunduan/objs/rightLegGunBarrel.obj", RIGHTLEGGUNBARREL);
 	load2Buffer("../FreedomGunduan/objs/rightLegGunPoint.obj", RIGHTLEGGUNPOINT);
 	load2Buffer("../FreedomGunduan/objs/rightLegSaber.obj", RIGHTLEGSABER);
+	load2Buffer("../FreedomGunduan/objs/rightLegBlade.obj", RIGHTLEGBLADE);
 	load2Buffer("../FreedomGunduan/objs/right_foot.obj", RIGHTFOOT);
 
 	load2Buffer("../FreedomGunduan/objs/leftConnector.obj", LEFTCONNECTOR);
@@ -1646,10 +1651,16 @@ void updateModels()
 	Models[RIGHTLEGGUNPOINT] = Models[RIGHTLEGGUNBARREL] * Translation[RIGHTLEGGUNPOINT] * Rotatation[RIGHTLEGGUNPOINT];
 	//=============================================================
 
-	//¥k»L¥ú¼C
+	//¥k»L¥ú¼C¬`
 	Rotatation[RIGHTLEGSABER] = rotate(angles[RIGHTLEGSABER][X], 1, 0, 0) * rotate(angles[RIGHTLEGSABER][Z], 0, 0, 1) * rotate(angles[RIGHTLEGSABER][Y], 0, 1, 0);
 	Translation[RIGHTLEGSABER] = translate(positions[RIGHTLEGSABER][X], positions[RIGHTLEGSABER][Y], positions[RIGHTLEGSABER][Z]);
 	Models[RIGHTLEGSABER] = Models[RIGHTLEGARMOR] * Translation[RIGHTLEGSABER] * Rotatation[RIGHTLEGSABER];
+	//=============================================================
+
+	//¥k»L¥ú¼C¤b
+	Rotatation[RIGHTLEGBLADE] = rotate(angles[RIGHTLEGBLADE][X], 1, 0, 0) * rotate(angles[RIGHTLEGBLADE][Z], 0, 0, 1) * rotate(angles[RIGHTLEGBLADE][Y], 0, 1, 0);
+	Translation[RIGHTLEGBLADE] = translate(positions[RIGHTLEGBLADE][X], positions[RIGHTLEGBLADE][Y], positions[RIGHTLEGBLADE][Z]);
+	Models[RIGHTLEGBLADE] = Models[RIGHTLEGSABER] * Translation[RIGHTLEGBLADE] * Rotatation[RIGHTLEGBLADE];
 	//=============================================================
 
 	//¥k¸}
