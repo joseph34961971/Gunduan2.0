@@ -544,7 +544,7 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 Ks 0.70 0.70 0.70
 Ns 6.00
-newmtl freedom:phong4SG
+newmtl phong4SG
 illum 4
 Kd 1.00 0.00 0.07
 Ka 1.00 1.00 1.00
@@ -552,7 +552,7 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 Ks 0.50 0.50 0.50
 Ns 18.00
-newmtl freedom:ChafCil88SG3
+newmtl rightLegSaber:ChafCil88SG2
 illum 4
 Kd 0.50 0.50 0.50
 Ka 0.00 0.00 0.00
@@ -560,7 +560,7 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 Ks 0.50 0.50 0.50
 Ns 18.00
-newmtl freedom:wire_134110009
+newmtl rightLegSaber:wire_134110009
 illum 4
 Kd 0.53 0.43 0.03
 Ka 0.53 0.43 0.03
