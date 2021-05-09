@@ -21,7 +21,7 @@ using namespace std;
 
 using namespace glm;
 
-#define PARTSNUM 36
+#define PARTSNUM 37
 #define BODY 0
 #define HEAD 1
 #define LEFTSHOULDER 2
@@ -58,6 +58,7 @@ using namespace glm;
 #define RIGHTLEGGUNPOINT 33
 #define RIGHTLEGSABER 34
 #define LEFTARMGUN 35
+#define	LEFTFIST 36
 
 
 void updateModels();

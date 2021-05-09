@@ -184,9 +184,13 @@ void resetObj(int f)
 	positions[LEFTARM][Y] = -11.0f;
 	positions[LEFTARM][Z] = 0.0f;
 
-	positions[LEFTARMGUN][X] = 2.0f;
-	positions[LEFTARMGUN][Y] = -25.0f;
-	positions[LEFTARMGUN][Z] = 3.0f;
+	positions[LEFTARMGUN][X] = 2.5f;
+	positions[LEFTARMGUN][Y] = -7.0f;
+	positions[LEFTARMGUN][Z] = 4.5f;
+
+	positions[LEFTFIST][X] = 0.55f;
+	positions[LEFTFIST][Y] = -19.0f;
+	positions[LEFTFIST][Z] = 0.0f;
 
 	positions[RIGHTSHOULDER][X] = 14.0f;
 	positions[RIGHTSHOULDER][Y] = 21.0f;
@@ -1393,6 +1397,7 @@ void Obj2Buffer()
 	load2Buffer("../FreedomGunduan/objs/left_arm.obj", LEFTSHOULDER);
 	load2Buffer("../FreedomGunduan/objs/left_hand.obj", LEFTARM);
 	load2Buffer("../FreedomGunduan/objs/leftHandGun.obj", LEFTARMGUN);
+	load2Buffer("../FreedomGunduan/objs/leftFist.obj", LEFTFIST);
 	load2Buffer("../FreedomGunduan/objs/right_arm.obj", RIGHTSHOULDER);
 	load2Buffer("../FreedomGunduan/objs/right_hand.obj", RIGHTARM);
 
@@ -1533,10 +1538,16 @@ void updateModels()
 	Models[LEFTARM] = Models[LEFTSHOULDER] * Translation[LEFTARM] * Rotatation[LEFTARM];
 	//============================================================
 
+	//¥ª®±ÀY
+	Rotatation[LEFTFIST] = rotate(angles[LEFTFIST][Z], 0, 0, 1) * rotate(angles[LEFTFIST][Y], 0, 1, 0) * rotate(angles[LEFTFIST][X], 1, 0, 0);
+	Translation[LEFTFIST] = translate(positions[LEFTFIST][X], positions[LEFTFIST][Y], positions[LEFTFIST][Z]); // 0 -3 0
+	Models[LEFTFIST] = Models[LEFTARM] * Translation[LEFTFIST] * Rotatation[LEFTFIST];
+	//============================================================
+
 	//¥ª¤âºj
 	Rotatation[LEFTARMGUN] = rotate(angles[LEFTARMGUN][Z], 0, 0, 1) * rotate(angles[LEFTARMGUN][Y], 0, 1, 0) * rotate(angles[LEFTARMGUN][X], 1, 0, 0);
 	Translation[LEFTARMGUN] = translate(positions[LEFTARMGUN][X], positions[LEFTARMGUN][Y], positions[LEFTARMGUN][Z]); // 0 -3 0
-	Models[LEFTARMGUN] = Models[LEFTARM] * Translation[LEFTARMGUN] * Rotatation[LEFTARMGUN];
+	Models[LEFTARMGUN] = Models[LEFTFIST] * Translation[LEFTARMGUN] * Rotatation[LEFTARMGUN];
 	//============================================================
 	
 	//ÀY
