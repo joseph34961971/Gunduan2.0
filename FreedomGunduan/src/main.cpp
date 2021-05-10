@@ -1068,11 +1068,10 @@ void updateObj(int frame)
 		{
 			drawRifle = false;
 
-			gundam_speed = 5.0f;
-
 			positions[BODY][Y] -= 0.05f;
 
-			//angles[BODY][Y] += 1.0f;
+			angles[BODY][X] += 2.0f;
+			angles[BODY][Y] += 1.0f;
 
 			angles[LEFTSHOULDER][Y] += 6.0f;
 			angles[LEFTARM][X] -= 5.0f;
@@ -1084,8 +1083,22 @@ void updateObj(int frame)
 			angles[LEFTFOOT][X] += 2.0f;
 			angles[RIGHTFOOT][X] += 2.0f;
 		}
+		else if (second_current == 0 && frame >= 40 && frame < 50)
+		{
+			drawBlade = true;
+			gundam_speed = 5.0f;
+
+			angles[BODY][Y] -= 1.5f;
+
+			angles[LEFTSHOULDER][Y] -= 11.0f;
+			angles[LEFTARM][X] += 8.0f;
+			angles[LEFTSHOULDER][Z] -= 2.5f;
+			angles[LEFTFIST][X] -= 3.0f;
+			angles[LEFTFIST][Y] -= 8.0f;
+			angles[LEFTFIST][Z] -= 4.5f;
+		}
 		
-		if (second_current == 0 && frame >= 30)
+		if (second_current == 0 && frame == 30)
 		{
 			exchangeBladeParent = true;
 			positions[RIGHTLEGSABER][X] = -1.193f + -0.3;
