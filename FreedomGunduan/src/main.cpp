@@ -126,6 +126,8 @@ void resetObj(int f)
 	railgun_shooting = false;
 
 	drawRifle = true;
+	drawBlade = false;
+	exchangeBladeParent = false;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -316,6 +318,10 @@ void resetObj(int f)
 	rifle_beam_positions[Y] = -37.872f;
 	rifle_beam_positions[Z] = 22.017f;
 
+	positions[RIGHTLEGSABER][X] = 0.0f;
+	positions[RIGHTLEGSABER][Y] = 0.0f;
+	positions[RIGHTLEGSABER][Z] = 0.0f;
+
 	if (action == WALK)
 	{
 		angles[LEFTSHOULDER][X] = 45.0f;
@@ -330,6 +336,10 @@ void resetObj(int f)
 		angles[RIGHTLEG][X] = 30.0f;
 		angles[RIGHTFOOT][X] = 0.0f;
 	}
+
+	angles[RIGHTLEGSABER][X] = 0.0f;
+	angles[RIGHTLEGSABER][Y] = 0.0f;
+	angles[RIGHTLEGSABER][Z] = 0.0f;
 
 	second_current = 0;
 
@@ -1065,11 +1075,32 @@ void updateObj(int frame)
 			//angles[BODY][Y] += 1.0f;
 
 			angles[LEFTSHOULDER][Y] += 6.0f;
-			angles[LEFTARM][X] -= 4.0f;
-
+			angles[LEFTARM][X] -= 5.0f;
+			angles[LEFTFIST][Y] += 8.0f;
+			angles[LEFTFIST][X] += 3.0f;
+			angles[LEFTFIST][Z] += 3.0f;
+			
 			angles[WING][X] += 1.5f;
 			angles[LEFTFOOT][X] += 2.0f;
 			angles[RIGHTFOOT][X] += 2.0f;
+		}
+		
+		if (second_current == 0 && frame >= 30)
+		{
+			exchangeBladeParent = true;
+			positions[RIGHTLEGSABER][X] = -1.193f + -0.3;
+			positions[RIGHTLEGSABER][Y] = -6.32f + 0.3;
+			positions[RIGHTLEGSABER][Z] = 4.714f + 6.0;
+			angles[RIGHTLEGSABER][X] = -32.832f;
+			angles[RIGHTLEGSABER][Y] = 144.938f;
+			angles[RIGHTLEGSABER][Z] = 0.0f;
+
+			/*positions[RIGHTLEGSABER][X] = 2.093f;
+			positions[RIGHTLEGSABER][Y] = -9.525f;
+			positions[RIGHTLEGSABER][Z] = 2.414f;
+			angles[RIGHTLEGSABER][X] = 32.832f;
+			angles[RIGHTLEGSABER][Y] = 144.938f;
+			angles[RIGHTLEGSABER][Z] = 0.0f;*/
 		}
 	}
 }
@@ -1327,7 +1358,7 @@ void display()
 				glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
 				glUniform3fv(M_KsID, 1, &Ks[0]);
 			}
-			if (!(i == LEFTARMGUN && !drawRifle))
+			if (!((i == LEFTARMGUN && !drawRifle) || (i == RIGHTLEGBLADE && !drawBlade)))
 				glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
 			//we draw triangles by giving the glVertexID base and vertex count is face count*3
 			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
@@ -1652,9 +1683,17 @@ void updateModels()
 	//=============================================================
 
 	//¥k»L¥ú¼C¬`
+	
 	Rotatation[RIGHTLEGSABER] = rotate(angles[RIGHTLEGSABER][X], 1, 0, 0) * rotate(angles[RIGHTLEGSABER][Z], 0, 0, 1) * rotate(angles[RIGHTLEGSABER][Y], 0, 1, 0);
 	Translation[RIGHTLEGSABER] = translate(positions[RIGHTLEGSABER][X], positions[RIGHTLEGSABER][Y], positions[RIGHTLEGSABER][Z]);
-	Models[RIGHTLEGSABER] = Models[RIGHTLEGARMOR] * Translation[RIGHTLEGSABER] * Rotatation[RIGHTLEGSABER];
+	if (exchangeBladeParent)
+	{
+		Models[RIGHTLEGSABER] = Models[LEFTFIST] * Translation[RIGHTLEGSABER] * Rotatation[RIGHTLEGSABER];
+	}
+	else
+	{
+		Models[RIGHTLEGSABER] = Models[RIGHTLEGARMOR] * Translation[RIGHTLEGSABER] * Rotatation[RIGHTLEGSABER];
+	}
 	//=============================================================
 
 	//¥k»L¥ú¼C¤b
@@ -1828,27 +1867,33 @@ void Keyboard(unsigned char key, int x, int y)
 	case 'U':
 		/*angles[BODY][Y] += 5;
 		if (angles[BODY][Y] >= 360) angles[BODY][Y] = 0;*/
+		//zz -= 0.1f;
 		break;
 	case 'o':
 	case 'O':
 		/*angles[BODY][Y] -= 5;
 		if (angles[BODY][Y] <= 0) angles[BODY][Y] = 360;*/
+		//zz += 0.1f;
 		break;
 	case 'i':
 	case 'I':
 		eyeheight -= 2;
+		//yy += 0.1f;
 		break;
 	case 'k':
 	case 'K':
 		eyeheight += 2;
+		//yy -= 0.1f;
 		break;
 	case 'j':
 	case 'J':
 		positions[BODY][X] += 1;
+		//xx -= 0.1f;
 		break;
 	case 'l':
 	case 'L':
 		positions[BODY][X] -= 1;
+		//xx += 0.1f;
 		break;
 	case 'w':
 	case 'W':

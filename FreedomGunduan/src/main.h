@@ -255,6 +255,9 @@ int asteroids_species[ASTEROIDAMOUNT];
 float gundam_speed = 0.5f;
 
 bool drawRifle;
+bool drawBlade;
+bool exchangeBladeParent;
+//float xx, yy, zz = 0.0f;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;
