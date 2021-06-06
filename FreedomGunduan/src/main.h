@@ -170,6 +170,7 @@ mat4 Models[PARTSNUM];
 #define Shoot 8
 #define AllShoot 9
 #define DrawSaber 10
+#define PowerOn 11
 int mode = 1;
 int action;
 const int fps = 60;
@@ -258,6 +259,10 @@ bool drawRifle;
 bool drawBlade;
 bool exchangeBladeParent;
 //float xx, yy, zz = 0.0f;
+
+bool drawDissolveGray;
+int t_drawDissolveGray;
+GLuint dissolveTex;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;

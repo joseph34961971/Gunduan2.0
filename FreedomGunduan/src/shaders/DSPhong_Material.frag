@@ -21,6 +21,14 @@ in vec3 vVaryingNormal;
 in vec3 vVaryingLightDir;
 in vec2 UV;
 float Shininess = 128.0; // for material specular
+uniform bool dissolveGray;
+uniform sampler2D dissolveTex;
+uniform float dissolveThreshold;
+
+vec3 gray(vec3 color)
+{
+    return vec3(color.r * 0.3 + color.g * 0.59 + color.b * 0.11);
+}
 
 void main(void)
 { 
@@ -43,6 +51,13 @@ void main(void)
 		spec = pow(spec, Shininess);
 		vFragColor += specularColor * vec4(Material.Ka,1) * spec;
     }
+
+    if (dissolveGray)
+    {
+        if (texture(dissolveTex, UV).r > dissolveThreshold)
+        {
+            vec4 color = vec4(gray(vec3(vFragColor)), 1.0);
+            vFragColor = color;
+        }
+    }
 }
-	
-    

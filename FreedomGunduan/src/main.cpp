@@ -41,7 +41,8 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Opening Pose", 7);
 	glutAddMenuEntry("Shoot", 8);
 	glutAddMenuEntry("All Shoot", 9);
-	glutAddMenuEntry("Draw Saber", 10); 
+	glutAddMenuEntry("Draw Saber", 10);
+	glutAddMenuEntry("Power On", 11);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	ModeMenu = glutCreateMenu(ModeMenuEvents);//建立右鍵菜單
@@ -1116,6 +1117,60 @@ void updateObj(int frame)
 			angles[RIGHTLEGSABER][Z] = 0.0f;*/
 		}
 	}
+	else if (action == PowerOn)
+	{
+		if (second_current == 0 && frame == 0)
+		{
+			drawDissolveGray = true;
+		}
+
+		if (second_current == 0)
+		{
+			t_drawDissolveGray = frame;
+		}
+		else if (second_current == 1 && frame < 40)
+		{
+			t_drawDissolveGray = 60 + frame;
+		}
+		else
+		{
+			drawDissolveGray = false;
+		}
+
+		if (second_current == 1 && frame < 15)
+		{
+			angles[HEAD][Y] -= 1.0f;
+
+			angles[LEFTSHOULDER][X] -= 12.0f;
+
+			angles[BODY][Y] += 1.0f;
+			angles[BODY][Z] -= 1.0f;
+
+			angles[LEFTINSIDEBIGWING][Z] -= 8.0f;
+			angles[LEFTINSIDESMALLWING][Z] -= 6.0f;
+			angles[LEFTMIDDLESMALLWING][Z] -= 4.0f;
+			angles[LEFTOUTSIDESMALLWING][Z] -= 2.0f;
+			angles[LEFTOUTSIDEBIGWING][Z] -= 4.0f;
+
+			angles[RIGHTINSIDEBIGWING][Z] += 8.0f;
+			angles[RIGHTINSIDESMALLWING][Z] += 6.0f;
+			angles[RIGHTMIDDLESMALLWING][Z] += 4.0f;
+			angles[RIGHTOUTSIDESMALLWING][Z] += 2.0f;
+			angles[RIGHTOUTSIDEBIGWING][Z] += 4.0f;
+
+			angles[LEFTLEG][Z] -= 1.0f;
+			angles[LEFTFOOT][X] += 1.0f;
+			angles[RIGHTLEG][Z] += 2.0f;
+			angles[RIGHTFOOT][X] += 3.0f;
+		}
+		else if (second_current == 1 && frame >= 30 && frame < 35)
+		{
+			angles[LEFTSHOULDER][X] += 21.0f;
+			//angles[LEFTSHOULDER][Y] -= 6.0f;
+			//angles[LEFTSHOULDER][Z] -= 9.0f;
+			angles[LEFTARM][Y] += 8.0f;
+		}
+	}
 }
 
  GLuint M_KaID;
@@ -1128,6 +1183,7 @@ void updateObj(int frame)
 	 pps = 0;
 	 action = WALK;
 	 resetObj(0); // initial angles array
+	 drawDissolveGray = false;
 
 	 for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
 	 {
@@ -1243,6 +1299,7 @@ void updateObj(int frame)
 	 asteroids_textures[3] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_4_Color.bmp");
 	 asteroids_textures[4] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_5_Color.bmp");
 	 asteroids_textures[5] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_6_Color.bmp");
+	 dissolveTex = loadTexture("../FreedomGunduan/images/febucci-dissolve-texture.jpg");
 
 	 glGenVertexArrays(1, &asteroids_VAO);
 
@@ -1318,6 +1375,11 @@ void display()
 		{
 			glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
 			glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
+			glUniform1i(glGetUniformLocation(gundaun_shader, "dissolveGray"), drawDissolveGray);
+			glUniform1i(glGetUniformLocation(gundaun_shader, "dissolveTex"), 1);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, dissolveTex);
+			glUniform1f(glGetUniformLocation(gundaun_shader, "dissolveThreshold"), t_drawDissolveGray / 100.0f);
 		}
 		else
 		{
@@ -1380,7 +1442,7 @@ void display()
 	//unbind VAO
 		glBindVertexArray(0);
 	}//end for loop for updating and drawing model
-
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glUseProgram(0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
