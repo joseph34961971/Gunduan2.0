@@ -113,6 +113,7 @@ GLuint gaussian_shader;
 GLuint basic_shader;
 GLuint diamond_shader;
 GLuint texture_shader;
+GLuint radialBlur_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
@@ -264,6 +265,7 @@ vec3 asteroids_pos[ASTEROIDAMOUNT];
 vec3 asteroids_scale[ASTEROIDAMOUNT];
 int asteroids_species[ASTEROIDAMOUNT];
 float gundam_speed = 0.5f;
+bool openRadialBlur;
 
 bool drawRifle;
 bool drawBlade;

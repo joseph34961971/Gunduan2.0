@@ -129,6 +129,9 @@ void resetObj(int f)
 	drawRifle = true;
 	drawBlade = false;
 	exchangeBladeParent = false;
+	drawDissolveGray = false;
+	recordLastBladeModels = false;
+	openRadialBlur = false;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -892,6 +895,7 @@ void updateObj(int frame)
 		else if (second_current == 0 && frame < 30)
 		{
 			gundam_speed = 5.0f;
+			openRadialBlur = true;
 
 			positions[BODY][Y] -= 0.05f;
 
@@ -1099,6 +1103,7 @@ void updateObj(int frame)
 		{
 			drawBlade = true;
 			gundam_speed = 5.0f;
+			openRadialBlur = true;
 
 			angles[BODY][Y] -= 1.5f;
 
@@ -1112,7 +1117,7 @@ void updateObj(int frame)
 		
 		if (recordLastBladeModels)
 		{
-			int afterImageLength = 10 - abs(frame - 50);
+			int afterImageLength = 10 - abs(frame - 50); // record 40 ~ 60 frames
 			for (int recordIndex = 0; recordIndex < recordLastBladeLength; recordIndex++)
 			{
 				for (int axisIndex = 0; axisIndex < 3; axisIndex++) //record all value
@@ -1218,8 +1223,6 @@ void updateObj(int frame)
 	 pps = 0;
 	 action = WALK;
 	 resetObj(0); // initial angles array
-	 drawDissolveGray = false;
-	 recordLastBladeModels = false;
 
 	 for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
 	 {
@@ -1281,6 +1284,12 @@ void updateObj(int frame)
 		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/texture.frag" },//fragment shader
 		 { GL_NONE, NULL } };
 	 texture_shader = LoadShaders(texture_shaders);//讀取shader
+
+	 ShaderInfo radialBlur_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/radialBlur.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/radialBlur.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 radialBlur_shader = LoadShaders(radialBlur_shaders);//讀取shader
 
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
@@ -1390,7 +1399,7 @@ void display()
 		break;
 	}
 
-	if (pps != ORIGIN)
+	if (pps != ORIGIN || openRadialBlur)
 		renderScreenBegin();
 
 	if (mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)
@@ -1407,7 +1416,7 @@ void display()
 	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
 	for (int i = 0; i < PARTSNUM; i++) {
 		glBindVertexArray(VAO);
-		if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND))
+		if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)) // normal case
 		{
 			glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
 			glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
@@ -1419,7 +1428,7 @@ void display()
 			glUniform1f(glGetUniformLocation(gundaun_shader, "alpha"), 1.0f);
 			glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 1);
 		}
-		else
+		else // diamond
 		{
 			glUniformMatrix4fv(glGetUniformLocation(diamond_shader, "u_model"), 1, GL_FALSE, &Models[i][0][0]);
 		}
@@ -1474,14 +1483,14 @@ void display()
 			if (!((i == LEFTARMGUN && !drawRifle) || (i == RIGHTLEGBLADE && !drawBlade)))
 			{
 				if (i == RIGHTLEGBLADE)
-					glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 0);
+					glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 0); // The blade has own lighting
 				glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
 			}
 			//we draw triangles by giving the glVertexID base and vertex count is face count*3
 			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
 		}//end for loop for draw one part of the robot	
 
-	//unbind VAO
+		//unbind VAO
 		glBindVertexArray(0);
 	}//end for loop for updating and drawing model
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -1516,6 +1525,7 @@ void display()
 
 	drawSkybox();
 
+	// draw after image for blade
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1546,7 +1556,7 @@ void display()
 	}
 	glDisable(GL_BLEND);
 
-	if (pps != ORIGIN)
+	if (pps != ORIGIN || openRadialBlur)
 	{
 		renderScreenEnd();
 
@@ -2264,6 +2274,8 @@ void initScreenRender()
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 void renderScreenBegin()
@@ -2327,6 +2339,8 @@ void drawScreenQuad()
 		glUseProgram(uniform_shader);
 	else if (pps == GAUSSIAN)
 		glUseProgram(gaussian_shader);
+	else if (openRadialBlur)
+		glUseProgram(radialBlur_shader);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, screen_id);
@@ -2339,6 +2353,8 @@ void drawScreenQuad()
 		glUniform1i(glGetUniformLocation(gaussian_shader, "screen"), 0);
 		glUniform2fv(glGetUniformLocation(gaussian_shader, "img_size"), 1, &vec2(screen_width, screen_height)[0]);
 	}
+	else if (openRadialBlur)
+		glUniform1i(glGetUniformLocation(radialBlur_shader, "screen"), 0);
 	glBindVertexArray(screen_quad_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);

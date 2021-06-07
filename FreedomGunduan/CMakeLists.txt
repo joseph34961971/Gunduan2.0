@@ -21,7 +21,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/diamond_surface.vert
     ${SRC_DIR}shaders/diamond_surface.frag
     ${SRC_DIR}shaders/texture.vert
-    ${SRC_DIR}shaders/texture.frag)
+    ${SRC_DIR}shaders/texture.frag
+    ${SRC_DIR}shaders/radialBlur.vert
+    ${SRC_DIR}shaders/radialBlur.frag)
 
 include_directories(${INCLUDE_DIR})
 
