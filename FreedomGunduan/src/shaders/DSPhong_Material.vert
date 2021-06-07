@@ -20,6 +20,8 @@ uniform mat4 u_model;
 out vec3 vVaryingNormal;
 out vec3 vVaryingLightDir;
 out vec2 UV;
+out vec4 FragPosLightSpace;
+uniform mat4 lightSpaceMatrix;
 
 void main(void) 
 { 
@@ -38,6 +40,9 @@ void main(void)
     vVaryingLightDir = normalize(vLightPosition - vPosition3);
 
 	UV = vertexUV;
+
+	FragPosLightSpace = lightSpaceMatrix * u_model * vec4(vPosition, 1.0);
+
     // Don't forget to transform the geometry!
     gl_Position = MVP * vec4(vPosition, 1);
 }

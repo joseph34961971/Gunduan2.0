@@ -23,7 +23,11 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/texture.vert
     ${SRC_DIR}shaders/texture.frag
     ${SRC_DIR}shaders/radialBlur.vert
-    ${SRC_DIR}shaders/radialBlur.frag)
+    ${SRC_DIR}shaders/radialBlur.frag
+    ${SRC_DIR}shaders/shadow.vert
+    ${SRC_DIR}shaders/shadow.frag
+    ${SRC_DIR}shaders/shadowDebug.vert
+    ${SRC_DIR}shaders/shadowDebug.frag)
 
 include_directories(${INCLUDE_DIR})
 

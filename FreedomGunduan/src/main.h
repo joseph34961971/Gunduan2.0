@@ -114,10 +114,13 @@ GLuint basic_shader;
 GLuint diamond_shader;
 GLuint texture_shader;
 GLuint radialBlur_shader;
+GLuint shadow_shader;
+GLuint shadowdebug_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
 #define GAUSSIAN 3
+#define DRAWSHADOWDEBUG 4
 int pps;
 bool JumpingJack_beginpose = true;
 bool GangnanStyle_rightfoot = false;
@@ -194,7 +197,7 @@ GLuint cubemap_texture;
 void initSkybox();
 GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
 void drawSkybox();
-vec3 light_pos = vec3(0, 50, 0);
+vec3 light_pos;
 
 GLuint screen_id;
 bool load_screen = false;
@@ -275,6 +278,15 @@ bool exchangeBladeParent;
 bool drawDissolveGray;
 int t_drawDissolveGray;
 GLuint dissolveTex;
+
+GLuint depthMapFBO;
+GLuint depthMapID;
+void generatingDepthMap();
+mat4 lightSpaceMatrix;
+void setLightSpaceMatrix();
+void renderDepthMapBegin();
+void renderDepthMapEnd();
+void drawGunduan(bool drawShadow = false);
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;

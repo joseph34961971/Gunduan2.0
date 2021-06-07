@@ -1,5 +1,7 @@
 #include "main.h"
 
+static unsigned int SHADOW_WIDTH = 9102;
+static unsigned int SHADOW_HEIGHT = 9102;
 vec3 camera = vec3(0, 0, 20);
 int main(int argc, char** argv)
 {
@@ -60,6 +62,7 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Gray", 1);
 	glutAddMenuEntry("Uniform", 2);
 	glutAddMenuEntry("Gaussian", 3);
+	glutAddMenuEntry("Shadow Debug", 4);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	glutCreateMenu(menuEvents);//建立右鍵菜單
@@ -120,7 +123,7 @@ void idle(int dummy)
 
 void resetObj(int f)
 {
-	light_pos = vec3(-10, 0, 0);
+	light_pos = vec3(0, 10, 0);
 
 	rifle_shooting = false;
 	cannon_shooting = false;
@@ -1223,6 +1226,7 @@ void updateObj(int frame)
 	 pps = 0;
 	 action = WALK;
 	 resetObj(0); // initial angles array
+	 generatingDepthMap();
 
 	 for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
 	 {
@@ -1290,6 +1294,18 @@ void updateObj(int frame)
 		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/radialBlur.frag" },//fragment shader
 		 { GL_NONE, NULL } };
 	 radialBlur_shader = LoadShaders(radialBlur_shaders);//讀取shader
+
+	 ShaderInfo shadow_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/shadow.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/shadow.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 shadow_shader = LoadShaders(shadow_shaders);//讀取shader
+
+	 ShaderInfo shadowdebug_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/shadowDebug.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/shadowDebug.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 shadowdebug_shader = LoadShaders(shadowdebug_shaders);//讀取shader
 
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
@@ -1399,102 +1415,14 @@ void display()
 		break;
 	}
 
+	renderDepthMapBegin();
+	drawGunduan(true);
+	renderDepthMapEnd();
+
 	if (pps != ORIGIN || openRadialBlur)
 		renderScreenBegin();
 
-	if (mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)
-	{
-		glUseProgram(diamond_shader);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture);
-		glUniform1i(glGetUniformLocation(diamond_shader, "skybox"), 0);
-		glUniform1i(glGetUniformLocation(diamond_shader, "mode"), mode - DIAMONDREFLECT);
-	}
-	else
-		glUseProgram(gundaun_shader); //uniform參數數值前必須先use shader
-
-	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
-	for (int i = 0; i < PARTSNUM; i++) {
-		glBindVertexArray(VAO);
-		if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)) // normal case
-		{
-			glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
-			glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
-			glUniform1i(glGetUniformLocation(gundaun_shader, "dissolveGray"), drawDissolveGray);
-			glUniform1i(glGetUniformLocation(gundaun_shader, "dissolveTex"), 1);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, dissolveTex);
-			glUniform1f(glGetUniformLocation(gundaun_shader, "dissolveThreshold"), t_drawDissolveGray / 100.0f);
-			glUniform1f(glGetUniformLocation(gundaun_shader, "alpha"), 1.0f);
-			glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 1);
-		}
-		else // diamond
-		{
-			glUniformMatrix4fv(glGetUniformLocation(diamond_shader, "u_model"), 1, GL_FALSE, &Models[i][0][0]);
-		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0,				//location
-			3,				//vec3
-			GL_FLOAT,			//type
-			GL_FALSE,			//not normalized
-			0,				//strip
-			(void*)offset[0]);//buffer offset
-//(location,vec3,type,固定點,連續點的偏移量,buffer point)
-		offset[0] += vertices_size[i] * sizeof(vec3);
-
-		// 2nd attribute buffer : UVs
-		glEnableVertexAttribArray(1);//location 1 :vec2 UV
-		glBindBuffer(GL_ARRAY_BUFFER, uVBO);
-		glVertexAttribPointer(1,
-			2,
-			GL_FLOAT,
-			GL_FALSE,
-			0,
-			(void*)offset[1]);
-		//(location,vec2,type,固定點,連續點的偏移量,point)
-		offset[1] += uvs_size[i] * sizeof(vec2);
-
-		// 3rd attribute buffer : normals
-		glEnableVertexAttribArray(2);//location 2 :vec3 Normal
-		glBindBuffer(GL_ARRAY_BUFFER, nVBO);
-		glVertexAttribPointer(2,
-			3,
-			GL_FLOAT,
-			GL_FALSE,
-			0,
-			(void*)offset[2]);
-		//(location,vec3,type,固定點,連續點的偏移量,point)
-		offset[2] += normals_size[i] * sizeof(vec3);
-
-		int vertexIDoffset = 0;//glVertexID's offset 
-		string mtlname;//material name
-		vec3 Ks = vec3(1, 1, 1);//because .mtl excluding specular , so give it here.
-		for (int j = 0; j < mtls[i].size(); j++) {//
-			mtlname = mtls[i][j];
-			//find the material diffuse color in map:KDs by material name.
-			if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND))
-			{
-				glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
-				glUniform3fv(M_KsID, 1, &Ks[0]);
-			}
-			if (!((i == LEFTARMGUN && !drawRifle) || (i == RIGHTLEGBLADE && !drawBlade)))
-			{
-				if (i == RIGHTLEGBLADE)
-					glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 0); // The blade has own lighting
-				glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
-			}
-			//we draw triangles by giving the glVertexID base and vertex count is face count*3
-			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
-		}//end for loop for draw one part of the robot	
-
-		//unbind VAO
-		glBindVertexArray(0);
-	}//end for loop for updating and drawing model
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
+	drawGunduan();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -2341,6 +2269,8 @@ void drawScreenQuad()
 		glUseProgram(gaussian_shader);
 	else if (openRadialBlur)
 		glUseProgram(radialBlur_shader);
+	else if (pps == DRAWSHADOWDEBUG)
+		glUseProgram(shadowdebug_shader);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, screen_id);
@@ -2355,6 +2285,13 @@ void drawScreenQuad()
 	}
 	else if (openRadialBlur)
 		glUniform1i(glGetUniformLocation(radialBlur_shader, "screen"), 0);
+	else if (pps == DRAWSHADOWDEBUG)
+	{
+		glBindTexture(GL_TEXTURE_2D, depthMapID);
+		glUniform1i(glGetUniformLocation(shadowdebug_shader, "depthMap"), 0);
+		glUniform1f(glGetUniformLocation(shadowdebug_shader, "near_plane"), 0.1f);
+		glUniform1f(glGetUniformLocation(shadowdebug_shader, "far_plane"), 1000.0f);
+	}
 	glBindVertexArray(screen_quad_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -2707,6 +2644,204 @@ void drawAsteroids()
 		glBindVertexArray(0);
 	}
 	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void generatingDepthMap()
+{
+	//************************************************************************
+	//
+	// * generate a new texture
+	//
+	//========================================================================
+	glGenFramebuffers(1, &depthMapFBO);
+	glGenTextures(1, &depthMapID);
+	glBindTexture(GL_TEXTURE_2D, depthMapID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapID, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+void setLightSpaceMatrix()
+{
+	float ortho_size = 32.0f;
+	float near_plane = 0.1f, far_plane = ortho_size * 0.95f;
+	mat4 lightProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
+	mat4 lightView = glm::lookAt(vec3(light_pos), vec3(0.0), vec3(0.0, 0.0, -1.0));
+	lightSpaceMatrix = lightProjection * lightView;
+	/*for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			std::cout << meshWindowCam.GetModelMatrix()[i][j] << " ";
+		}
+		std::cout << "\n=========\n";
+	}*/
+}
+
+void renderDepthMapBegin()
+{
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// 1. render depth of scene to texture (from light's perspective)
+	// --------------------------------------------------------------
+	setLightSpaceMatrix();
+
+	// render scene from light's point of view
+	glUseProgram(shadow_shader);
+	glUniformMatrix4fv(glGetUniformLocation(shadow_shader, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void renderDepthMapEnd()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glViewport(0, 0, screen_width, screen_height); // reset viewport
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void drawGunduan(bool drawShadow)
+{
+	if (!drawShadow)
+	{
+		if (mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)
+		{
+			glUseProgram(diamond_shader);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture);
+			glUniform1i(glGetUniformLocation(diamond_shader, "skybox"), 0);
+			glUniform1i(glGetUniformLocation(diamond_shader, "mode"), mode - DIAMONDREFLECT);
+		}
+		else
+			glUseProgram(gundaun_shader); //uniform參數數值前必須先use shader
+	}
+
+	if (!drawShadow)
+	{
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, depthMapID);
+		glUniform1i(glGetUniformLocation(gundaun_shader, "shadowMap"), 2);
+	}
+
+	GLuint offset[3] = { 0,0,0 };//offset for vertices , uvs , normals
+	for (int i = 0; i < PARTSNUM; i++) {
+		glBindVertexArray(VAO);
+		if (drawShadow)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(shadow_shader, "model"), 1, GL_FALSE, &Models[i][0][0]);
+		}
+		else
+		{
+			if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND)) // normal case
+			{
+				glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Models[i][0][0]);
+				glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
+				glUniform1i(glGetUniformLocation(gundaun_shader, "dissolveGray"), drawDissolveGray);
+				glUniform1i(glGetUniformLocation(gundaun_shader, "dissolveTex"), 1);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, dissolveTex);
+				glUniform1f(glGetUniformLocation(gundaun_shader, "dissolveThreshold"), t_drawDissolveGray / 100.0f);
+				glUniform1f(glGetUniformLocation(gundaun_shader, "alpha"), 1.0f);
+				glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 1);
+				glUniformMatrix4fv(glGetUniformLocation(gundaun_shader, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+			}
+			else // diamond
+			{
+				glUniformMatrix4fv(glGetUniformLocation(diamond_shader, "u_model"), 1, GL_FALSE, &Models[i][0][0]);
+			}
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0,				//location
+			3,				//vec3
+			GL_FLOAT,			//type
+			GL_FALSE,			//not normalized
+			0,				//strip
+			(void*)offset[0]);//buffer offset
+//(location,vec3,type,固定點,連續點的偏移量,buffer point)
+		offset[0] += vertices_size[i] * sizeof(vec3);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);//location 1 :vec2 UV
+		glBindBuffer(GL_ARRAY_BUFFER, uVBO);
+		glVertexAttribPointer(1,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)offset[1]);
+		//(location,vec2,type,固定點,連續點的偏移量,point)
+		offset[1] += uvs_size[i] * sizeof(vec2);
+
+		// 3rd attribute buffer : normals
+		glEnableVertexAttribArray(2);//location 2 :vec3 Normal
+		glBindBuffer(GL_ARRAY_BUFFER, nVBO);
+		glVertexAttribPointer(2,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)offset[2]);
+		//(location,vec3,type,固定點,連續點的偏移量,point)
+		offset[2] += normals_size[i] * sizeof(vec3);
+
+		int vertexIDoffset = 0;//glVertexID's offset 
+		string mtlname;//material name
+		vec3 Ks = vec3(1, 1, 1);//because .mtl excluding specular , so give it here.
+		for (int j = 0; j < mtls[i].size(); j++) {//
+			if (drawShadow)
+			{
+				glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
+			}
+			else
+			{
+				mtlname = mtls[i][j];
+				//find the material diffuse color in map:KDs by material name.
+				if (!(mode == DIAMONDREFLECT || mode == DIAMONDREFRACT || mode == DIAMOND))
+				{
+					glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
+					glUniform3fv(M_KsID, 1, &Ks[0]);
+				}
+				if (!((i == LEFTARMGUN && !drawRifle) || (i == RIGHTLEGBLADE && !drawBlade)))
+				{
+					if (i == RIGHTLEGBLADE)
+						glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 0); // The blade has own lighting
+					glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
+				}
+			}
+			//we draw triangles by giving the glVertexID base and vertex count is face count*3
+			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
+		}//end for loop for draw one part of the robot	
+
+		//unbind VAO
+		glBindVertexArray(0);
+	}//end for loop for updating and drawing model
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glUseProgram(0);
 }
 
