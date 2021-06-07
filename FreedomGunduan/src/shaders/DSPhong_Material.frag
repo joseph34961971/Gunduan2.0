@@ -24,6 +24,8 @@ float Shininess = 128.0; // for material specular
 uniform bool dissolveGray;
 uniform sampler2D dissolveTex;
 uniform float dissolveThreshold;
+uniform float alpha;
+uniform bool useLighting;
 
 vec3 gray(vec3 color)
 {
@@ -32,24 +34,31 @@ vec3 gray(vec3 color)
 
 void main(void)
 { 
-    // Dot product gives us diffuse intensity
-    float diff = max(0.0, dot(normalize(vVaryingNormal),
-					normalize(vVaryingLightDir)));
+    if (useLighting)
+    {
+        // Dot product gives us diffuse intensity
+        float diff = max(0.0, dot(normalize(vVaryingNormal),
+					    normalize(vVaryingLightDir)));
 
-    // Multiply intensity by diffuse color, force alpha to 1.0
-    vFragColor = diff * diffuseColor*vec4(Material.Kd,1);
+        // Multiply intensity by diffuse color, force alpha to 1.0
+        vFragColor = diff * diffuseColor*vec4(Material.Kd,1);
 
-    // Add in ambient light
-    vFragColor += ambientColor;
+        // Add in ambient light
+        vFragColor += ambientColor;
 
 
-    // Specular Light
-    vec3 vReflection = normalize(reflect(-normalize(vVaryingLightDir),
-								normalize(vVaryingNormal)));//反射角
-    float spec = max(0.0, dot(normalize(vVaryingNormal), vReflection));
-    if(diff != 0) {
-		spec = pow(spec, Shininess);
-		vFragColor += specularColor * vec4(Material.Ka,1) * spec;
+        // Specular Light
+        vec3 vReflection = normalize(reflect(-normalize(vVaryingLightDir),
+								    normalize(vVaryingNormal)));//反射角
+        float spec = max(0.0, dot(normalize(vVaryingNormal), vReflection));
+        if(diff != 0) {
+		    spec = pow(spec, Shininess);
+		    vFragColor += specularColor * vec4(Material.Ka,1) * spec;
+        }
+    }
+    else
+    {
+        vFragColor = vec4(Material.Kd,1);
     }
 
     if (dissolveGray)
@@ -60,4 +69,6 @@ void main(void)
             vFragColor = color;
         }
     }
+
+    vFragColor = vec4(vec3(vFragColor), alpha);
 }

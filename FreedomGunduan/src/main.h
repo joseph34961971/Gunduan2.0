@@ -153,7 +153,17 @@ map<string, vec3> KSs;//mtl-name&Ks
 mat4 Projection;
 mat4 View;
 mat4 Model;
+mat4 Rotatation[PARTSNUM];
+mat4 Translation[PARTSNUM];
+mat4 Scaling[PARTSNUM];
 mat4 Models[PARTSNUM];
+bool recordLastBladeModels;
+const int recordLastBladeLength = 256;
+float lastBodyAngles[recordLastBladeLength][3];
+float lastLeftFistAngles[recordLastBladeLength][3];
+float lastLeftArmAngles[recordLastBladeLength][3];
+float lastLeftShoulderAngles[recordLastBladeLength][3];
+mat4 lastBladeModels[recordLastBladeLength];
 
 #define DIAMONDREFLECT 2
 #define DIAMONDREFRACT 3

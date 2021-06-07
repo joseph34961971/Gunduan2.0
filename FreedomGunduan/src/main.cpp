@@ -1051,6 +1051,15 @@ void updateObj(int frame)
 	}
 	else if (action == DrawSaber)
 	{
+		if (second_current == 0 && frame > 40)
+		{
+			recordLastBladeModels = true;
+		}
+		else
+		{
+			recordLastBladeModels = false;
+		}
+
 		if (second_current == 0 && frame < 15)
 		{
 			angles[LEFTINSIDEBIGWING][Z] -= 8.0f;
@@ -1079,7 +1088,9 @@ void updateObj(int frame)
 			angles[LEFTFIST][Y] += 8.0f;
 			angles[LEFTFIST][X] += 3.0f;
 			angles[LEFTFIST][Z] += 3.0f;
-			
+
+			angles[RIGHTSHOULDER][Z] += 2.0f; // Avoid saber cutting the shield
+
 			angles[WING][X] += 1.5f;
 			angles[LEFTFOOT][X] += 2.0f;
 			angles[RIGHTFOOT][X] += 2.0f;
@@ -1099,6 +1110,39 @@ void updateObj(int frame)
 			angles[LEFTFIST][Z] -= 4.5f;
 		}
 		
+		if (recordLastBladeModels)
+		{
+			int afterImageLength = 10 - abs(frame - 50);
+			for (int recordIndex = 0; recordIndex < recordLastBladeLength; recordIndex++)
+			{
+				for (int axisIndex = 0; axisIndex < 3; axisIndex++) //record all value
+				{
+					lastBodyAngles[recordIndex][axisIndex] = angles[BODY][axisIndex];
+					lastLeftFistAngles[recordIndex][axisIndex] = angles[LEFTFIST][axisIndex];
+					lastLeftArmAngles[recordIndex][axisIndex] = angles[LEFTARM][axisIndex];
+					lastLeftShoulderAngles[recordIndex][axisIndex] = angles[LEFTSHOULDER][axisIndex];
+				}
+
+				lastBodyAngles[recordIndex][Y] += 1.5f * afterImageLength;
+
+				lastLeftShoulderAngles[recordIndex][Y] += 11.0f * afterImageLength;
+				lastLeftArmAngles[recordIndex][X] -= 8.0f * afterImageLength;
+				lastLeftShoulderAngles[recordIndex][Z] += 2.5f * afterImageLength;
+				lastLeftFistAngles[recordIndex][X] += 3.0f * afterImageLength;
+				lastLeftFistAngles[recordIndex][Y] += 8.0f * afterImageLength;
+				lastLeftFistAngles[recordIndex][Z] += 4.5f * afterImageLength;
+
+				lastBodyAngles[recordIndex][Y] -= 1.5f * afterImageLength / recordLastBladeLength * recordIndex;
+
+				lastLeftShoulderAngles[recordIndex][Y] -= 11.0f * afterImageLength / recordLastBladeLength * recordIndex;
+				lastLeftArmAngles[recordIndex][X] += 8.0f * afterImageLength / recordLastBladeLength * recordIndex;
+				lastLeftShoulderAngles[recordIndex][Z] -= 2.5f * afterImageLength / recordLastBladeLength * recordIndex;
+				lastLeftFistAngles[recordIndex][X] -= 3.0f * afterImageLength / recordLastBladeLength * recordIndex;
+				lastLeftFistAngles[recordIndex][Y] -= 8.0f * afterImageLength / recordLastBladeLength * recordIndex;
+				lastLeftFistAngles[recordIndex][Z] -= 4.5f * afterImageLength / recordLastBladeLength * recordIndex;
+			}
+		}
+
 		if (second_current == 0 && frame == 30)
 		{
 			exchangeBladeParent = true;
@@ -1108,13 +1152,6 @@ void updateObj(int frame)
 			angles[RIGHTLEGSABER][X] = -32.832f;
 			angles[RIGHTLEGSABER][Y] = 144.938f;
 			angles[RIGHTLEGSABER][Z] = 0.0f;
-
-			/*positions[RIGHTLEGSABER][X] = 2.093f;
-			positions[RIGHTLEGSABER][Y] = -9.525f;
-			positions[RIGHTLEGSABER][Z] = 2.414f;
-			angles[RIGHTLEGSABER][X] = 32.832f;
-			angles[RIGHTLEGSABER][Y] = 144.938f;
-			angles[RIGHTLEGSABER][Z] = 0.0f;*/
 		}
 	}
 	else if (action == PowerOn)
@@ -1166,8 +1203,6 @@ void updateObj(int frame)
 		else if (second_current == 1 && frame >= 30 && frame < 35)
 		{
 			angles[LEFTSHOULDER][X] += 21.0f;
-			//angles[LEFTSHOULDER][Y] -= 6.0f;
-			//angles[LEFTSHOULDER][Z] -= 9.0f;
 			angles[LEFTARM][Y] += 8.0f;
 		}
 	}
@@ -1184,6 +1219,7 @@ void updateObj(int frame)
 	 action = WALK;
 	 resetObj(0); // initial angles array
 	 drawDissolveGray = false;
+	 recordLastBladeModels = false;
 
 	 for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
 	 {
@@ -1311,7 +1347,7 @@ void updateObj(int frame)
 	 glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4) * 2, NULL, GL_STATIC_DRAW);
 	 glBindBufferRange(GL_UNIFORM_BUFFER, /*binding point*/1, skybox_matrices_ubo, 0, sizeof(mat4) * 2);
 	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	 glClearColor(0.0, 1.0, 0.0, 1);//black screen
+	 glClearColor(0.0, 0.0, 0.0, 1);//black screen
 
 	 initScreenRender();
 
@@ -1380,6 +1416,8 @@ void display()
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, dissolveTex);
 			glUniform1f(glGetUniformLocation(gundaun_shader, "dissolveThreshold"), t_drawDissolveGray / 100.0f);
+			glUniform1f(glGetUniformLocation(gundaun_shader, "alpha"), 1.0f);
+			glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 1);
 		}
 		else
 		{
@@ -1434,7 +1472,11 @@ void display()
 				glUniform3fv(M_KsID, 1, &Ks[0]);
 			}
 			if (!((i == LEFTARMGUN && !drawRifle) || (i == RIGHTLEGBLADE && !drawBlade)))
+			{
+				if (i == RIGHTLEGBLADE)
+					glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 0);
 				glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
+			}
 			//we draw triangles by giving the glVertexID base and vertex count is face count*3
 			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
 		}//end for loop for draw one part of the robot	
@@ -1473,6 +1515,36 @@ void display()
 	}
 
 	drawSkybox();
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	if (recordLastBladeModels) // debug using drawBlade
+	{
+		int vertexIDoffset = 0;
+		glUseProgram(gundaun_shader); //uniform參數數值前必須先use shader
+		glUniform3fv(glGetUniformLocation(gundaun_shader, "vLightPosition"), 1, &light_pos[0]);
+		glUniform1i(glGetUniformLocation(gundaun_shader, "dissolveGray"), drawDissolveGray);
+		glUniform1i(glGetUniformLocation(gundaun_shader, "dissolveTex"), 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, dissolveTex);
+		glUniform1f(glGetUniformLocation(gundaun_shader, "dissolveThreshold"), t_drawDissolveGray / 100.0f);
+		glUniform1f(glGetUniformLocation(gundaun_shader, "alpha"), 0.5f);
+		glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 0);
+		glBindVertexArray(VAO);
+		for (int j = 0; j < mtls[RIGHTLEGBLADE].size(); j++)
+		{
+			for (int recordIndex = 0; recordIndex < recordLastBladeLength; recordIndex++)
+			{
+				glUniformMatrix4fv(ModelID, 1, GL_FALSE, &lastBladeModels[recordIndex][0][0]);
+				glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[RIGHTLEGBLADE][j + 1] * 3);
+			}
+			vertexIDoffset += faces[RIGHTLEGBLADE][j + 1] * 3;//glVertexID's base offset is face count*3
+		}
+		glBindVertexArray(0);
+		glUseProgram(0);
+	}
+	glDisable(GL_BLEND);
 
 	if (pps != ORIGIN)
 	{
@@ -1620,9 +1692,23 @@ void Obj2Buffer()
 
 void updateModels()
 {
-	mat4 Rotatation[PARTSNUM];
-	mat4 Translation[PARTSNUM];
-	mat4 Scaling[PARTSNUM];
+	//if (recordLastBladeModels)
+	{
+		for (int recordIndex = 0; recordIndex < recordLastBladeLength; recordIndex++)
+		{
+			Rotatation[BODY] = rotate(lastBodyAngles[recordIndex][X], 1, 0, 0) * rotate(lastBodyAngles[recordIndex][Y], 0, 1, 0) * rotate(lastBodyAngles[recordIndex][Z], 0, 0, 1);
+			Models[BODY] = Translation[BODY] * Rotatation[BODY] * Scaling[BODY];
+			Rotatation[LEFTSHOULDER] = rotate(lastLeftShoulderAngles[recordIndex][X], 1, 0, 0) * rotate(lastLeftShoulderAngles[recordIndex][Z], 0, 0, 1) * rotate(lastLeftShoulderAngles[recordIndex][Y], 0, 1, 0);
+			Models[LEFTSHOULDER] = Models[BODY] * Translation[LEFTSHOULDER] * Rotatation[LEFTSHOULDER];
+			Rotatation[LEFTARM] = rotate(lastLeftArmAngles[recordIndex][Z], 0, 0, 1) * rotate(lastLeftArmAngles[recordIndex][Y], 0, 1, 0) * rotate(lastLeftArmAngles[recordIndex][X], 1, 0, 0);
+			Models[LEFTARM] = Models[LEFTSHOULDER] * Translation[LEFTARM] * Rotatation[LEFTARM];
+			Rotatation[LEFTFIST] = rotate(lastLeftFistAngles[recordIndex][Z], 0, 0, 1) * rotate(lastLeftFistAngles[recordIndex][Y], 0, 1, 0) * rotate(lastLeftFistAngles[recordIndex][X], 1, 0, 0);
+			Models[LEFTFIST] = Models[LEFTARM] * Translation[LEFTFIST] * Rotatation[LEFTFIST];
+			Models[RIGHTLEGSABER] = Models[LEFTFIST] * Translation[RIGHTLEGSABER] * Rotatation[RIGHTLEGSABER];
+			lastBladeModels[recordIndex] = Models[RIGHTLEGSABER] * Translation[RIGHTLEGBLADE] * Rotatation[RIGHTLEGBLADE];
+		}
+	}
+
 	for(int i = 0 ; i < PARTSNUM;i++)
 	{
 		Models[i] = mat4(1.0f);
@@ -1758,7 +1844,6 @@ void updateModels()
 	//=============================================================
 
 	//右腿光劍柄
-	
 	Rotatation[RIGHTLEGSABER] = rotate(angles[RIGHTLEGSABER][X], 1, 0, 0) * rotate(angles[RIGHTLEGSABER][Z], 0, 0, 1) * rotate(angles[RIGHTLEGSABER][Y], 0, 1, 0);
 	Translation[RIGHTLEGSABER] = translate(positions[RIGHTLEGSABER][X], positions[RIGHTLEGSABER][Y], positions[RIGHTLEGSABER][Z]);
 	if (exchangeBladeParent)
@@ -1866,7 +1951,7 @@ void updateModels()
 	Translation[RIGHTINSIDESMALLWING] = translate(positions[RIGHTINSIDESMALLWING][X], positions[RIGHTINSIDESMALLWING][Y], positions[RIGHTINSIDESMALLWING][Z]);
 	Models[RIGHTINSIDESMALLWING] = Models[RIGHTCONNECTOR] * Translation[RIGHTINSIDESMALLWING] * Rotatation[RIGHTINSIDESMALLWING];
 	//=============================================================
-
+	
 	mat4 rifle_beam_Rotatation = rotate(rifle_beam_angles[X], 1, 0, 0) * rotate(rifle_beam_angles[Y], 0, 1, 0) * rotate(rifle_beam_angles[Z], 0, 0, 1);
 	//mat4 rifle_beam_Translation = translate(rifle_beam_positions[X] + rifle_beam_offset.x, rifle_beam_positions[Y] + rifle_beam_offset.y, rifle_beam_positions[Z] + rifle_beam_offset.z);
 	mat4 rifle_beam_Translation = translate(rifle_beam_positions[X], rifle_beam_positions[Y], rifle_beam_positions[Z]);
