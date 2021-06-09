@@ -365,10 +365,15 @@ void resetObj(int f)
 
 void updateObj(int frame)
 {
-	if (eyeAngley < eyeAngleyGoal - 0.1f)
-		eyeAngley += 0.4f;
-	else if (eyeAngley > eyeAngleyGoal + 0.1f)
-		eyeAngley -= 0.4f;
+	if (eyeAngleY < eyeAngleYGoal - 0.1f)
+		eyeAngleY += 0.4f;
+	else if (eyeAngleY > eyeAngleYGoal + 0.1f)
+		eyeAngleY -= 0.4f;
+
+	if (eyeAngleX < eyeAngleXGoal - 0.1f)
+		eyeAngleX += 0.4f;
+	else if (eyeAngleX > eyeAngleXGoal + 0.1f)
+		eyeAngleX -= 0.4f;
 
 	if (eyeX < eyeXGoal - 0.1f)
 		eyeX += 0.4f;
@@ -1388,11 +1393,18 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	float eyey = DOR(eyeAngley);
+	float eyey = DOR(eyeAngleY);
+	vec3 cameraPos = vec3(eyedistance * sin(eyey) + eyeX, 2 + eyeheight, eyedistance * cos(eyey));
+	mat4 cameraModel = translate(mat4(1.0), cameraPos);
+	cameraModel = rotate(cameraModel, eyeAngleX, vec3(1, 0, 0));
+	cameraModel = translate(cameraModel, -cameraPos);
+	vec3 cameraCenter = vec3(cameraModel * vec4(eyeX, eyeheight, 0, 1));
+	mat4 cameraUpRotation = rotate(mat4(1.0), eyeAngleX, vec3(1, 0, 0));
+	vec3 cameraUp = vec3(cameraUpRotation * vec4(0, 1, 0, 1));
 	View = lookAt(
-		vec3(eyedistance * sin(eyey) + eyeX, 2 + eyeheight, eyedistance * cos(eyey)), // Camera is at (0,0,20), in World Space
-		vec3(eyeX, eyeheight, 0), // and looks at the origin
-		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+		cameraPos, // Camera is at (0,0,20), in World Space
+		cameraCenter, // and looks at the origin
+		cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 	updateModels();
 	//update data to UBO for MVP
@@ -2017,27 +2029,23 @@ void Keyboard(unsigned char key, int x, int y)
 		break;
 	case 'q':
 	case 'Q':
-		if (eyeAngleyGoal > eyeAngley - 10)
-			eyeAngleyGoal -= 10;
+		if (eyeAngleYGoal > eyeAngleY - 10)
+			eyeAngleYGoal -= 10;
 		break;
 	case 'e':
 	case 'E':
-		if (eyeAngleyGoal < eyeAngley + 10)
-			eyeAngleyGoal += 10;
+		if (eyeAngleYGoal < eyeAngleY + 10)
+			eyeAngleYGoal += 10;
 		break;
 	case 'r':
 	case 'R':
-		/*angles[1] -= 5;
-		if(angles[1] == -360) angles[1] = 0;
-		movey = 0;
-		movex = 0;*/
+		if (eyeAngleXGoal < eyeAngleX + 10)
+			eyeAngleXGoal += 10;
 		break;
-	case 't':
-	case 'T':
-		/*angles[2] -= 5;
-		if(angles[2] == -360) angles[2] = 0;
-		movey = 0;
-		movex = 0;*/
+	case 'f':
+	case 'F':
+		if (eyeAngleXGoal > eyeAngleX - 10)
+			eyeAngleXGoal -= 10;
 		break;
 	}
 	glutPostRedisplay();

@@ -132,8 +132,10 @@ bool GangnanStyle_beginpose = true;
 
 float angles[PARTSNUM][3];
 float positions[PARTSNUM][3];
-float eyeAngley = 0.0;
-float eyeAngleyGoal = 0.0;
+float eyeAngleY = 0.0;
+float eyeAngleYGoal = 0.0;
+float eyeAngleX = 0.0;
+float eyeAngleXGoal = 0.0;
 float eyedistance = 20.0;
 float eyeheight = 0.0;
 float eyeX = 0.0;
