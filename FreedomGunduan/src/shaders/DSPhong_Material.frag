@@ -25,6 +25,7 @@ uniform bool dissolveGray;
 uniform sampler2D dissolveTex;
 uniform float dissolveThreshold;
 uniform float alpha;
+uniform bool toonShading;
 uniform bool useLighting;
 
 in vec4 FragPosLightSpace;
@@ -109,6 +110,20 @@ void main(void)
             vec4 color = vec4(gray(vec3(vFragColor)), 1.0);
             vFragColor = color;
         }
+    }
+
+    if (toonShading)
+    {
+        float colorIntensity;
+        float intensity = dot(normalize(vVaryingLightDir), normalize(vVaryingNormal));
+
+        if (intensity > 0.95)      colorIntensity = 1.0;
+        else if (intensity > 0.75) colorIntensity = 0.8;
+        else if (intensity > 0.50) colorIntensity = 0.6;
+        else if (intensity > 0.25) colorIntensity = 0.4;
+        else                       colorIntensity = 0.2;
+
+        vFragColor = vec4(Material.Kd * colorIntensity, 1.0);
     }
 
     vFragColor = vec4(vec3(vFragColor), alpha);

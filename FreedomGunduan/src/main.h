@@ -288,6 +288,8 @@ void renderDepthMapBegin();
 void renderDepthMapEnd();
 void drawGunduan(bool drawShadow = false);
 
+bool drawToonShading;
+
 //void initOpenAL();
 //ALCdevice* device = nullptr;
 //ALCcontext* context = nullptr;

@@ -8,7 +8,7 @@ in V_OUT
 
 uniform sampler2D screen;
 // url: https://stackoverflow.com/questions/4579020/how-do-i-use-a-glsl-shader-to-apply-a-radial-blur-to-an-entire-scene
-const float sampleDist = 0.5;
+const float sampleDist = 0.4;
 const float sampleStrength = 2.2;
 
 void main()

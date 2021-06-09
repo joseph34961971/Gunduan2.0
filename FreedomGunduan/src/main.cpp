@@ -125,6 +125,8 @@ void resetObj(int f)
 {
 	light_pos = vec3(0, 10, 0);
 
+	fly_position = 0.0;
+
 	rifle_shooting = false;
 	cannon_shooting = false;
 	railgun_shooting = false;
@@ -135,6 +137,7 @@ void resetObj(int f)
 	drawDissolveGray = false;
 	recordLastBladeModels = false;
 	openRadialBlur = false;
+	drawToonShading = true;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -1167,6 +1170,7 @@ void updateObj(int frame)
 		if (second_current == 0 && frame == 0)
 		{
 			drawDissolveGray = true;
+			drawToonShading = false;
 		}
 
 		if (second_current == 0)
@@ -2764,6 +2768,7 @@ void drawGunduan(bool drawShadow)
 				glActiveTexture(GL_TEXTURE1);
 				glBindTexture(GL_TEXTURE_2D, dissolveTex);
 				glUniform1f(glGetUniformLocation(gundaun_shader, "dissolveThreshold"), t_drawDissolveGray / 100.0f);
+				glUniform1i(glGetUniformLocation(gundaun_shader, "toonShading"), drawToonShading);
 				glUniform1f(glGetUniformLocation(gundaun_shader, "alpha"), 1.0f);
 				glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 1);
 				glUniformMatrix4fv(glGetUniformLocation(gundaun_shader, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
