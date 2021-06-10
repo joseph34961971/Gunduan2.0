@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
 	//multisample for golygons smooth
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(800, 600);
 	glutCreateWindow("OpenGL 4.3 - Freedom Gunduan");
 
@@ -138,6 +138,7 @@ void resetObj(int f)
 	recordLastBladeModels = false;
 	openRadialBlur = false;
 	drawToonShading = true;
+	drawParticleSystem = true;
 
 	for (int i = 0; i < PARTSNUM; i++)
 	{
@@ -408,8 +409,6 @@ void updateObj(int frame)
 			angles[RIGHTFOOT][X] += 0.25f;
 
 			angles[WING][X] += 0.25f;
-
-			//angles[LEFTLEGARMOR][X] += 5.0f;
 		}
 		else
 		{
@@ -426,8 +425,6 @@ void updateObj(int frame)
 			angles[RIGHTFOOT][X] -= 0.25f;
 
 			angles[WING][X] -= 0.25f;
-
-			//angles[LEFTLEGARMOR][X] -= 5.0f;
 		}
 
 		fly_position = 1.0f * sin((float)frame / fps * 3.1415);
@@ -651,9 +648,7 @@ void updateObj(int frame)
 			angles[RIGHTARM][X] -= 1.5f; // -45
 			angles[RIGHTSHOULDER][Y] -= 2.0f; // -60
 
-			//angles[LEFTARM][Z] += 1.0f; // 30
 			angles[LEFTSHOULDER][X] -= 4.5f; // -135
-			//angles[LEFTSHOULDER][Z] -= 1.0f; // -30
 		}
 
 		if (frame % 30 == 0)
@@ -907,6 +902,7 @@ void updateObj(int frame)
 		{
 			gundam_speed = 5.0f;
 			openRadialBlur = true;
+			drawParticleSystem = true;
 
 			positions[BODY][Y] -= 0.05f;
 
@@ -1115,6 +1111,7 @@ void updateObj(int frame)
 			drawBlade = true;
 			gundam_speed = 5.0f;
 			openRadialBlur = true;
+			drawParticleSystem = true;
 
 			angles[BODY][Y] -= 1.5f;
 
@@ -1310,11 +1307,17 @@ void updateObj(int frame)
 		 { GL_NONE, NULL } };
 	 shadow_shader = LoadShaders(shadow_shaders);//讀取shader
 
-	 ShaderInfo shadowdebug_shaders[] = {
+	 ShaderInfo shadowDebug_shaders[] = {
 		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/shadowDebug.vert" },//vertex shader
 		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/shadowDebug.frag" },//fragment shader
 		 { GL_NONE, NULL } };
-	 shadowdebug_shader = LoadShaders(shadowdebug_shaders);//讀取shader
+	 shadowDebug_shader = LoadShaders(shadowDebug_shaders);//讀取shader
+
+	 ShaderInfo pointSprite_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/pointSprite.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/pointSprite.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 pointSprite_shader = LoadShaders(pointSprite_shaders);//讀取shader
 
 	 glUseProgram(gundaun_shader);//uniform參數數值前必須先use shader
 
@@ -1351,6 +1354,8 @@ void updateObj(int frame)
 	 glUniformBlockBinding(gundaun_shader, MatricesIdx, 0);
 	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+	 glUseProgram(0);
+
 	 //UBO
 	 glGenBuffers(1, &UBO);
 	 glBindBuffer(GL_UNIFORM_BUFFER, UBO);
@@ -1370,6 +1375,7 @@ void updateObj(int frame)
 	 asteroids_textures[4] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_5_Color.bmp");
 	 asteroids_textures[5] = loadTexture("../FreedomGunduan/images/asteroids/Aster_Small_6_Color.bmp");
 	 dissolveTex = loadTexture("../FreedomGunduan/images/febucci-dissolve-texture.jpg");
+	 particle_texture = loadTexture("../FreedomGunduan/images/particle.png", true);
 
 	 glGenVertexArrays(1, &asteroids_VAO);
 
@@ -1383,6 +1389,8 @@ void updateObj(int frame)
 	 glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	 glClearColor(0.0, 0.0, 0.0, 1);//black screen
 
+	 initPointSprite();
+
 	 initScreenRender();
 
 	 initScreenQuad();
@@ -1394,7 +1402,7 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	float eyey = DOR(eyeAngleY);
-	vec3 cameraPos = vec3(eyedistance * sin(eyey) + eyeX, 2 + eyeheight, eyedistance * cos(eyey));
+	cameraPos = vec3(eyedistance * sin(eyey) + eyeX, 2 + eyeheight, eyedistance * cos(eyey));
 	mat4 cameraModel = translate(mat4(1.0), cameraPos);
 	cameraModel = rotate(cameraModel, eyeAngleX, vec3(1, 0, 0));
 	cameraModel = translate(cameraModel, -cameraPos);
@@ -1473,6 +1481,16 @@ void display()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	if (drawParticleSystem)
+	{
+		for (int particle_index = 0; particle_index < NUM_PARTICLE_SYSTEM; particle_index++)
+		{
+			drawPointSprite(particle_index);
+		}
+	}
+	
+
 	if (recordLastBladeModels) // debug using drawBlade
 	{
 		int vertexIDoffset = 0;
@@ -1907,11 +1925,23 @@ void updateModels()
 	//=============================================================
 	
 	mat4 rifle_beam_Rotatation = rotate(rifle_beam_angles[X], 1, 0, 0) * rotate(rifle_beam_angles[Y], 0, 1, 0) * rotate(rifle_beam_angles[Z], 0, 0, 1);
-	//mat4 rifle_beam_Translation = translate(rifle_beam_positions[X] + rifle_beam_offset.x, rifle_beam_positions[Y] + rifle_beam_offset.y, rifle_beam_positions[Z] + rifle_beam_offset.z);
 	mat4 rifle_beam_Translation = translate(rifle_beam_positions[X], rifle_beam_positions[Y], rifle_beam_positions[Z]);
 	mat4 rifle_beam_Baias = translate(rifle_beam_offset.x, rifle_beam_offset.y, rifle_beam_offset.z);
 	mat4 rifle_beam_Scaling = scale(rifle_beam_scale.x, rifle_beam_scale.y, rifle_beam_scale.z);
 	rifle_beam_model = Models[LEFTARMGUN] * rifle_beam_Translation * rifle_beam_Rotatation * rifle_beam_Baias * rifle_beam_Scaling;
+
+	mat4 particle_translation;
+	mat4 particle_rotation;
+	particle_parent_models[PARTICLEWING] = Models[WING];
+	particle_parent_models[PARTICLEWING2] = Models[WING];
+	particle_parent_models[PARTICLELEFTWING] = Models[LEFTINSIDEBIGWING];
+	particle_parent_models[PARTICLERIGHTWING] = Models[RIGHTINSIDEBIGWING];
+	for (int particle_index = 0; particle_index < NUM_PARTICLE_SYSTEM; particle_index++)
+	{
+		particle_translation = translate(particle_center[particle_index].x, particle_center[particle_index].y, particle_center[particle_index].z);
+		particle_rotation = rotate(particle_angle[particle_index].x, 1, 0, 0) * rotate(particle_angle[particle_index].y, 0, 1, 0) * rotate(particle_angle[particle_index].z, 0, 0, 1);
+		particle_models[particle_index] = particle_parent_models[particle_index] * particle_translation * particle_rotation;
+	}
 }
 
 void load2Buffer(char* obj,int i)
@@ -2282,7 +2312,7 @@ void drawScreenQuad()
 	else if (openRadialBlur)
 		glUseProgram(radialBlur_shader);
 	else if (pps == DRAWSHADOWDEBUG)
-		glUseProgram(shadowdebug_shader);
+		glUseProgram(shadowDebug_shader);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, screen_id);
@@ -2300,9 +2330,9 @@ void drawScreenQuad()
 	else if (pps == DRAWSHADOWDEBUG)
 	{
 		glBindTexture(GL_TEXTURE_2D, depthMapID);
-		glUniform1i(glGetUniformLocation(shadowdebug_shader, "depthMap"), 0);
-		glUniform1f(glGetUniformLocation(shadowdebug_shader, "near_plane"), 0.1f);
-		glUniform1f(glGetUniformLocation(shadowdebug_shader, "far_plane"), 1000.0f);
+		glUniform1i(glGetUniformLocation(shadowDebug_shader, "depthMap"), 0);
+		glUniform1f(glGetUniformLocation(shadowDebug_shader, "near_plane"), 0.1f);
+		glUniform1f(glGetUniformLocation(shadowDebug_shader, "far_plane"), 1000.0f);
 	}
 	glBindVertexArray(screen_quad_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -2326,7 +2356,7 @@ void drawEarth()
 	glUseProgram(0);
 }
 
-GLint loadTexture(string path)
+GLint loadTexture(string path, bool transparent)
 {
 	GLuint textureID;
 	glGenTextures(1, &textureID);
@@ -2341,7 +2371,10 @@ GLint loadTexture(string path)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		if (transparent)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		else
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 		stbi_image_free(image);
 	}
 	else
@@ -2695,14 +2728,6 @@ void setLightSpaceMatrix()
 	mat4 lightProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
 	mat4 lightView = glm::lookAt(vec3(light_pos), vec3(0.0), vec3(0.0, 0.0, -1.0));
 	lightSpaceMatrix = lightProjection * lightView;
-	/*for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			std::cout << meshWindowCam.GetModelMatrix()[i][j] << " ";
-		}
-		std::cout << "\n=========\n";
-	}*/
 }
 
 void renderDepthMapBegin()
@@ -2855,6 +2880,90 @@ void drawGunduan(bool drawShadow)
 		glBindVertexArray(0);
 	}//end for loop for updating and drawing model
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glUseProgram(0);
+}
+
+void initPointSprite()
+{
+	struct particle_t
+	{
+		vec3 direction;
+		int begin_t;
+	};
+	
+	particle_range[PARTICLEWING] = vec3(0.1, 0.5, 0.1);
+	particle_limit[PARTICLEWING] = vec3(1, 2, 1);
+	particle_range[PARTICLEWING2] = vec3(0.1, 0.5, 0.5);
+	particle_limit[PARTICLEWING2] = vec3(1, 2, 2);
+	particle_range[PARTICLELEFTWING] = vec3(0.5, 0.8, 0.1);
+	particle_limit[PARTICLELEFTWING] = vec3(2, 1, 1);
+	particle_range[PARTICLERIGHTWING] = vec3(0.5, 0.8, 0.1);
+	particle_limit[PARTICLERIGHTWING] = vec3(0, 1, 1);
+
+	particle_center[PARTICLEWING] = vec3(0.0, -12.367, -4.127);
+	particle_angle[PARTICLEWING] = vec3(0.0);
+	particle_center[PARTICLEWING2] = vec3(0.0, -9.94, -11.358);
+	particle_angle[PARTICLEWING2] = vec3(10, 0.0, 0.0);
+	particle_center[PARTICLELEFTWING] = vec3(0.0);
+	particle_angle[PARTICLELEFTWING] = vec3(0.0, 0.0, 90);
+	particle_center[PARTICLERIGHTWING] = vec3(0.0);
+	particle_angle[PARTICLERIGHTWING] = vec3(0.0, 0.0, -90);
+
+	for (int particle_index = 0; particle_index < NUM_PARTICLE_SYSTEM; particle_index++)
+	{
+		glGenVertexArrays(1, &particleVAO[particle_index]);
+		glBindVertexArray(particleVAO[particle_index]);
+
+		glGenBuffers(1, &particleBuffer[particle_index]);
+		glBindBuffer(GL_ARRAY_BUFFER, particleBuffer[particle_index]);
+		glBufferData(GL_ARRAY_BUFFER, NUM_PARTICLE[particle_index] * sizeof(particle_t), NULL, GL_STATIC_DRAW);
+
+		particle_t* particle = (particle_t*)glMapBufferRange(GL_ARRAY_BUFFER, 0, NUM_PARTICLE[particle_index] * sizeof(particle_t), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+		for (int i = 0; i < NUM_PARTICLE[particle_index]; i++)
+		{
+			vec3 randomDir(normalize(vec3((rand() % 200 / 100.0f - particle_limit[particle_index].x) * particle_range[particle_index].x, (rand() % 200 / 100.0f - particle_limit[particle_index].y) * particle_range[particle_index].y, (rand() % 200 / 100.0f - particle_limit[particle_index].z) * particle_range[particle_index].z)));
+			particle[i].direction[0] = randomDir.x;
+			particle[i].direction[1] = randomDir.y;
+			particle[i].direction[2] = randomDir.z;
+			particle[i].begin_t = rand() % particle_size;
+		}
+
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(particle_t), NULL);
+		glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(particle_t), (void*)sizeof(glm::vec3));
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		// Unbind VAO
+		glBindVertexArray(0);
+	}
+}
+
+void drawPointSprite(int particle_index)
+{
+	glUseProgram(pointSprite_shader);
+	glUniform1i(glGetUniformLocation(pointSprite_shader, "tex_particle"), 1);
+	glUniform1i(glGetUniformLocation(pointSprite_shader, "time"), particle_time);
+	glUniformMatrix4fv(glGetUniformLocation(pointSprite_shader, "m_matrix"), 1, GL_FALSE, &particle_models[particle_index][0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(pointSprite_shader, "v_matrix"), 1, GL_FALSE, &View[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(pointSprite_shader, "p_matrix"), 1, GL_FALSE, &Projection[0][0]);
+	glUniform1i(glGetUniformLocation(pointSprite_shader, "speed"), gundam_speed * 10);
+	glUniform1i(glGetUniformLocation(pointSprite_shader, "particle_size"), particle_size);
+	glUniform3fv(glGetUniformLocation(pointSprite_shader, "cameraPos"), 1, &cameraPos[0]);
+
+	glEnable(GL_POINT_SPRITE);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, particle_texture);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+	glBindVertexArray(particleVAO[particle_index]);
+	glDrawArrays(GL_POINTS, 0, NUM_PARTICLE[particle_index]);
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	particle_time++;
+	if (particle_time > 2147483646) particle_time = 0;
 	glUseProgram(0);
 }
 

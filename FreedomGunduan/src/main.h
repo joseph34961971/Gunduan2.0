@@ -115,7 +115,8 @@ GLuint diamond_shader;
 GLuint texture_shader;
 GLuint radialBlur_shader;
 GLuint shadow_shader;
-GLuint shadowdebug_shader;
+GLuint shadowDebug_shader;
+GLuint pointSprite_shader;
 #define ORIGIN 0
 #define GRAY 1
 #define UNIFORM 2
@@ -214,7 +215,7 @@ void initScreenQuad();
 void drawScreenQuad();
 
 void drawEarth();
-GLint loadTexture(string path);
+GLint loadTexture(string path, bool transparent = false);
 GLuint sphere_vao;
 size_t sphere_indices_size;
 GLuint sphereGenerator(int subdivision_level);
@@ -291,6 +292,28 @@ void renderDepthMapEnd();
 void drawGunduan(bool drawShadow = false);
 
 bool drawToonShading;
+
+const int NUM_PARTICLE[4] = { 50, 50, 100, 100 };
+const int NUM_PARTICLE_SYSTEM = 4;
+mat4 particle_models[NUM_PARTICLE_SYSTEM];
+vec3 particle_center[NUM_PARTICLE_SYSTEM];
+vec3 particle_angle[NUM_PARTICLE_SYSTEM];
+mat4 particle_parent_models[NUM_PARTICLE_SYSTEM];
+GLuint particleVAO[NUM_PARTICLE_SYSTEM];
+GLuint particleBuffer[NUM_PARTICLE_SYSTEM];
+vec3 particle_range[NUM_PARTICLE_SYSTEM];
+vec3 particle_limit[NUM_PARTICLE_SYSTEM];
+GLint particle_texture;
+int particle_time = 0;
+const int particle_size = 1800;
+#define PARTICLEWING 0
+#define PARTICLEWING2 1
+#define PARTICLELEFTWING 2
+#define PARTICLERIGHTWING 3
+void initPointSprite();
+void drawPointSprite(int particle_index);
+bool drawParticleSystem;
+vec3 cameraPos;
 
 //void initOpenAL();
 //ALCdevice* device = nullptr;
