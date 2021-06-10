@@ -2822,7 +2822,6 @@ void drawGunduan(bool drawShadow)
 				glUniform1f(glGetUniformLocation(gundaun_shader, "dissolveThreshold"), t_drawDissolveGray / 100.0f);
 				glUniform1i(glGetUniformLocation(gundaun_shader, "toonShading"), drawToonShading);
 				glUniform1f(glGetUniformLocation(gundaun_shader, "alpha"), 1.0f);
-				glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 1);
 				glUniformMatrix4fv(glGetUniformLocation(gundaun_shader, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
 			}
 			else // diamond
@@ -2884,16 +2883,19 @@ void drawGunduan(bool drawShadow)
 					glUniform3fv(M_KdID, 1, &KDs[mtlname][0]);
 					glUniform3fv(M_KsID, 1, &Ks[0]);
 				}
+
 				if (!((i == LEFTARMGUN && !drawRifle) || (i == RIGHTLEGBLADE && !drawBlade)))
 				{
-					if (i == RIGHTLEGBLADE)
+					if (i == RIGHTLEGBLADE || (mtlname == "freedom:eyeColor" && (j + 1 == 46 || j + 1 == 42))) // 42 or 46 is index of eyes
 						glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 0); // The blade has own lighting
+					else
+						glUniform1i(glGetUniformLocation(gundaun_shader, "useLighting"), 1);
 					glDrawArrays(GL_TRIANGLES, vertexIDoffset, faces[i][j + 1] * 3);
 				}
 			}
 			//we draw triangles by giving the glVertexID base and vertex count is face count*3
 			vertexIDoffset += faces[i][j + 1] * 3;//glVertexID's base offset is face count*3
-		}//end for loop for draw one part of the robot	
+		}//end for loop for draw one part of the robot
 
 		//unbind VAO
 		glBindVertexArray(0);

@@ -112,7 +112,7 @@ void main(void)
         }
     }
 
-    if (toonShading)
+    if (toonShading && useLighting)
     {
         float colorIntensity;
         float intensity = dot(normalize(vVaryingLightDir), normalize(vVaryingNormal));
