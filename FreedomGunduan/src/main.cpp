@@ -137,7 +137,7 @@ void resetObj(int f)
 	drawDissolveGray = false;
 	recordLastBladeModels = false;
 	openRadialBlur = false;
-	drawToonShading = true;
+	drawToonShading = false;
 	drawParticleSystem = true;
 
 	for (int i = 0; i < PARTSNUM; i++)
@@ -841,6 +841,8 @@ void updateObj(int frame)
 	}
 	else if (action == Opening)
 	{
+		drawToonShading = true;
+
 		if (second_current == 0 && frame == 0)
 		{
 			earth_pos = earth_pos_begin;
@@ -884,6 +886,8 @@ void updateObj(int frame)
 	}
 	else if (action == Shoot)
 	{
+		drawToonShading = true;
+
 		if (second_current == 0 && frame < 15)
 		{
 			angles[LEFTINSIDEBIGWING][Z] -= 8.0f;
@@ -975,6 +979,8 @@ void updateObj(int frame)
 	}
 	else if (action == AllShoot)
 	{
+		drawToonShading = true;
+
 		if (second_current == 0 && frame < 15)
 		{
 			angles[LEFTGUN][Z] -= 12.0f;
@@ -1062,6 +1068,8 @@ void updateObj(int frame)
 	}
 	else if (action == DrawSaber)
 	{
+		drawToonShading = true;
+
 		if (second_current == 0 && frame > 40)
 		{
 			recordLastBladeModels = true;
