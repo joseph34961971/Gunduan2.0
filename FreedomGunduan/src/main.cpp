@@ -367,14 +367,14 @@ void resetObj(int f)
 void updateObj(int frame)
 {
 	if (eyeAngleY < eyeAngleYGoal - 0.1f)
-		eyeAngleY += 0.4f;
+		eyeAngleY += 0.8f;
 	else if (eyeAngleY > eyeAngleYGoal + 0.1f)
-		eyeAngleY -= 0.4f;
+		eyeAngleY -= 0.8f;
 
 	if (eyeAngleX < eyeAngleXGoal - 0.1f)
-		eyeAngleX += 0.4f;
+		eyeAngleX += 0.8f;
 	else if (eyeAngleX > eyeAngleXGoal + 0.1f)
-		eyeAngleX -= 0.4f;
+		eyeAngleX -= 0.8f;
 
 	if (eyeX < eyeXGoal - 0.1f)
 		eyeX += 0.4f;
@@ -1402,10 +1402,10 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	float eyey = DOR(eyeAngleY);
-	cameraPos = vec3(eyedistance * sin(eyey) + eyeX, 2 + eyeheight, eyedistance * cos(eyey));
-	mat4 cameraModel = translate(mat4(1.0), cameraPos);
+	cameraPos = vec3(eyeX, 2 + eyeheight, eyedistance);
+	mat4 cameraModel = rotate(mat4(1.0), eyeAngleY, vec3(0, 1, 0));
 	cameraModel = rotate(cameraModel, eyeAngleX, vec3(1, 0, 0));
-	cameraModel = translate(cameraModel, -cameraPos);
+	cameraPos = vec3(cameraModel * vec4(cameraPos, 1.0));
 	vec3 cameraCenter = vec3(cameraModel * vec4(eyeX, eyeheight, 0, 1));
 	mat4 cameraUpRotation = rotate(mat4(1.0), eyeAngleX, vec3(1, 0, 0));
 	vec3 cameraUp = vec3(cameraUpRotation * vec4(0, 1, 0, 1));
@@ -2059,23 +2059,23 @@ void Keyboard(unsigned char key, int x, int y)
 		break;
 	case 'q':
 	case 'Q':
-		if (eyeAngleYGoal > eyeAngleY - 10)
-			eyeAngleYGoal -= 10;
+		if (eyeAngleYGoal > eyeAngleY - 12)
+			eyeAngleYGoal -= 12;
 		break;
 	case 'e':
 	case 'E':
-		if (eyeAngleYGoal < eyeAngleY + 10)
-			eyeAngleYGoal += 10;
+		if (eyeAngleYGoal < eyeAngleY + 12)
+			eyeAngleYGoal += 12;
 		break;
 	case 'r':
 	case 'R':
-		if (eyeAngleXGoal < eyeAngleX + 10)
-			eyeAngleXGoal += 10;
+		if (eyeAngleXGoal > eyeAngleX - 12)
+			eyeAngleXGoal -= 12;
 		break;
 	case 'f':
 	case 'F':
-		if (eyeAngleXGoal > eyeAngleX - 10)
-			eyeAngleXGoal -= 10;
+		if (eyeAngleXGoal < eyeAngleX + 12)
+			eyeAngleXGoal += 12;
 		break;
 	}
 	glutPostRedisplay();
