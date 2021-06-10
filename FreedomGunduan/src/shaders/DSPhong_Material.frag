@@ -74,10 +74,10 @@ vec3 gray(vec3 color)
 
 void main(void)
 { 
-    if (useLighting)
-    {
-		float shadow = ShadowCalculation(FragPosLightSpace);
+	float shadow = ShadowCalculation(FragPosLightSpace);
 
+    if (!toonShading && useLighting)
+    {
         // Dot product gives us diffuse intensity
         float diff = max(0.0, dot(normalize(vVaryingNormal),
 					    normalize(vVaryingLightDir)));
@@ -123,7 +123,7 @@ void main(void)
         else if (intensity > 0.25) colorIntensity = 0.4;
         else                       colorIntensity = 0.2;
 
-        vFragColor = vec4(Material.Kd * colorIntensity, 1.0);
+        vFragColor = vec4((1.0 - shadow / 2.0) * Material.Kd * colorIntensity, 1.0);
     }
 
     vFragColor = vec4(vec3(vFragColor), alpha);

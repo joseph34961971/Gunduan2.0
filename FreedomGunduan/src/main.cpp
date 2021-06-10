@@ -2743,7 +2743,7 @@ void generatingDepthMap()
 void setLightSpaceMatrix()
 {
 	float ortho_size = 32.0f;
-	float near_plane = 0.1f, far_plane = ortho_size * 0.95f * 2.5;
+	float near_plane = 0.1f, far_plane = ortho_size * 0.95f * 3.0;
 	mat4 lightProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
 	mat4 lightView = glm::lookAt(vec3(light_pos), vec3(0.0), vec3(0.0, 0.0, -1.0));
 	lightSpaceMatrix = lightProjection * lightView;
