@@ -265,7 +265,7 @@ int asteroids_uvs_size[ASTEROIDNUM];
 int asteroids_normals_size[ASTEROIDNUM];
 void load2AsteroidBuffer(char* obj, int i);
 GLint asteroids_textures[ASTEROIDNUM];
-void drawAsteroids();
+void drawAsteroids(bool drawShadow = false);
 #define ASTEROIDAMOUNT 500
 vec3 asteroids_pos[ASTEROIDAMOUNT];
 vec3 asteroids_scale[ASTEROIDAMOUNT];

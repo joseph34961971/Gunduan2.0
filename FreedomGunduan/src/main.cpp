@@ -123,7 +123,7 @@ void idle(int dummy)
 
 void resetObj(int f)
 {
-	light_pos = vec3(0, 10, 0);
+	light_pos = vec3(10, 50, 5);
 
 	fly_position = 0.0;
 
@@ -1247,8 +1247,8 @@ void updateObj(int frame)
 		 asteroids_species[asteroids_index] = rand() % ASTEROIDNUM;
 		 do
 		 {
-			 asteroids_pos[asteroids_index] = vec3(rand() % 200 - 100, rand() % 200 - 100, rand() % 1000 - 500);
-		 } while (distance(vec2(asteroids_pos[asteroids_index].x, asteroids_pos[asteroids_index].y), vec2(positions[BODY][X], positions[BODY][Y])) < 50.0f);
+			 asteroids_pos[asteroids_index] = vec3(rand() % 100 - 50, rand() % 100 - 50, rand() % 1000 - 500);
+		 } while (distance(vec2(asteroids_pos[asteroids_index].x, asteroids_pos[asteroids_index].y), vec2(positions[BODY][X], positions[BODY][Y])) < 40.0f);
 		 asteroids_scale[asteroids_index] = vec3(rand() % 8);
 	 }
 
@@ -1449,6 +1449,7 @@ void display()
 
 	renderDepthMapBegin();
 	drawGunduan(true);
+	drawAsteroids(true);
 	renderDepthMapEnd();
 
 	if (pps != ORIGIN || openRadialBlur)
@@ -2637,9 +2638,11 @@ void load2AsteroidBuffer(char* obj, int i)
 	asteroids_normals_size[i] = normals.size();
 }
 
-void drawAsteroids()
+void drawAsteroids(bool drawShadow)
 {
-	glUseProgram(basic_shader);
+	if (!drawShadow)
+		glUseProgram(basic_shader);
+
 	for (int asteroids_index = 0; asteroids_index < ASTEROIDAMOUNT; asteroids_index++)
 	{
 		glBindVertexArray(asteroids_VAO);
@@ -2647,11 +2650,18 @@ void drawAsteroids()
 		mat4 model_matrix = mat4();
 		model_matrix = translate(model_matrix, asteroids_pos[asteroids_index]);
 		model_matrix = scale(model_matrix, asteroids_scale[asteroids_index]);
-		glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-		glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, asteroids_textures[asteroids_species[asteroids_index]]);
-		glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+		if (drawShadow)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(shadow_shader, "model"), 1, GL_FALSE, &model_matrix[0][0]);
+		}
+		else
+		{
+			glUniformMatrix4fv(glGetUniformLocation(basic_shader, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform3fv(glGetUniformLocation(basic_shader, "vLightPosition"), 1, &light_pos[0]);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, asteroids_textures[asteroids_species[asteroids_index]]);
+			glUniform1i(glGetUniformLocation(basic_shader, "u_texture"), 0);
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, asteroids_VBOs[asteroids_species[asteroids_index]]);
 		// 1rst attribute buffer : vertices
@@ -2697,7 +2707,8 @@ void drawAsteroids()
 		glBindVertexArray(0);
 	}
 	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
+	if (!drawShadow)
+		glUseProgram(0);
 }
 
 void generatingDepthMap()
@@ -2732,7 +2743,7 @@ void generatingDepthMap()
 void setLightSpaceMatrix()
 {
 	float ortho_size = 32.0f;
-	float near_plane = 0.1f, far_plane = ortho_size * 0.95f;
+	float near_plane = 0.1f, far_plane = ortho_size * 0.95f * 2.5;
 	mat4 lightProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
 	mat4 lightView = glm::lookAt(vec3(light_pos), vec3(0.0), vec3(0.0, 0.0, -1.0));
 	lightSpaceMatrix = lightProjection * lightView;
@@ -2888,7 +2899,9 @@ void drawGunduan(bool drawShadow)
 		glBindVertexArray(0);
 	}//end for loop for updating and drawing model
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
+
+	if (!drawShadow)
+		glUseProgram(0);
 }
 
 void initPointSprite()
