@@ -31,7 +31,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/pointSprite.vert
     ${SRC_DIR}shaders/pointSprite.frag
     ${SRC_DIR}shaders/mosaic.vert
-    ${SRC_DIR}shaders/mosaic.frag)
+    ${SRC_DIR}shaders/mosaic.frag
+    ${SRC_DIR}shaders/whiteNoise.vert
+    ${SRC_DIR}shaders/whiteNoise.frag)
 
 include_directories(${INCLUDE_DIR})
 
