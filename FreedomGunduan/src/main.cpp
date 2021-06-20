@@ -63,6 +63,7 @@ int main(int argc, char** argv)
 	glutAddMenuEntry("Uniform", 2);
 	glutAddMenuEntry("Gaussian", 3);
 	glutAddMenuEntry("Shadow Debug", 4);
+	glutAddMenuEntry("Mosaic", 5);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);	//與右鍵關聯
 
 	glutCreateMenu(menuEvents);//建立右鍵菜單
@@ -137,6 +138,8 @@ void resetObj(int f)
 	drawDissolveGray = false;
 	recordLastBladeModels = false;
 	openRadialBlur = false;
+	openMosaic = false;
+	openWhiteNoise = false;
 	drawToonShading = false;
 	drawParticleSystem = true;
 
@@ -501,6 +504,7 @@ void updateObj(int frame)
 	{
 		if (second_current % 2 == 0)
 		{
+			openMosaic = true;
 			angles[RIGHTSHOULDER][X] -= 1.5f;
 
 			angles[LEFTSHOULDER][X] -= 1.5f;
@@ -590,6 +594,7 @@ void updateObj(int frame)
 		}
 		else if ((second_current == 2 && frame < 15))
 		{
+			openMosaic = true;
 			angles[BODY][Y] += 6.0f;
 
 			angles[LEFTSHOULDER][X] += 1.5f;
@@ -975,6 +980,17 @@ void updateObj(int frame)
 		if (second_current == 4)
 		{
 			rifle_shooting = false;
+			//openWhiteNoise = true;
+			if (frame < 10)
+				openWhiteNoise = true;
+			else if (frame < 20)
+				openWhiteNoise = false;
+			else if (frame < 30)
+				openWhiteNoise = true;
+			else if (frame < 40)
+				openWhiteNoise = false;
+			else if (frame < 50)
+				openWhiteNoise = true;
 		}
 	}
 	else if (action == AllShoot)
@@ -1057,10 +1073,33 @@ void updateObj(int frame)
 			rcannon_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
 			lrailgun_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
 			rrailgun_beam_offset = vec3(0, 0, (frame + 60) * beam_speed);
+			//openWhiteNoise = true;
+
+			if (frame < 10)
+				openWhiteNoise = true;
+			else if (frame < 20)
+				openWhiteNoise = false;
+			else if (frame < 30)
+				openWhiteNoise = true;
+			else if (frame < 40)
+				openWhiteNoise = false;
+			else if (frame < 50)
+				openWhiteNoise = true;
 		}
 
 		if (second_current == 3)
 		{
+			/*if (frame < 10)
+				openWhiteNoise = true;
+			else if (frame < 20)
+				openWhiteNoise = false;
+			else if (frame < 30)
+				openWhiteNoise = true;
+			else if (frame < 40)
+				openWhiteNoise = false;
+			else if (frame < 50)
+				openWhiteNoise = true;*/
+
 			rifle_shooting = false;
 			cannon_shooting = false;
 			railgun_shooting = false;
@@ -1273,6 +1312,18 @@ void updateObj(int frame)
 		 { GL_NONE, NULL } };
 	 gray_shader = LoadShaders(gray_shaders);//讀取shader
 
+	 ShaderInfo mosaic_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/mosaic.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/mosaic.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 mosaic_shader = LoadShaders(mosaic_shaders);//讀取shader
+
+	 ShaderInfo whiteNoise_shaders[] = {
+		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/whiteNoise.vert" },//vertex shader
+		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/whiteNoise.frag" },//fragment shader
+		 { GL_NONE, NULL } };
+	 whiteNoise_shader = LoadShaders(whiteNoise_shaders);//讀取shader
+
 	 ShaderInfo uniform_shaders[] = {
 		 { GL_VERTEX_SHADER, "../FreedomGunduan/src/shaders/uniform.vert" },//vertex shader
 		 { GL_FRAGMENT_SHADER, "../FreedomGunduan/src/shaders/uniform.frag" },//fragment shader
@@ -1452,7 +1503,7 @@ void display()
 	drawAsteroids(true);
 	renderDepthMapEnd();
 
-	if (pps != ORIGIN || openRadialBlur)
+	if (pps != ORIGIN || openRadialBlur || openMosaic)
 		renderScreenBegin();
 
 	drawGunduan();
@@ -1527,7 +1578,7 @@ void display()
 	}
 	glDisable(GL_BLEND);
 
-	if (pps != ORIGIN || openRadialBlur)
+	if (pps != ORIGIN || openRadialBlur || openMosaic || openWhiteNoise)
 	{
 		renderScreenEnd();
 
@@ -2318,10 +2369,15 @@ void drawScreenQuad()
 		glUseProgram(uniform_shader);
 	else if (pps == GAUSSIAN)
 		glUseProgram(gaussian_shader);
+	else if (pps == MOSAIC || openMosaic)
+		glUseProgram(mosaic_shader);
+	else if (openWhiteNoise)
+		glUseProgram(whiteNoise_shader);
 	else if (openRadialBlur)
 		glUseProgram(radialBlur_shader);
 	else if (pps == DRAWSHADOWDEBUG)
 		glUseProgram(shadowDebug_shader);
+	
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, screen_id);
@@ -2334,6 +2390,15 @@ void drawScreenQuad()
 		glUniform1i(glGetUniformLocation(gaussian_shader, "screen"), 0);
 		glUniform2fv(glGetUniformLocation(gaussian_shader, "img_size"), 1, &vec2(screen_width, screen_height)[0]);
 	}
+	else if (pps == MOSAIC || openMosaic)
+	{
+		glUniform1i(glGetUniformLocation(mosaic_shader, "screen"), 0);
+		glUniform2fv(glGetUniformLocation(mosaic_shader, "img_size"), 1, &vec2(screen_width, screen_height)[0]);
+	}
+	else if (openWhiteNoise)
+	{
+		glUniform1f(glGetUniformLocation(whiteNoise_shader, "u_time"), float(rand()));
+	}
 	else if (openRadialBlur)
 		glUniform1i(glGetUniformLocation(radialBlur_shader, "screen"), 0);
 	else if (pps == DRAWSHADOWDEBUG)
@@ -2343,6 +2408,7 @@ void drawScreenQuad()
 		glUniform1f(glGetUniformLocation(shadowDebug_shader, "near_plane"), 0.1f);
 		glUniform1f(glGetUniformLocation(shadowDebug_shader, "far_plane"), 1000.0f);
 	}
+
 	glBindVertexArray(screen_quad_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);

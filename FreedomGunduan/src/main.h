@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <math.h>
+#include <cmath>
 using namespace std;
 //#include <cmath>
 
@@ -108,6 +110,8 @@ GLuint asteroids_VAO;
 GLuint gundaun_shader;
 GLuint skybox_shader;
 GLuint gray_shader;
+GLuint mosaic_shader;
+GLuint whiteNoise_shader;
 GLuint uniform_shader;
 GLuint gaussian_shader;
 GLuint basic_shader;
@@ -122,6 +126,7 @@ GLuint pointSprite_shader;
 #define UNIFORM 2
 #define GAUSSIAN 3
 #define DRAWSHADOWDEBUG 4
+#define	MOSAIC 5
 int pps;
 bool JumpingJack_beginpose = true;
 bool GangnanStyle_rightfoot = false;
@@ -272,6 +277,8 @@ vec3 asteroids_scale[ASTEROIDAMOUNT];
 int asteroids_species[ASTEROIDAMOUNT];
 float gundam_speed = 0.5f;
 bool openRadialBlur;
+bool openMosaic;
+bool openWhiteNoise;
 
 bool drawRifle;
 bool drawBlade;
@@ -292,6 +299,7 @@ void renderDepthMapEnd();
 void drawGunduan(bool drawShadow = false);
 
 bool drawToonShading;
+
 
 const int NUM_PARTICLE[4] = { 50, 50, 100, 100 };
 const int NUM_PARTICLE_SYSTEM = 4;
